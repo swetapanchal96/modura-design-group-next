@@ -1,168 +1,161 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  /* ========================================
+    /* ========================================
      MODURA BRAND COLORS
   ======================================== */
 
-  --modura-primary: #0b1d33;
-  --modura-primary-light: #1d3349;
-  --modura-primary-dark: #061322;
+    --modura-primary: #0b1d33;
+    --modura-primary-light: #1d3349;
+    --modura-primary-dark: #061322;
 
-  --modura-secondary: #596a79;
-  --modura-secondary-light: #84919c;
-  --modura-secondary-dark: #3e4d5a;
+    --modura-secondary: #596a79;
+    --modura-secondary-light: #84919c;
+    --modura-secondary-dark: #3e4d5a;
 
-  /* ========================================
+    /* ========================================
      NEUTRAL COLORS
   ======================================== */
 
-  --modura-white: #ffffff;
-  --modura-black: #000000;
+    --modura-white: #ffffff;
+    --modura-black: #000000;
 
-  --modura-off-white: #f7f8f8;
-  --modura-light: #eef1f3;
+    --modura-off-white: #f7f8f8;
+    --modura-light: #eef1f3;
 
-  --modura-gray-100: #f4f5f6;
-  --modura-gray-200: #e4e7e9;
-  --modura-gray-300: #cdd2d6;
-  --modura-gray-400: #9ca5ad;
-  --modura-gray-500: #6f7a84;
-  --modura-gray-600: #505b65;
-  --modura-gray-700: #38434d;
-  --modura-gray-800: #202b35;
-  --modura-gray-900: #111a23;
+    --modura-gray-100: #f4f5f6;
+    --modura-gray-200: #e4e7e9;
+    --modura-gray-300: #cdd2d6;
+    --modura-gray-400: #9ca5ad;
+    --modura-gray-500: #6f7a84;
+    --modura-gray-600: #505b65;
+    --modura-gray-700: #38434d;
+    --modura-gray-800: #202b35;
+    --modura-gray-900: #111a23;
 
-  /* ========================================
+    /* ========================================
      SEMANTIC COLORS
   ======================================== */
 
-  --background: var(--modura-white);
-  --foreground: var(--modura-primary);
+    --background: var(--modura-white);
+    --foreground: var(--modura-primary);
 
-  --heading-color: var(--modura-primary);
-  --text-color: var(--modura-gray-600);
-  --muted-text: var(--modura-gray-500);
+    --heading-color: var(--modura-primary);
+    --text-color: var(--modura-gray-600);
+    --muted-text: var(--modura-gray-500);
 
-  --border-color: var(--modura-gray-200);
+    --border-color: var(--modura-gray-200);
 
-  --section-light: var(--modura-off-white);
-  --section-dark: var(--modura-primary);
+    --section-light: var(--modura-off-white);
+    --section-dark: var(--modura-primary);
 
-  /* ========================================
+    /* ========================================
      TRANSITIONS
   ======================================== */
 
-  --transition-base: 0.3s ease;
+    --transition-base: 0.3s ease;
 }
-
 
 /* ========================================
    TAILWIND THEME
 ======================================== */
 
 @theme inline {
+    /* Brand */
 
-  /* Brand */
+    --color-modura-primary: var(--modura-primary);
+    --color-modura-primary-light: var(--modura-primary-light);
+    --color-modura-primary-dark: var(--modura-primary-dark);
 
-  --color-modura-primary: var(--modura-primary);
-  --color-modura-primary-light: var(--modura-primary-light);
-  --color-modura-primary-dark: var(--modura-primary-dark);
+    --color-modura-secondary: var(--modura-secondary);
+    --color-modura-secondary-light: var(--modura-secondary-light);
+    --color-modura-secondary-dark: var(--modura-secondary-dark);
 
-  --color-modura-secondary: var(--modura-secondary);
-  --color-modura-secondary-light: var(--modura-secondary-light);
-  --color-modura-secondary-dark: var(--modura-secondary-dark);
+    /* Neutral */
 
+    --color-modura-white: var(--modura-white);
+    --color-modura-black: var(--modura-black);
 
-  /* Neutral */
+    --color-modura-off-white: var(--modura-off-white);
+    --color-modura-light: var(--modura-light);
 
-  --color-modura-white: var(--modura-white);
-  --color-modura-black: var(--modura-black);
+    /* Gray */
 
-  --color-modura-off-white: var(--modura-off-white);
-  --color-modura-light: var(--modura-light);
+    --color-modura-gray-100: var(--modura-gray-100);
+    --color-modura-gray-200: var(--modura-gray-200);
+    --color-modura-gray-300: var(--modura-gray-300);
+    --color-modura-gray-400: var(--modura-gray-400);
+    --color-modura-gray-500: var(--modura-gray-500);
+    --color-modura-gray-600: var(--modura-gray-600);
+    --color-modura-gray-700: var(--modura-gray-700);
+    --color-modura-gray-800: var(--modura-gray-800);
+    --color-modura-gray-900: var(--modura-gray-900);
 
+    /* Semantic */
 
-  /* Gray */
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
 
-  --color-modura-gray-100: var(--modura-gray-100);
-  --color-modura-gray-200: var(--modura-gray-200);
-  --color-modura-gray-300: var(--modura-gray-300);
-  --color-modura-gray-400: var(--modura-gray-400);
-  --color-modura-gray-500: var(--modura-gray-500);
-  --color-modura-gray-600: var(--modura-gray-600);
-  --color-modura-gray-700: var(--modura-gray-700);
-  --color-modura-gray-800: var(--modura-gray-800);
-  --color-modura-gray-900: var(--modura-gray-900);
+    --color-heading: var(--heading-color);
+    --color-text: var(--text-color);
+    --color-muted: var(--muted-text);
 
+    --color-border: var(--border-color);
 
-  /* Semantic */
-
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-
-  --color-heading: var(--heading-color);
-  --color-text: var(--text-color);
-  --color-muted: var(--muted-text);
-
-  --color-border: var(--border-color);
-
-  --color-section-light: var(--section-light);
-  --color-section-dark: var(--section-dark);
+    --color-section-light: var(--section-light);
+    --color-section-dark: var(--section-dark);
 }
-
 
 /* ========================================
    GLOBAL
 ======================================== */
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html {
-  scroll-behavior: smooth;
+    scroll-behavior: smooth;
 }
 
 body {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 
-  background: var(--background);
-  color: var(--text-color);
+    background: var(--background);
+    color: var(--text-color);
 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+    color: inherit;
+    text-decoration: none;
 }
 
 button,
 a {
-  transition: var(--transition-base);
+    transition: var(--transition-base);
 }
 
 img {
-  max-width: 100%;
-  height: auto;
+    max-width: 100%;
+    height: auto;
 }
 
-
 .modura-hero-pagination .swiper-pagination-bullet {
-  width: 9px;
-  height: 9px;
-  margin: 0 !important;
-  opacity: 0.65;
-  background: var(--modura-white);
-  transition: var(--transition-base);
+    width: 9px;
+    height: 9px;
+    margin: 0 !important;
+    opacity: 0.65;
+    background: var(--modura-white);
+    transition: var(--transition-base);
 }
 
 .modura-hero-pagination .swiper-pagination-bullet-active {
-  width: 28px;
-  border-radius: 30px;
-  opacity: 1;
-  background: var(--modura-secondary-light);
+    width: 28px;
+    border-radius: 30px;
+    opacity: 1;
+    background: var(--modura-secondary-light);
 }
