@@ -33,31 +33,31 @@ type ServiceCategory = {
 const companyLinks = [
     {
         title: 'About Modura',
-        href: '/company/about',
+        href: '#',
     },
     {
         title: 'Why Choose Us',
-        href: '/company/why-us',
+        href: '#',
     },
     {
         title: 'Our Team',
-        href: '/company/team',
+        href: '#',
     },
     {
         title: 'Quality Policy',
-        href: '/company/quality-policy',
+        href: '#',
     },
     {
         title: 'Certifications',
-        href: '/company/certifications',
+        href: '#',
     },
     {
         title: 'Testimonials',
-        href: '/company/testimonials',
+        href: '#',
     },
     {
         title: 'FAQs',
-        href: '/company/faqs',
+        href: '#',
     },
 ];
 
@@ -68,400 +68,400 @@ const companyLinks = [
 const serviceCategories: ServiceCategory[] = [
     {
         title: 'CAD Drafting Services',
-        href: '/services/cad-drafting-services',
+        href: '#',
         description:
             'Accurate CAD drafting and technical documentation for architecture, engineering and construction projects.',
         services: [
             {
                 title: '2D CAD Drafting',
-                href: '/services/cad-drafting-services/2d-cad-drafting',
+                href: '#',
             },
             {
                 title: 'CAD Conversion',
-                href: '/services/cad-drafting-services/cad-conversion',
+                href: '#',
             },
             {
                 title: 'As-Built Drawings',
-                href: '/services/cad-drafting-services/as-built-drawings',
+                href: '#',
             },
             {
                 title: 'Construction Drawings',
-                href: '/services/cad-drafting-services/construction-drawings',
+                href: '#',
             },
             {
                 title: 'PDF / Sketch to CAD',
-                href: '/services/cad-drafting-services/pdf-sketch-to-cad',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Architectural Engineering',
-        href: '/services/architectural-engineering',
+        href: '#',
         description:
             'Architectural planning, documentation, modelling and visualization for coordinated project delivery.',
         services: [
             {
                 title: 'Architectural Drafting',
-                href: '/services/architectural-engineering/architectural-drafting',
+                href: '#',
             },
             {
                 title: 'Architectural Planning',
-                href: '/services/architectural-engineering/architectural-planning',
+                href: '#',
             },
             {
                 title: 'Architectural Modeling',
-                href: '/services/architectural-engineering/architectural-modeling',
+                href: '#',
             },
             {
                 title: 'Architectural Renderings',
-                href: '/services/architectural-engineering/architectural-renderings',
+                href: '#',
             },
             {
                 title: 'Architectural Walkthroughs',
-                href: '/services/architectural-engineering/architectural-walkthroughs',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Structural Engineering',
-        href: '/services/structural-engineering',
+        href: '#',
         description:
             'Structural analysis, design and detailing solutions for safe, coordinated and constructible building systems.',
         services: [
             {
                 title: 'Residential Structural Design',
-                href: '/services/structural-engineering/residential-structural-design',
+                href: '#',
             },
             {
                 title: 'Structural Steel Detailing',
-                href: '/services/structural-engineering/structural-steel-detailing',
+                href: '#',
             },
             {
                 title: 'Reinforcement Detailing',
-                href: '/services/structural-engineering/reinforcement-detailing',
+                href: '#',
             },
             {
                 title: 'Steel / Concrete Structures',
-                href: '/services/structural-engineering/steel-concrete-structures',
+                href: '#',
             },
             {
                 title: 'Structural Steel Frame Analysis',
-                href: '/services/structural-engineering/structural-steel-frame-analysis',
+                href: '#',
             },
             {
                 title: 'Structural Calculations',
-                href: '/services/structural-engineering/structural-calculations',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Building Information Modeling',
-        href: '/services/building-information-modeling',
+        href: '#',
         description: 'Integrated BIM workflows connecting design, coordination, construction and project information.',
         services: [
             {
                 title: 'Architectural BIM',
-                href: '/services/building-information-modeling/architectural-bim',
+                href: '#',
             },
             {
                 title: 'Structural BIM',
-                href: '/services/building-information-modeling/structural-bim',
+                href: '#',
             },
             {
                 title: 'MEP BIM',
-                href: '/services/building-information-modeling/mep-bim',
+                href: '#',
             },
             {
                 title: 'Scan to BIM',
-                href: '/services/building-information-modeling/scan-to-bim',
+                href: '#',
             },
             {
                 title: 'Clash Detection',
-                href: '/services/building-information-modeling/clash-detection',
+                href: '#',
             },
             {
                 title: 'BIM Coordination',
-                href: '/services/building-information-modeling/bim-coordination',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'MEP Engineering',
-        href: '/services/mep-engineering',
+        href: '#',
         description: 'Integrated mechanical, electrical and plumbing engineering for coordinated building systems.',
         services: [
             {
                 title: 'MEP Design',
-                href: '/services/mep-engineering/mep-design',
+                href: '#',
             },
             {
                 title: 'MEP Coordination',
-                href: '/services/mep-engineering/mep-coordination',
+                href: '#',
             },
             {
                 title: 'MEP Drafting',
-                href: '/services/mep-engineering/mep-drafting',
+                href: '#',
             },
             {
                 title: 'MEP BIM Modeling',
-                href: '/services/mep-engineering/mep-bim-modeling',
+                href: '#',
             },
             {
                 title: 'MEP Shop Drawings',
-                href: '/services/mep-engineering/mep-shop-drawings',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Mechanical Engineering',
-        href: '/services/mechanical-engineering',
+        href: '#',
         description:
             'Mechanical design, modelling and technical documentation for multidisciplinary engineering projects.',
         services: [
             {
                 title: 'Mechanical Design',
-                href: '/services/mechanical-engineering/mechanical-design',
+                href: '#',
             },
             {
                 title: 'Mechanical Drafting',
-                href: '/services/mechanical-engineering/mechanical-drafting',
+                href: '#',
             },
             {
                 title: '3D Mechanical Modeling',
-                href: '/services/mechanical-engineering/3d-modeling',
+                href: '#',
             },
             {
                 title: 'Mechanical Detailing',
-                href: '/services/mechanical-engineering/mechanical-detailing',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Shop Drawing Services',
-        href: '/services/shop-drawing-services',
+        href: '#',
         description: 'Fabrication and installation-ready shop drawings developed for accurate project execution.',
         services: [
             {
                 title: 'Architectural Shop Drawings',
-                href: '/services/shop-drawing-services/architectural',
+                href: '#',
             },
             {
                 title: 'Structural Shop Drawings',
-                href: '/services/shop-drawing-services/structural',
+                href: '#',
             },
             {
                 title: 'MEP Shop Drawings',
-                href: '/services/shop-drawing-services/mep',
+                href: '#',
             },
             {
                 title: 'Fabrication Drawings',
-                href: '/services/shop-drawing-services/fabrication',
+                href: '#',
             },
             {
                 title: 'Facade Shop Drawings',
-                href: '/services/shop-drawing-services/facade',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Electrical Services',
-        href: '/services/electrical-services',
+        href: '#',
         description: 'Electrical layouts, engineering documentation and coordinated building-services design.',
         services: [
             {
                 title: 'Electrical Design',
-                href: '/services/electrical-services/electrical-design',
+                href: '#',
             },
             {
                 title: 'Electrical Drafting',
-                href: '/services/electrical-services/electrical-drafting',
+                href: '#',
             },
             {
                 title: 'Lighting Layouts',
-                href: '/services/electrical-services/lighting-layouts',
+                href: '#',
             },
             {
                 title: 'Power Distribution',
-                href: '/services/electrical-services/power-distribution',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Plumbing / Piping',
-        href: '/services/plumbing-piping',
+        href: '#',
         description: 'Coordinated plumbing and piping design solutions for building and engineering applications.',
         services: [
             {
                 title: 'Plumbing Design',
-                href: '/services/plumbing-piping/plumbing-design',
+                href: '#',
             },
             {
                 title: 'Piping Design',
-                href: '/services/plumbing-piping/piping-design',
+                href: '#',
             },
             {
                 title: 'Plumbing Drafting',
-                href: '/services/plumbing-piping/plumbing-drafting',
+                href: '#',
             },
             {
                 title: 'Piping Layouts',
-                href: '/services/plumbing-piping/piping-layouts',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'HVAC Engineering',
-        href: '/services/hvac-engineering',
+        href: '#',
         description: 'HVAC design, calculations, layouts and coordinated documentation for efficient building systems.',
         services: [
             {
                 title: 'HVAC System Design',
-                href: '/services/hvac-engineering/system-design',
+                href: '#',
             },
             {
                 title: 'HVAC Load Calculations',
-                href: '/services/hvac-engineering/load-calculations',
+                href: '#',
             },
             {
                 title: 'Duct Layouts',
-                href: '/services/hvac-engineering/duct-layouts',
+                href: '#',
             },
             {
                 title: 'HVAC Piping Design',
-                href: '/services/hvac-engineering/piping-design',
+                href: '#',
             },
             {
                 title: 'HVAC Shop Drawings',
-                href: '/services/hvac-engineering/shop-drawings',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Civil Engineering',
-        href: '/services/civil-engineering',
+        href: '#',
         description: 'Civil engineering and documentation support across planning, design and construction stages.',
         services: [
             {
                 title: 'Civil Drafting',
-                href: '/services/civil-engineering/civil-drafting',
+                href: '#',
             },
             {
                 title: 'Civil Engineering Design',
-                href: '/services/civil-engineering/design',
+                href: '#',
             },
             {
                 title: 'Site Development',
-                href: '/services/civil-engineering/site-development',
+                href: '#',
             },
             {
                 title: 'Construction Documentation',
-                href: '/services/civil-engineering/construction-documentation',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Detailing Services',
-        href: '/services/detailing-services',
+        href: '#',
         description: 'Detailed fabrication and construction documentation developed for accuracy and coordination.',
         services: [
             {
                 title: 'Steel Detailing',
-                href: '/services/detailing-services/steel-detailing',
+                href: '#',
             },
             {
                 title: 'Rebar Detailing',
-                href: '/services/detailing-services/rebar-detailing',
+                href: '#',
             },
             {
                 title: 'Precast Detailing',
-                href: '/services/detailing-services/precast-detailing',
+                href: '#',
             },
             {
                 title: 'Structural Detailing',
-                href: '/services/detailing-services/structural-detailing',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Mass Timber Buildings',
-        href: '/services/mass-timber-buildings',
+        href: '#',
         description: 'Engineering and detailing support for modern mass-timber building systems and assemblies.',
         services: [
             {
                 title: 'Mass Timber Detailing',
-                href: '/services/mass-timber-buildings/detailing',
+                href: '#',
             },
             {
                 title: 'CLT Detailing',
-                href: '/services/mass-timber-buildings/clt-detailing',
+                href: '#',
             },
             {
                 title: 'Glulam Detailing',
-                href: '/services/mass-timber-buildings/glulam-detailing',
+                href: '#',
             },
             {
                 title: 'Timber Shop Drawings',
-                href: '/services/mass-timber-buildings/shop-drawings',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Sheet Metal Design',
-        href: '/services/sheet-metal-design',
+        href: '#',
         description: 'Precision sheet-metal modelling, detailing and fabrication documentation.',
         services: [
             {
                 title: 'Sheet Metal Drafting',
-                href: '/services/sheet-metal-design/drafting',
+                href: '#',
             },
             {
                 title: 'Sheet Metal Detailing',
-                href: '/services/sheet-metal-design/detailing',
+                href: '#',
             },
             {
                 title: 'Fabrication Drawings',
-                href: '/services/sheet-metal-design/fabrication-drawings',
+                href: '#',
             },
             {
                 title: '3D Sheet Metal Modeling',
-                href: '/services/sheet-metal-design/3d-modeling',
+                href: '#',
             },
         ],
     },
 
     {
         title: 'Cladding Engineering',
-        href: '/services/cladding-engineering',
+        href: '',
         description: 'Facade and cladding engineering documentation supporting fabrication and installation.',
         services: [
             {
                 title: 'Cladding Design',
-                href: '/services/cladding-engineering/design',
+                href: '#',
             },
             {
                 title: 'Facade Detailing',
-                href: '/services/cladding-engineering/facade-detailing',
+                href: '#',
             },
             {
                 title: 'Cladding Shop Drawings',
-                href: '/services/cladding-engineering/shop-drawings',
+                href: '#',
             },
             {
                 title: 'Panel Layouts',
-                href: '/services/cladding-engineering/panel-layouts',
+                href: '#',
             },
         ],
     },
@@ -476,31 +476,31 @@ const softwareLinks = [
         title: 'AutoCAD',
         subtitle: 'CAD Drafting',
         icon: PiBlueprint,
-        href: '/software-expertise/autocad',
+        href: '#',
     },
     {
         title: 'Autodesk Revit',
         subtitle: 'BIM & Coordination',
         icon: PiCube,
-        href: '/software-expertise/revit',
+        href: '#',
     },
     {
         title: 'Tekla Structures',
         subtitle: 'Structural Detailing',
         icon: PiBridge,
-        href: '/software-expertise/tekla',
+        href: '#',
     },
     {
         title: 'STAAD.Pro',
         subtitle: 'Structural Analysis',
         icon: PiBuildings,
-        href: '/software-expertise/staad-pro',
+        href: '#',
     },
     {
         title: 'Autodesk Inventor',
         subtitle: 'Mechanical Engineering',
         icon: PiGear,
-        href: '/software-expertise/autodesk-inventor',
+        href: '#',
     },
 ];
 
@@ -511,39 +511,39 @@ const softwareLinks = [
 const portfolioLinks = [
     {
         title: 'Steel Detailing Samples',
-        href: '/portfolio/steel-detailing',
+        href: '#',
     },
     {
         title: 'Rebar Detailing Samples',
-        href: '/portfolio/rebar-detailing',
+        href: '#',
     },
     {
         title: 'Architectural Samples',
-        href: '/portfolio/architectural',
+        href: '#',
     },
     {
         title: 'Structural Samples',
-        href: '/portfolio/structural',
+        href: '#',
     },
     {
         title: 'Facade Shop Drawings',
-        href: '/portfolio/facade-shop-drawings',
+        href: '#',
     },
     {
         title: 'Precast Shop Drawings',
-        href: '/portfolio/precast-shop-drawings',
+        href: '#',
     },
     {
         title: 'BIM Samples',
-        href: '/portfolio/bim',
+        href: '#',
     },
     {
         title: 'Mechanical Detailing',
-        href: '/portfolio/mechanical-detailing',
+        href: '#',
     },
     {
         title: 'Millwork / Joinery',
-        href: '/portfolio/millwork-joinery',
+        href: '#',
     },
 ];
 
@@ -1364,7 +1364,7 @@ export default function Header() {
                     {/* MOBILE CTA */}
 
                     <Link
-                        href="/get-a-quote"
+                        href="#"
                         onClick={() => setMobileMenu(false)}
                         className="bg-modura-primary text-modura-white mt-5 flex h-[52px] items-center justify-between px-5 text-[12px] font-bold tracking-[0.08em] uppercase"
                     >

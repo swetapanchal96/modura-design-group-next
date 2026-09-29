@@ -2,21 +2,32 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-import { FiArrowUpRight, FiX, FiUser, FiMail, FiPhone, FiLayers } from 'react-icons/fi';
+import { FiArrowUpRight, FiX, FiUser, FiMail, FiPhone } from 'react-icons/fi';
 
 import gsap from 'gsap';
 
 const services = [
     'Architecture Design',
+
     'Structural Engineering',
+
     'BIM Services',
+
     'MEP Services',
+
     'CAD Drafting',
+
     'Project Management',
 ];
 
 const InquiryDrawer = () => {
     const [open, setOpen] = useState(false);
+
+    // ADDED FOR CUSTOM SERVICE DROPDOWN
+
+    const [serviceOpen, setServiceOpen] = useState(false);
+
+    const [selectedService, setSelectedService] = useState('Select Service');
 
     const drawerRef = useRef<HTMLDivElement | null>(null);
 
@@ -36,25 +47,30 @@ const InquiryDrawer = () => {
 
             gsap.set(overlayRef.current, {
                 opacity: 0,
+
                 display: 'none',
             });
 
             gsap.set('.inquiry-field', {
                 y: 40,
+
                 opacity: 0,
             });
 
             gsap.set('.inquiry-title', {
                 y: 30,
+
                 opacity: 0,
             });
 
             gsap.set('.inquiry-button', {
                 y: 20,
+
                 opacity: 0,
             });
 
             tlRef.current = gsap
+
                 .timeline({
                     paused: true,
                 })
@@ -65,51 +81,73 @@ const InquiryDrawer = () => {
 
                 .to(overlayRef.current, {
                     opacity: 1,
+
                     duration: 0.4,
+
                     ease: 'power2.out',
                 })
 
                 .to(
                     drawerRef.current,
+
                     {
                         xPercent: 0,
+
                         duration: 0.7,
+
                         ease: 'power4.out',
                     },
+
                     '-=0.2',
                 )
 
                 .to(
                     '.inquiry-title',
+
                     {
                         y: 0,
+
                         opacity: 1,
+
                         duration: 0.6,
+
                         ease: 'power3.out',
                     },
+
                     '-=0.3',
                 )
 
                 .to(
                     '.inquiry-field',
+
                     {
                         y: 0,
+
                         opacity: 1,
+
                         duration: 0.5,
+
                         stagger: 0.12,
+
                         ease: 'power3.out',
                     },
+
                     '-=0.3',
                 )
 
                 .to(
                     '.inquiry-button',
+
                     {
                         y: 0,
+
                         opacity: 1,
+
                         duration: 0.5,
+
                         ease: 'power3.out',
                     },
+
                     '-=0.2',
                 );
         });
@@ -120,9 +158,11 @@ const InquiryDrawer = () => {
     useEffect(() => {
         if (open) {
             tlRef.current?.play();
+
             document.body.style.overflow = 'hidden';
         } else {
             tlRef.current?.reverse();
+
             document.body.style.overflow = '';
         }
 
@@ -198,13 +238,9 @@ const InquiryDrawer = () => {
                     </p>
                 </div>
 
-                {/* FORM */}
+                {/* FORM STARTS IN PART 2 */}
 
-                <form
-                    ref={formRef}
-
-                    className="space-y-5"
-                >
+                <form ref={formRef} className="space-y-5">
                     {/* NAME */}
 
                     <div className="inquiry-field">
@@ -267,18 +303,64 @@ const InquiryDrawer = () => {
 
                     {/* SERVICE */}
 
-                    <div className="inquiry-field">
+                    <div className="inquiry-field relative z-50">
                         <label className="text-modura-gray-400 mb-2 block text-[11px] tracking-widest uppercase">
                             Service
                         </label>
 
-                        <select className="focus:border-modura-secondary w-full border-b border-white/20 bg-transparent py-3 text-sm text-gray-300 outline-none">
-                            <option>Select Service</option>
+                        <button
+                            type="button"
 
-                            {services.map((service) => (
-                                <option key={service}>{service}</option>
-                            ))}
-                        </select>
+                            onClick={() => setServiceOpen(!serviceOpen)}
+
+                            className="hover:border-modura-secondary flex w-full items-center justify-between border-b border-white/20 bg-transparent py-3 text-sm text-gray-300 transition outline-none"
+                        >
+                            <span className={selectedService === 'Select Service' ? 'text-gray-400' : 'text-white'}>
+                                {selectedService}
+                            </span>
+
+                            <svg
+                                className={`h-4 w-4 transition-transform duration-300 ${serviceOpen ? 'rotate-180' : ''} `}
+
+                                fill="none"
+
+                                stroke="currentColor"
+
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+
+                                    strokeLinejoin="round"
+
+                                    strokeWidth="2"
+
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+
+                        {serviceOpen && (
+                            <div className="absolute top-full left-0 z-[9999] mt-2 max-h-[220px] w-full overflow-y-auto border border-white/10 bg-[#13263d] shadow-2xl">
+                                {services.map((service) => (
+                                    <button
+                                        key={service}
+
+                                        type="button"
+
+                                        onClick={() => {
+                                            setSelectedService(service);
+
+                                            setServiceOpen(false);
+                                        }}
+
+                                        className="hover:bg-modura-secondary block w-full px-5 py-3 text-left text-sm text-gray-300 transition-all duration-300 hover:text-white"
+                                    >
+                                        {service}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* DESCRIPTION */}

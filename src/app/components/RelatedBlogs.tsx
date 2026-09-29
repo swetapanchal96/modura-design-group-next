@@ -14,33 +14,26 @@ import blog1 from '@/app/assets/images/about-1.jpg';
 import blog3 from '@/app/assets/images/about-3.jpg';
 
 const blogs = [
-
     {
         title: 'How BIM Is Transforming Modern Construction',
         date: 'June 24, 2026',
         image: blog1.src,
-        desc:
-            'Building Information Modeling (BIM) is revolutionizing the construction industry by improving project coordination, reducing errors.'
+        desc: 'Building Information Modeling (BIM) is revolutionizing the construction industry by improving project coordination, reducing errors.',
     },
-
 
     {
         title: 'Future Trends In Architectural Design',
         date: 'May 18, 2026',
         image: blog3.src,
-        desc:
-            'Modern architectural design is evolving with sustainable materials, advanced technologies, and innovative planning approaches. '
+        desc: 'Modern architectural design is evolving with sustainable materials, advanced technologies, and innovative planning approaches. ',
     },
-
 
     {
         title: 'Key Trends In Structural Engineering',
         date: 'April 12, 2026',
         image: blog1.src,
-        desc:
-            'Structural engineering is moving towards smarter solutions with advanced analysis tools, sustainable practices, and improved construction techniques.'
-    }
-
+        desc: 'Structural engineering is moving towards smarter solutions with advanced analysis tools, sustainable practices, and improved construction techniques.',
+    },
 ];
 
 export default function RelatedBlogs() {
@@ -83,7 +76,7 @@ export default function RelatedBlogs() {
         <section
             ref={sectionRef}
 
-            className="relative overflow-hidden bg-modura-white py-20"
+            className="bg-modura-white relative overflow-hidden py-20"
         >
             {/* blueprint */}
 
@@ -102,7 +95,7 @@ export default function RelatedBlogs() {
 
                         <h2 className="text-[48px] leading-none font-bold text-[#0b1d33] uppercase">
                             Knowledge For
-                            <span className="ml-2 text-modura-secondary"> A Smarter Built World</span>
+                            <span className="text-modura-secondary ml-2"> A Smarter Built World</span>
                         </h2>
                     </div>
 
@@ -139,7 +132,7 @@ export default function RelatedBlogs() {
                             </div>
 
                             <div className="p-7">
-                                <p className="text-xs font-semibold tracking-[0.2em] text-modura-secondary uppercase">
+                                <p className="text-modura-secondary text-xs font-semibold tracking-[0.2em] uppercase">
                                     {blog.date}
                                 </p>
 
@@ -150,11 +143,11 @@ export default function RelatedBlogs() {
                                 {/* CREATIVE BUTTON */}
 
                                 <button className="group/btn mt-7 flex items-center gap-3 text-sm font-bold tracking-wider text-[#0b1d33] uppercase">
-                                    <span className="relative after:absolute after:bottom-[-6px] after:left-0 after:h-[2px] after:w-full after:bg-modura-secondary after:transition-all after:duration-500 group-hover/btn:after:w-[40%]">
+                                    <span className="after:bg-modura-secondary relative after:absolute after:bottom-[-6px] after:left-0 after:h-[2px] after:w-full after:transition-all after:duration-500 group-hover/btn:after:w-[40%]">
                                         Read More
                                     </span>
 
-                                    <span className="flex h-8 w-8 items-center justify-center border border-modura-secondary text-modura-secondary transition-all duration-500 group-hover/btn:bg-modura-secondary group-hover/btn:text-white">
+                                    <span className="border-modura-secondary text-modura-secondary group-hover/btn:bg-modura-secondary flex h-8 w-8 items-center justify-center border transition-all duration-500 group-hover/btn:text-white">
                                         <FiArrowUpRight />
                                     </span>
                                 </button>
