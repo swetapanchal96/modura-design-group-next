@@ -55,7 +55,7 @@ const projects: Project[] = [
         description:
             'Integrated architectural, structural and BIM support developed to deliver coordinated, accurate and buildable residential environments.',
         image: residentialProject,
-        href: '/projects/residential-projects',
+        href: '#',
     },
 
     {
@@ -64,7 +64,7 @@ const projects: Project[] = [
         description:
             'Coordinated design and engineering solutions supporting commercial developments from design documentation through BIM coordination.',
         image: commercialProject,
-        href: '/projects/commercial-projects',
+        href: '#',
     },
 
     {
@@ -73,7 +73,7 @@ const projects: Project[] = [
         description:
             'Engineering-focused project support combining structural systems, MEP coordination and digital modelling for complex industrial facilities.',
         image: industrialProject,
-        href: '/projects/industrial-projects',
+        href: '#',
     },
 
     {
@@ -82,7 +82,7 @@ const projects: Project[] = [
         description:
             'Detailed structural engineering and documentation focused on constructability, coordination and accurate project delivery.',
         image: structuralProject,
-        href: '/projects/structural-samples',
+        href: '#',
     },
 
     {
@@ -91,7 +91,7 @@ const projects: Project[] = [
         description:
             'Multidisciplinary BIM modelling and coordination supporting efficient collaboration between architectural and engineering teams.',
         image: bimProject,
-        href: '/projects/bim-projects',
+        href: '#',
     },
 ];
 
@@ -446,7 +446,7 @@ const ProjectsSection = () => {
 
                     <div ref={buttonRef}>
                         <Link
-                            href="/projects"
+                            href="#"
                             className="group/project-btn border-modura-primary bg-modura-white text-modura-primary relative inline-flex h-[52px] items-center overflow-hidden border pr-[62px] pl-5"
                         >
                             {/* HOVER BACKGROUND */}

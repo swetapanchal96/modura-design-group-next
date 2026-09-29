@@ -17,32 +17,32 @@ const services = [
     {
         title: 'CAD Drafting',
         image: cadDrafting,
-        href: '/services/cad-drafting',
+        href: '#',
     },
     {
         title: 'Architectural Engineering',
         image: architecturalEngineering,
-        href: '/services/architectural-engineering',
+        href: '#',
     },
     {
         title: 'Structural Engineering',
         image: structuralEngineering,
-        href: '/services/structural-engineering',
+        href: '#',
     },
     {
         title: 'BIM Services',
         image: bimServices,
-        href: '/services/bim-services',
+        href: '#',
     },
     {
         title: 'MEP Engineering',
         image: mepEngineering,
-        href: '/services/mep-engineering',
+        href: '#',
     },
     {
         title: 'Shop Drawing',
         image: shopDrawing,
-        href: '/services/shop-drawing',
+        href: '#',
     },
 ];
 
@@ -153,7 +153,7 @@ const ServicesSection = () => {
                         } `}
                     >
                         <Link
-                            href="/services"
+                            href="#"
                             className="group/services-btn border-modura-primary bg-modura-white text-modura-primary relative inline-flex h-[52px] w-fit items-center overflow-hidden border pr-[62px] pl-5"
                         >
                             {/* NAVY HOVER FILL */}

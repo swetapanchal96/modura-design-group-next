@@ -194,7 +194,7 @@ const HeroSection = () => {
                                         {/* EXPLORE */}
 
                                         <Link
-                                            href="/services"
+                                            href="#"
                                             className="group/hero-cta border-modura-white bg-modura-white text-modura-primary relative flex h-[56px] items-center overflow-hidden border pr-[66px] pl-6"
                                         >
                                             {/* NAVY HOVER FILL */}
