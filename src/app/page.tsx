@@ -8,6 +8,8 @@ import Clients from './components/Clients';
 import GlobalPresence from './components/GlobalPresence';
 import TestimonialSection from './components/TestimonialSection';
 import RelatedBlogs from './components/RelatedBlogs';
+import ProjectsNew from './components/ProjectsNew';
+import IndustriesServe from './components/IndustriesServe';
 
 export default function Home() {
     return (
@@ -15,10 +17,12 @@ export default function Home() {
             <HeroSection />
             <AboutSection />
             <ServicesSection />
-            <ProjectsSection />
+            {/* <ProjectsSection /> */}
+            <ProjectsNew />
             <CounterSection />
             <Clients />
-            <GlobalPresence />
+            {/* <GlobalPresence /> */}
+            <IndustriesServe />
             <TestimonialSection />
             <RelatedBlogs />
         </>
