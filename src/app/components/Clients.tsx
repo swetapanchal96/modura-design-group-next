@@ -100,7 +100,7 @@ const Clients = () => {
                         </div>
 
                         <h2 className="text-modura-primary text-[32px] font-semibold tracking-tight uppercase lg:text-[43px] xl:text-[46px]">
-                            Trusted by Global Brands
+                            Trusted by <span className="text-[#596a79]"> Global Brands </span>
                         </h2>
                     </div>
                 </div>
