@@ -10,6 +10,7 @@ import TestimonialSection from './components/TestimonialSection';
 import RelatedBlogs from './components/RelatedBlogs';
 import ProjectsNew from './components/ProjectsNew';
 import IndustriesServe from './components/IndustriesServe';
+import TestimonialSectionNew from './components/TestimonialSectionNew';
 
 export default function Home() {
     return (
@@ -23,7 +24,8 @@ export default function Home() {
             <Clients />
             {/* <GlobalPresence /> */}
             <IndustriesServe />
-            <TestimonialSection />
+            {/* <TestimonialSection /> */}
+            <TestimonialSectionNew />
             <RelatedBlogs />
         </>
     );

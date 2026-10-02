@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
 
 import 'swiper/css';
 
@@ -21,83 +22,56 @@ import infrastructure from '@/app/assets/images/infrastructure.jpg';
 import steel from '@/app/assets/images/steel-metal.jpg';
 import water from '@/app/assets/images/water-treatment.jpg';
 import transportation from '@/app/assets/images/transportation.jpg';
+import paint from '@/app/assets/images/paint-plastics.jpg';
+import agro from '@/app/assets/images/food-agro.jpg';
+import textile from '@/app/assets/images/textile.jpg';
+import paper from '@/app/assets/images/paper.jpg';
+import cement from '@/app/assets/images/cement.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
-
-/* ============================================================
-   INDUSTRIES DATA
-============================================================ */
 
 const industries = [
     {
         name: 'Oil & Gas',
-        image: oil,
+        image: oil.src,
     },
-
     {
         name: 'Infrastructure',
-        image: infrastructure,
+        image: infrastructure.src,
     },
-
     {
         name: 'Steel & Metal',
-        image: steel,
+        image: steel.src,
     },
-
     {
         name: 'Water Treatment',
-        image: water,
+        image: water.src,
     },
-
     {
         name: 'Transportation',
-        image: transportation,
+        image: transportation.src,
     },
-
     {
         name: 'Paint & Plastics',
-        image: '/images/industries/paint-plastics.jpg',
+        image: paint.src,
     },
-
-    {
-        name: 'Institution',
-        image: '/images/industries/institution.jpg',
-    },
-
     {
         name: 'Food & Agro',
-        image: '/images/industries/food-agro.jpg',
+        image: agro.src,
     },
-
     {
         name: 'Cement',
-        image: '/images/industries/cement.jpg',
+        image: cement.src,
     },
-
     {
         name: 'Textile',
-        image: '/images/industries/textile.jpg',
+        image: textile.src,
     },
-
-    {
-        name: 'Fertilizers',
-        image: '/images/industries/fertilizers.jpg',
-    },
-
     {
         name: 'Paper',
-        image: '/images/industries/paper.jpg',
-    },
-
-    {
-        name: 'Water Network',
-        image: '/images/industries/water-network.jpg',
+        image: paper.src,
     },
 ];
-
-/* ============================================================
-   COMPONENT
-============================================================ */
 
 export default function IndustriesServe() {
     const sectionRef = useRef<HTMLDivElement>(null);
@@ -108,12 +82,12 @@ export default function IndustriesServe() {
 
     /* ==========================================================
        GET POSITION OF EACH CARD
-       
-       0 = outer left
-       1 = inner left
-       2 = CENTER
-       3 = inner right
-       4 = outer right
+
+       -2 = outer left
+       -1 = inner left
+        0 = center
+        1 = inner right
+        2 = outer right
     ========================================================== */
 
     const getCardPosition = (index: number) => {
@@ -121,19 +95,6 @@ export default function IndustriesServe() {
 
         let difference =
             (index - activeIndex + total) % total;
-
-        /*
-         * Convert circular index to nearest position.
-         *
-         * Example:
-         * active = 3
-         *
-         * index 1 -> -2
-         * index 2 -> -1
-         * index 3 ->  0
-         * index 4 ->  1
-         * index 5 ->  2
-         */
 
         if (difference > total / 2) {
             difference -= total;
@@ -144,7 +105,15 @@ export default function IndustriesServe() {
 
     /* ==========================================================
        CARD STYLE
-    ========================================================== */
+
+       ONLY OPACITY CHANGED:
+
+       OUTER  = 40%
+       INNER  = 80%
+       CENTER = 100%
+
+       SCALE / POSITION KEPT SAME
+       ========================================================== */
 
     const getCardClasses = (index: number) => {
         const position = getCardPosition(index);
@@ -152,40 +121,44 @@ export default function IndustriesServe() {
         if (position === 0) {
             return {
                 opacity: 'opacity-100',
-                zIndex: 'z-[50]',
+                zIndex: 50,
                 scale: 'scale-100',
                 y: 'translate-y-0',
+                height: 'h-[390px]',
             };
         }
 
         if (position === -1 || position === 1) {
             return {
-                opacity: 'opacity-50',
-                zIndex: 'z-[30]',
+                opacity: 'opacity-[80%]',
+                zIndex: 30,
                 scale: 'scale-[0.90]',
                 y: 'translate-y-8',
+                height: 'h-[350px]',
             };
         }
 
         if (position === -2 || position === 2) {
             return {
-                opacity: 'opacity-25',
-                zIndex: 'z-[10]',
+                opacity: 'opacity-[40%]',
+                zIndex: 10,
                 scale: 'scale-[0.82]',
                 y: 'translate-y-16',
+                height: 'h-[350px]',
             };
         }
 
         return {
             opacity: 'opacity-0',
-            zIndex: 'z-0',
+            zIndex: 0,
             scale: 'scale-[0.75]',
             y: 'translate-y-20',
+            height: 'h-[350px]',
         };
     };
 
     /* ==========================================================
-       INITIAL SECTION ANIMATION
+       INITIAL GSAP ANIMATION
     ========================================================== */
 
     useLayoutEffect(() => {
@@ -254,10 +227,6 @@ export default function IndustriesServe() {
 
         setActiveIndex(nextIndex);
 
-        /*
-         * Animate cards after React updates them.
-         */
-
         requestAnimationFrame(() => {
             const direction =
                 nextIndex > oldIndex ? 1 : -1;
@@ -277,10 +246,6 @@ export default function IndustriesServe() {
         });
     };
 
-    /* ==========================================================
-       RENDER
-    ========================================================== */
-
     return (
         <section
             ref={sectionRef}
@@ -289,7 +254,7 @@ export default function IndustriesServe() {
                 overflow-hidden
                 bg-modura-white
                 py-16
-                md:py-20
+                md:py-12
             "
         >
             {/* ==================================================
@@ -345,23 +310,16 @@ export default function IndustriesServe() {
                         <div
                             className="
                                 industry-kicker
-                                mb-4
+                                mb-2
                                 flex
                                 items-center
                                 gap-3
                             "
                         >
-                            <span
-                                className="
-                                    h-[2px]
-                                    w-12
-                                    bg-modura-secondary
-                                "
-                            />
 
                             <span
                                 className="
-                                    text-[10px]
+                                    text-[14px]
                                     font-bold
                                     tracking-[0.35em]
                                     text-modura-secondary
@@ -403,43 +361,138 @@ export default function IndustriesServe() {
                             md:flex
                         "
                     >
-                        <span
-                            className="
-                                h-px
-                                w-16
-                                bg-modura-secondary/30
-                            "
-                        />
+                        {/* RIGHT BUTTONS */}
 
-                        <span
-                            className="
-                                text-[9px]
-                                font-bold
-                                tracking-[0.3em]
-                                text-modura-secondary-light
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    swiperRef.current?.slidePrev()
+                                }
+                                className="
+                            group
+                            relative
+                            flex
+                            h-11
+                            w-11
+                            items-center
+                            justify-center
+                            overflow-hidden
+                            border
+                            border-modura-primary/20
+                            text-modura-primary
+                            transition-all
+                            duration-500
+                            hover:border-modura-primary
+                            hover:bg-modura-primary
+                            hover:text-white
+                        "
+                                aria-label="Previous industry"
+                            >
+                                <span
+                                    className="
+                                absolute
+                                left-0
+                                top-0
+                                h-[2px]
+                                w-0
+                                bg-modura-secondary-light
+                                transition-all
+                                duration-500
+                                group-hover:w-full
                             "
-                        >
-                            INDUSTRIES WE SERVE
-                        </span>
+                                />
+
+                                <FiArrowLeft
+                                    size={16}
+                                    className="
+                                transition-transform
+                                duration-500
+                                group-hover:-translate-x-1
+                            "
+                                />
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    swiperRef.current?.slideNext()
+                                }
+                                className="
+                            group
+                            relative
+                            flex
+                            h-11
+                            w-11
+                            items-center
+                            justify-center
+                            overflow-hidden
+                            border
+                            border-modura-primary
+                            bg-modura-primary
+                            text-white
+                            transition-all
+                            duration-500
+                            hover:bg-modura-primary-dark
+                        "
+                                aria-label="Next industry"
+                            >
+                                <span
+                                    className="
+                                absolute
+                                right-0
+                                top-0
+                                h-[2px]
+                                w-0
+                                bg-modura-secondary-light
+                                transition-all
+                                duration-500
+                                group-hover:w-full
+                            "
+                                />
+
+                                <FiArrowRight
+                                    size={16}
+                                    className="
+                                transition-transform
+                                duration-500
+                                group-hover:translate-x-1
+                            "
+                                />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* ==================================================
                 SLIDER
-            ================================================== */}
+
+                IMPORTANT:
+                Same original negative spacing is preserved.
+
+                The only changes are:
+                - slider is inside max-width container
+                - overflow-hidden
+                - autoplay
+                ================================================== */}
 
             <div
                 className="
                     industry-slider-wrapper
                     relative
+                    mx-auto
                     mt-10
                     w-full
+                    max-w-[1380px]
                     overflow-hidden
+                    px-6
                     md:mt-12
+                    md:px-10
                 "
             >
                 <Swiper
+                    modules={[Autoplay]}
                     loop={true}
                     centeredSlides={true}
                     slidesPerView={5}
@@ -448,12 +501,14 @@ export default function IndustriesServe() {
                     grabCursor={true}
                     watchSlidesProgress={true}
                     allowTouchMove={true}
+                    autoplay={{
+                        delay: 2800,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                    }}
                     onSwiper={(swiper) => {
                         swiperRef.current = swiper;
 
-                        /*
-                         * First slide should be the center.
-                         */
                         setTimeout(() => {
                             setActiveIndex(
                                 swiper.realIndex,
@@ -513,45 +568,47 @@ export default function IndustriesServe() {
                                 <SwiperSlide
                                     key={index}
                                     className="
-                                        !h-auto
+                                        h-auto!
                                     "
+                                    style={{
+                                        zIndex: cardStyle.zIndex,
+                                    }}
                                 >
                                     <div
                                         className={`
-                                            industry-card
-                                            group
-                                            relative
-                                            mx-auto
-                                            h-[350px]
-                                            w-full
-                                            max-w-[350px]
-                                            transform
-                                            transition-all
-                                            duration-700
-                                            ease-[cubic-bezier(0.22,1,0.36,1)]
-                                            ${cardStyle.opacity}
-                                            ${cardStyle.zIndex}
-                                            ${cardStyle.scale}
-                                            ${cardStyle.y}
-                                        `}
-                                        data-position={
-                                            position
-                                        }
+        industry-card
+        group
+        relative
+        mx-auto
+        ${cardStyle.height}
+        w-full
+        max-w-[350px]
+        transform
+        transition-all
+        duration-700
+        ease-[cubic-bezier(0.22,1,0.36,1)]
+        ${cardStyle.opacity}
+        ${cardStyle.scale}
+        ${cardStyle.y}
+    `}
                                     >
                                         {/* ==================================================
                                             IMAGE
                                         ================================================== */}
 
                                         <div
-                                            className="
-                                                relative
-                                                h-[285px]
-                                                w-full
-                                                overflow-hidden
-                                                bg-modura-light
-                                                md:h-[320px]
-                                            "
-                                        >
+    className={`
+        relative
+        w-full
+        overflow-hidden
+        bg-modura-light
+        ${
+            position === 0
+                ? 'h-[325px] md:h-[350px]'
+                : 'h-[285px] md:h-[320px]'
+        }
+    `}
+>
                                             <Image
                                                 src={
                                                     industry.image
@@ -587,84 +644,34 @@ export default function IndustriesServe() {
                                                 "
                                             />
 
-                                            {/* NUMBER */}
-
-                                            <span
-                                                className="
-                                                    absolute
-                                                    left-5
-                                                    top-5
-                                                    text-[10px]
-                                                    font-semibold
-                                                    tracking-[0.25em]
-                                                    text-white/80
-                                                "
-                                            >
-                                                {String(
-                                                    index + 1,
-                                                ).padStart(
-                                                    2,
-                                                    '0',
-                                                )}
-                                            </span>
-
-                                            {/* CORNER FRAME */}
-
-                                            <span
-                                                className="
-                                                    absolute
-                                                    right-5
-                                                    top-5
-                                                    h-9
-                                                    w-9
-                                                    border
-                                                    border-white/50
-                                                    transition-all
-                                                    duration-500
-                                                    group-hover:border-white
-                                                "
-                                            />
-
-                                            <FiArrowUpRight
-                                                size={14}
-                                                className="
-                                                    absolute
-                                                    right-[30px]
-                                                    top-[30px]
-                                                    text-white
-                                                    opacity-0
-                                                    transition-all
-                                                    duration-500
-                                                    group-hover:translate-x-1
-                                                    group-hover:-translate-y-1
-                                                    group-hover:opacity-100
-                                                "
-                                            />
                                         </div>
 
                                         {/* ==================================================
-                                            WHITE NAME PANEL
+                                            WHITE TITLE PANEL
+
+                                            SAME FORMAT
                                         ================================================== */}
 
                                         <div
-                                            className="
-                                                absolute
-                                                bottom-0
-                                                left-[15px]
-                                                right-0
-                                                z-20
-                                                flex
-                                                h-[82px]
-                                                items-center
-                                                bg-modura-white
-                                                px-5
-                                                shadow-[0_12px_35px_rgba(11,29,51,0.12)]
-                                                md:h-[90px]
-                                                md:px-6
-                                            "
-                                        >
-                                            {/* TOP LINE */}
-
+    className={`
+        absolute
+        bottom-0
+        left-[15px]
+        right-0
+        z-20
+        flex
+        items-center
+        bg-modura-white
+        px-5
+        shadow-[0_12px_35px_rgba(11,29,51,0.12)]
+        md:px-6
+        ${
+            position === 0
+                ? 'h-[95px] md:h-[100px]'
+                : 'h-[82px] md:h-[90px]'
+        }
+    `}
+>
                                             <span
                                                 className="
                                                     absolute
@@ -687,15 +694,13 @@ export default function IndustriesServe() {
                                                     tracking-tight
                                                     text-modura-primary
                                                     uppercase
-                                                    md:text-[21px]
+                                                    md:text-[20px]
                                                 "
                                             >
                                                 {
                                                     industry.name
                                                 }
                                             </h3>
-
-                                            {/* RIGHT LINE */}
 
                                             <span
                                                 className="
@@ -712,9 +717,7 @@ export default function IndustriesServe() {
                                             />
                                         </div>
 
-                                        {/* ==================================================
-                                            ACTIVE BOTTOM LINE
-                                        ================================================== */}
+                                        {/* ACTIVE BOTTOM LINE */}
 
                                         {position === 0 && (
                                             <div
@@ -738,7 +741,7 @@ export default function IndustriesServe() {
             </div>
 
             {/* ==================================================
-                BOTTOM NAVIGATION
+                FOOTER / CONTROLS
             ================================================== */}
 
             <div
@@ -748,147 +751,14 @@ export default function IndustriesServe() {
                     mx-auto
                     mt-7
                     flex
-                    max-w-[1380px]
+                    max-w-345
                     items-center
-                    justify-between
+                    justify-end
+                    border-t
+                    border-modura-gray-200
                     px-6
-                    md:px-10
                 "
             >
-                {/* LEFT LABEL */}
-
-                <div
-                    className="
-                        flex
-                        items-center
-                        gap-3
-                    "
-                >
-                    <span
-                        className="
-                            h-[2px]
-                            w-10
-                            bg-modura-secondary
-                        "
-                    />
-
-                    <span
-                        className="
-                            text-[9px]
-                            font-bold
-                            tracking-[0.3em]
-                            text-modura-secondary
-                        "
-                    >
-                        EXPLORE INDUSTRIES
-                    </span>
-                </div>
-
-                {/* BUTTONS */}
-
-                <div className="flex gap-2">
-                    {/* PREVIOUS */}
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            swiperRef.current?.slidePrev()
-                        }
-                        aria-label="Previous industry"
-                        className="
-                            group
-                            relative
-                            flex
-                            h-11
-                            w-11
-                            items-center
-                            justify-center
-                            overflow-hidden
-                            border
-                            border-modura-primary/20
-                            bg-modura-white
-                            text-modura-primary
-                            transition-all
-                            duration-500
-                            hover:border-modura-primary
-                            hover:bg-modura-primary
-                            hover:text-modura-white
-                        "
-                    >
-                        <span
-                            className="
-                                absolute
-                                left-0
-                                top-0
-                                h-[2px]
-                                w-0
-                                bg-modura-secondary-light
-                                transition-all
-                                duration-500
-                                group-hover:w-full
-                            "
-                        />
-
-                        <FiArrowLeft
-                            size={16}
-                            className="
-                                transition-transform
-                                duration-500
-                                group-hover:-translate-x-1
-                            "
-                        />
-                    </button>
-
-                    {/* NEXT */}
-
-                    <button
-                        type="button"
-                        onClick={() =>
-                            swiperRef.current?.slideNext()
-                        }
-                        aria-label="Next industry"
-                        className="
-                            group
-                            relative
-                            flex
-                            h-11
-                            w-11
-                            items-center
-                            justify-center
-                            overflow-hidden
-                            border
-                            border-modura-primary
-                            bg-modura-primary
-                            text-modura-white
-                            transition-all
-                            duration-500
-                            hover:bg-modura-primary-dark
-                        "
-                    >
-                        <span
-                            className="
-                                absolute
-                                right-0
-                                top-0
-                                h-[2px]
-                                w-0
-                                bg-modura-secondary-light
-                                transition-all
-                                duration-500
-                                group-hover:w-full
-                            "
-                        />
-
-                        <FiArrowRight
-                            size={16}
-                            className="
-                                transition-transform
-                                duration-500
-                                group-hover:translate-x-1
-                            "
-                        />
-                    </button>
-                </div>
             </div>
         </section>
     );
