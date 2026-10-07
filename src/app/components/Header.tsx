@@ -1148,7 +1148,7 @@ export default function Header() {
 
                     <div className="flex items-center">
                         <Link
-                            href="/get-a-quote"
+                            href="/contact"
                             className="group border-modura-primary bg-modura-white text-modura-primary relative hidden h-[52px] items-center overflow-hidden border pr-[62px] pl-5 xl:flex"
                         >
                             {/* NAVY FILL */}
