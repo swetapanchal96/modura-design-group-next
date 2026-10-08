@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -14,8 +14,10 @@ import {
     FiCompass,
     FiLayers,
     FiMail,
+    FiFileText,
     FiMapPin,
     FiUsers,
+    FiUploadCloud,
 } from 'react-icons/fi';
 
 import Breadcrumb from '../components/Breadcrumb';
@@ -35,24 +37,127 @@ const positions = [
         department: 'Architecture',
         location: 'Ahmedabad / Hybrid',
         type: 'Full Time',
+
+        description:
+            'We are looking for candidates with strong knowledge of architectural design to support international and offshore projects. The ideal candidate should be comfortable working with architectural BIM models, drawings and project documentation.',
+
+        skills: [
+            'Good knowledge of architectural design and BIM workflows.',
+            'Knowledge of AutoCAD will be an added advantage.',
+            'Experience working with architectural BIM projects.',
+            'Understanding of architectural drawings and documentation.',
+            'Ability to coordinate with project teams and other disciplines.',
+        ],
+
+        responsibilities: [
+            'Develop and manage architectural BIM models.',
+            'Create detailed architectural components including walls, floors, doors and families.',
+            'Prepare accurate construction drawings and documentation.',
+            'Coordinate architectural information with engineering disciplines.',
+        ],
+
+        qualification:
+            'B.Arch, Diploma in Architecture or ITI Draftsman with good technical knowledge.',
+
+        experience: '2+ Years',
+
+        vacancy: '02',
     },
+
     {
         title: 'BIM Engineer',
         department: 'BIM Solutions',
         location: 'Ahmedabad / Hybrid',
         type: 'Full Time',
+
+        description:
+            'We are looking for a BIM professional who can contribute to the development and coordination of digital building models for architecture and engineering projects. The candidate should have a strong understanding of BIM workflows and project documentation.',
+
+        skills: [
+            'Good knowledge of BIM modelling and coordination workflows.',
+            'Experience with Revit and BIM-based project delivery.',
+            'Understanding of architectural and engineering drawings.',
+            'Knowledge of BIM standards and documentation.',
+            'Ability to coordinate with multidisciplinary project teams.',
+        ],
+
+        responsibilities: [
+            'Develop and maintain accurate BIM models.',
+            'Coordinate models between architecture and engineering disciplines.',
+            'Prepare BIM documentation and project deliverables.',
+            'Identify and communicate model coordination issues.',
+        ],
+
+        qualification:
+            'Diploma / Degree in Architecture, Civil Engineering or a related technical field.',
+
+        experience: '1–3 Years',
+
+        vacancy: '03',
     },
+
     {
         title: 'Structural Engineer',
         department: 'Structural Engineering',
         location: 'Ahmedabad / Hybrid',
         type: 'Full Time',
+
+        description:
+            'We are looking for a structural engineering professional to support the development and coordination of structural design projects. The ideal candidate should understand structural drawings, engineering documentation and multidisciplinary coordination.',
+
+        skills: [
+            'Strong understanding of structural engineering principles.',
+            'Good knowledge of structural drawings and detailing.',
+            'Experience with structural design and documentation.',
+            'Knowledge of BIM coordination will be an advantage.',
+            'Ability to work with architects and other engineering disciplines.',
+        ],
+
+        responsibilities: [
+            'Prepare and coordinate structural engineering drawings.',
+            'Support structural design and documentation activities.',
+            'Coordinate structural information with architectural and MEP teams.',
+            'Review drawings and identify coordination requirements.',
+        ],
+
+        qualification:
+            'B.E. / B.Tech / Diploma in Civil or Structural Engineering.',
+
+        experience: '2+ Years',
+
+        vacancy: '02',
     },
+
     {
         title: 'Steel Detailer',
         department: 'Steel Detailing',
         location: 'Ahmedabad / Hybrid',
         type: 'Full Time',
+
+        description:
+            'We are looking for a skilled steel detailing professional to work on structural steel projects and produce accurate fabrication and construction documentation. The candidate should have a strong understanding of steel structures and detailing practices.',
+
+        skills: [
+            'Good understanding of structural steel detailing.',
+            'Knowledge of steel fabrication and construction drawings.',
+            'Experience with steel detailing software and workflows.',
+            'Ability to read and understand structural drawings.',
+            'Strong attention to dimensions, connections and detailing accuracy.',
+        ],
+
+        responsibilities: [
+            'Prepare detailed structural steel fabrication drawings.',
+            'Develop accurate steel models and construction documentation.',
+            'Coordinate steel detailing with structural design information.',
+            'Review drawings for accuracy and fabrication requirements.',
+        ],
+
+        qualification:
+            'Diploma / Degree in Civil Engineering or relevant technical qualification.',
+
+        experience: '2+ Years',
+
+        vacancy: '02',
     },
 ];
 
@@ -83,6 +188,7 @@ const benefits = [
 ========================================================= */
 
 export default function Career() {
+    const [resume, setResume] = useState<File | null>(null);
     const sectionRef = useRef<HTMLDivElement | null>(null);
 
     useLayoutEffect(() => {
@@ -197,7 +303,15 @@ export default function Career() {
                     CAREER INTRO
                 ================================================= */}
 
-                <section className="relative py-16 md:py-20 lg:py-4">
+                <section
+                    className="
+                        relative
+                        bg-modura-white
+                        py-20
+                        md:py-24
+                        lg:py-14
+                    "
+                >
                     <div
                         className="
                             mx-auto
@@ -206,60 +320,65 @@ export default function Career() {
                             md:px-8
                         "
                     >
+                        {/* =================================================
+            TOP LABEL
+        ================================================= */}
+
                         <div
                             className="
-                                grid
+                                career-hero-content
+                                flex
                                 items-center
-                                gap-12
-
-                                lg:grid-cols-[0.9fr_1.1fr]
-                                lg:gap-20
+                                gap-3
                             "
                         >
-                            {/* LEFT */}
 
-                            <div className="career-hero-content">
-                                <div
-                                    className="
-                                        mb-5
-                                        flex
-                                        items-center
-                                        gap-3
-                                    "
-                                >
-                                    <span
-                                        className="
-                                            h-[2px]
-                                            w-12
-                                            bg-modura-secondary
-                                        "
-                                    />
+                            <span
+                                className="
+                                    text-[13px]
+                                    font-bold
+                                    tracking-[0.35em]
+                                    text-modura-secondary
+                                    uppercase
+                                "
+                            >
+                                CAREERS AT MODURA
+                            </span>
+                        </div>
 
-                                    <span
-                                        className="
-                                            text-[10px]
-                                            font-bold
-                                            tracking-[0.35em]
-                                            text-modura-secondary
-                                            uppercase
-                                        "
-                                    >
-                                        CAREERS AT MODURA
-                                    </span>
-                                </div>
 
+                        {/* =================================================
+            MAIN CONTENT
+        ================================================= */}
+
+                        <div
+                            className="
+                                mt-4
+                                grid
+                                gap-10
+
+                                lg:grid-cols-[1.05fr_0.95fr]
+                                lg:gap-24
+                            "
+                        >
+
+                            {/* =================================================
+                                HEADING
+                            ================================================= */}
+
+                            <div>
                                 <h1
                                     className="
-                                        max-w-[650px]
-                                        text-[42px]
-                                        leading-[1.02]
+                                        max-w-[850px]
+                                        text-[48px]
+                                        leading-[0.98]
                                         font-bold
-                                        tracking-[-0.035em]
+                                        tracking-[-0.04em]
                                         text-modura-primary
 
-                                        md:text-[56px]
+                                        md:text-[64px]
 
-                                        lg:text-[68px]
+                                       
                                     "
                                 >
                                     Build
@@ -268,13 +387,29 @@ export default function Career() {
                                         What Comes Next.
                                     </span>
                                 </h1>
+                            </div>
 
+
+                            {/* =================================================
+                                CONTENT
+                            ================================================= */}
+
+                            <div
+                                className="
+                                    border-l
+                                    border-modura-secondary
+                                    pl-7
+
+                                    md:pl-9
+
+                                    lg:pl-10
+                                "
+                            >
                                 <p
                                     className="
-                                        mt-7
-                                        max-w-[580px]
+                                        max-w-[560px]
                                         text-[16px]
-                                        leading-8
+                                        leading-
                                         text-modura-gray-600
                                     "
                                 >
@@ -286,10 +421,10 @@ export default function Career() {
 
                                 <p
                                     className="
-                                        mt-4
-                                        max-w-[580px]
-                                        text-[15px]
-                                        leading-8
+                                        mt-2
+                                        max-w-[560px]
+                                        text-[16px]
+                                        leading-6
                                         text-modura-gray-600
                                     "
                                 >
@@ -299,129 +434,140 @@ export default function Career() {
                                     plays a part in shaping the final result.
                                 </p>
 
-                                <Link
-                                    href="#open-positions"
-                                    className="
-                                        mt-8
-                                        inline-flex
-                                        items-center
-                                        gap-4
-                                        border
-                                        border-modura-primary
-                                        px-6
-                                        py-4
-                                        text-[11px]
-                                        font-bold
-                                        tracking-[0.18em]
-                                        text-modura-primary
-                                        uppercase
-                                        transition-all
-                                        duration-300
-                                        hover:bg-modura-primary
-                                        hover:text-modura-white
-                                    "
-                                >
-                                    Explore Opportunities
+                                {/* =================================================
+                                    BUTTON
+                                ================================================= */}
 
-                                    <FiArrowUpRight size={17} />
-                                </Link>
-                            </div>
-
-                            {/* RIGHT IMAGE */}
-
-                            <div className="career-hero-image relative">
-                                <div
-                                    className="
-                                        absolute
-                                        -left-5
-                                        top-8
-                                        z-0
-                                        h-[85%]
-                                        w-[85%]
-                                        border
-                                        border-modura-secondary/30
-                                    "
-                                />
-
-                                <div
-                                    className="
-                                        relative
-                                        z-10
-                                        h-[400px]
-                                        overflow-hidden
-
-                                        md:h-[500px]
-                                    "
-                                >
-                                    <Image
-                                        src={careerImage}
-                                        alt="Modura Design Group careers"
-                                        fill
-                                        priority
+                                <div className="mt-8">
+                                    <Link
+                                        href="#open-positions"
                                         className="
-                                            object-cover
-                                        "
-                                    />
-
-                                    <div
-                                        className="
-                                            absolute
-                                            inset-0
-                                            bg-gradient-to-t
-                                            from-modura-primary/60
-                                            via-transparent
-                                            to-transparent
-                                        "
-                                    />
-
-                                    <div
-                                        className="
-                                            absolute
-                                            bottom-0
-                                            left-0
-                                            flex
+                                            group
+                                            border-modura-primary
+                                            bg-modura-white
+                                            text-modura-primary
+                                            relative
+                                            inline-flex
+                                            h-[52px]
                                             items-center
-                                            gap-4
-                                            p-7
-                                            text-modura-white
+                                            overflow-hidden
+                                            border
+                                            pr-[62px]
+                                            pl-5
                                         "
                                     >
-                                        <FiBriefcase size={20} />
+                                        {/* NAVY FILL */}
 
                                         <span
                                             className="
-                                                text-[10px]
-                                                font-bold
-                                                tracking-[0.25em]
-                                                uppercase
+                                                bg-modura-primary
+                                                absolute
+                                                inset-y-0
+                                                left-0
+                                                w-0
+                                                transition-all
+                                                duration-500
+                                                group-hover:w-full
+                                            "
+                                        />
+
+                                        {/* TOP ARCHITECTURAL LINE */}
+
+                                        <span
+                                            className="
+                                                bg-modura-secondary
+                                                absolute
+                                                top-0
+                                                left-0
+                                                z-10
+                                                h-[3px]
+                                                w-8
+                                                transition-all
+                                                duration-500
+                                                group-hover:w-full
+                                            "
+                                        />
+
+                                        {/* TECHNICAL MARK */}
+
+                                        <span
+                                            className="
+                                                relative
+                                                z-10
+                                                mr-3
+                                                flex
+                                                items-center
+                                                gap-1.5
                                             "
                                         >
-                                            Shape Better Spaces
+                                            <span
+                                                className="
+                                                    bg-modura-secondary
+                                                    group-hover:bg-modura-white
+                                                    h-[5px]
+                                                    w-[5px]
+                                                    rotate-45
+                                                    transition-colors
+                                                    duration-300
+                                                "
+                                            />
                                         </span>
-                                    </div>
-                                </div>
 
-                                {/* DECORATIVE MARK */}
+                                        {/* TEXT */}
 
-                                <div
-                                    className="
-                                        absolute
-                                        -right-4
-                                        -bottom-4
-                                        z-20
-                                        flex
-                                        h-24
-                                        w-24
-                                        items-center
-                                        justify-center
-                                        bg-modura-secondary
-                                        text-modura-white
-                                    "
-                                >
-                                    <FiCompass size={30} />
+                                        <span
+                                            className="
+                                                group-hover:text-modura-white
+                                                relative
+                                                z-10
+                                                text-[12px]
+                                                font-bold
+                                                tracking-[0.08em]
+                                                whitespace-nowrap
+                                                uppercase
+                                                transition-colors
+                                                duration-300
+                                            "
+                                        >
+                                            Explore Opportunities
+                                        </span>
+
+                                        {/* ARROW */}
+
+                                        <span
+                                            className="
+                                                bg-modura-primary
+                                                text-modura-white
+                                                group-hover:bg-modura-secondary
+                                                absolute
+                                                top-0
+                                                right-0
+                                                z-10
+                                                flex
+                                                h-full
+                                                w-[48px]
+                                                items-center
+                                                justify-center
+                                                transition-colors
+                                                duration-300
+                                            "
+                                        >
+                                            <FiArrowUpRight
+                                                className="
+                                                text-[18px]
+                                                transition-transform
+                                                duration-300
+                                                group-hover:rotate-45
+                                            "
+                                            />
+                                        </span>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
+
+
+                        
                     </div>
                 </section>
 
@@ -432,9 +578,10 @@ export default function Career() {
                 <section
                     className="
                         career-benefits
-                        bg-modura-primary
-                        py-16
-                        md:py-20
+                        bg-modura-light
+                        py-20
+                        md:py-14
+                        
                     "
                 >
                     <div
@@ -447,127 +594,208 @@ export default function Career() {
                     >
                         <div
                             className="
-                                mb-12
-                                max-w-[700px]
+                                grid
+                                items-start
+                                gap-12
+
+                                lg:grid-cols-[0.82fr_1.8fr]
+                                lg:gap-14
                             "
                         >
+
+                            {/* =================================================
+                                LEFT CONTENT
+                            ================================================= */}
+
                             <div
                                 className="
-                                    mb-4
-                                    flex
-                                    items-center
-                                    gap-3
+                                    career-benefits-heading
+                                    lg:pr-8
                                 "
                             >
-                                <span
-                                    className="
-                                        h-[2px]
-                                        w-12
-                                        bg-modura-secondary-light
-                                    "
-                                />
+                                {/* EYEBROW */}
 
-                                <span
+                                <div
                                     className="
-                                        text-[10px]
-                                        font-bold
-                                        tracking-[0.35em]
-                                        text-modura-secondary-light
-                                        uppercase
+                                        mb-2
+                                        flex
+                                        items-center
+                                        gap-3
                                     "
                                 >
-                                    WHY MODURA
-                                </span>
-                            </div>
-
-                            <h2
-                                className="
-                                    text-[34px]
-                                    leading-tight
-                                    font-bold
-                                    text-modura-white
-
-                                    md:text-[46px]
-                                "
-                            >
-                                A place to
-                                <span className="text-modura-secondary-light">
-                                    {' '}
-                                    grow.
-                                </span>
-                            </h2>
-                        </div>
-
-                        <div
-                            className="
-                                grid
-                                border-t
-                                border-modura-primary-light
-
-                                md:grid-cols-3
-                            "
-                        >
-                            {benefits.map((item, index) => {
-                                const Icon = item.icon;
-
-                                return (
-                                    <div
-                                        key={item.title}
+                                    <span
                                         className="
-                                            career-benefit
-                                            border-b
-                                            border-modura-primary-light
-                                            px-0
-                                            py-8
-
-                                            md:border-r
-                                            md:px-8
-                                            md:py-10
-
-                                            first:md:pl-0
-                                            last:md:border-r-0
+                                            text-[13px]
+                                            font-bold
+                                            tracking-[0.35em]
+                                            text-modura-secondary
+                                            uppercase
                                         "
                                     >
+                                        WHY MODURA
+                                    </span>
+                                </div>
+
+                                {/* HEADING */}
+
+                                <h2
+                                    className="
+                                        max-w-[470px]
+                                        text-[46px]
+                                        leading-[0.96]
+                                        font-bold
+                                        tracking-[-0.04em]
+                                        text-modura-primary
+
+                                        md:text-[58px]
+
+                                       
+                                    "
+                                >
+                                    A place to
+                                    <span
+                                        className="
+                                            block
+                                            text-modura-secondary
+                                        "
+                                    >
+                                        grow.
+                                    </span>
+                                </h2>
+                            </div>
+
+
+                            {/* =================================================
+                                BENEFITS
+                            ================================================= */}
+
+                            <div
+                                className="
+                                    grid
+                                    border-l
+                                    border-modura-gray-300
+
+                                    md:grid-cols-3
+                                "
+                            >
+                                {benefits.map((item) => {
+                                    const Icon = item.icon;
+
+                                    return (
                                         <div
+                                            key={item.title}
                                             className="
-                                                mb-6
-                                                flex
-                                                h-12
-                                                w-12
-                                                items-center
-                                                justify-center
-                                                border
-                                                border-modura-secondary-light/40
-                                                text-modura-secondary-light
+                                                career-benefit
+                                                group
+                                                relative
+                                                border-b
+                                                border-modura-gray-300
+                                                px-0
+                                                py-8
+
+                                                md:min-h-[250px]
+                                                md:border-r
+                                                md:border-b-0
+                                                md:px-7
+                                                md:py-0
+
+                                                lg:px-8
+
+                                                last:border-r-0
                                             "
                                         >
-                                            <Icon size={21} />
+
+                                            {/* =================================================
+                                                ICON
+                                            ================================================= */}
+
+                                            <div
+                                                className="
+                                                    mb-8
+                                                    flex
+                                                    h-[68px]
+                                                    w-[68px]
+                                                    items-center
+                                                    justify-center
+                                                    border
+                                                    border-modura-secondary
+                                                    bg-modura-light
+                                                    text-modura-primary
+                                                    transition-all
+                                                    duration-500
+
+                                                    group-hover:bg-modura-primary
+                                                    group-hover:text-modura-white
+                                                "
+                                            >
+                                                <Icon
+                                                    size={28}
+                                                    strokeWidth={1.5}
+                                                />
+                                            </div>
+
+
+                                            {/* =================================================
+                                                TITLE
+                                            ================================================= */}
+
+                                            <h3
+                                                className="
+                                                    max-w-[250px]
+                                                    text-[20px]
+                                                    leading-[1.2]
+                                                    font-bold
+                                                    tracking-[-0.02em]
+                                                    text-modura-primary
+
+                                                    md:text-[21px]
+                                                "
+                                            >
+                                                {item.title}
+                                            </h3>
+
+
+                                            {/* =================================================
+                                                DESCRIPTION
+                                            ================================================= */}
+
+                                            <p
+                                                className="
+                                                    mt-4
+                                                    max-w-[270px]
+                                                    text-[14px]
+                                                    leading-7
+                                                    text-modura-gray-500
+                                                "
+                                            >
+                                                {item.text}
+                                            </p>
+
+
+                                            {/* =================================================
+                                                BOTTOM ACCENT
+                                            ================================================= */}
+
+                                            <div
+                                                className="
+                                                    absolute
+                                                    bottom-0
+                                                    left-7
+                                                    h-[2px]
+                                                    w-9
+                                                    bg-modura-secondary
+                                                    transition-all
+                                                    duration-500
+
+                                                    md:left-7
+
+                                                    group-hover:w-16
+                                                "
+                                            />
                                         </div>
-
-                                        <h3
-                                            className="
-                                                text-[19px]
-                                                font-bold
-                                                text-modura-white
-                                            "
-                                        >
-                                            {item.title}
-                                        </h3>
-
-                                        <p
-                                            className="
-                                                mt-3
-                                                max-w-[330px]
-                                                text-[14px]
-                                                leading-7
-                                                text-modura-secondary-light
-                                            "
-                                        >
-                                            {item.text}
-                                        </p>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -582,8 +810,8 @@ export default function Career() {
                         career-jobs
                         bg-modura-off-white
                         py-16
-                        md:py-20
-                        lg:py-24
+                        md:py-14
+                        
                     "
                 >
                     <div
@@ -594,12 +822,17 @@ export default function Career() {
                             md:px-8
                         "
                     >
+
+                        {/* =================================================
+                            SECTION HEADER
+                        ================================================= */}
+
                         <div
                             className="
-                                mb-12
+                                mb-7
                                 flex
                                 flex-col
-                                gap-5
+                                gap-6
 
                                 md:flex-row
                                 md:items-end
@@ -607,25 +840,21 @@ export default function Career() {
                             "
                         >
                             <div>
+
+                                {/* EYEBROW */}
+
                                 <div
                                     className="
-                                        mb-4
+                                        mb-2
                                         flex
                                         items-center
                                         gap-3
                                     "
                                 >
+           
                                     <span
                                         className="
-                                            h-[2px]
-                                            w-12
-                                            bg-modura-secondary
-                                        "
-                                    />
-
-                                    <span
-                                        className="
-                                            text-[10px]
+                                            text-[13px]
                                             font-bold
                                             tracking-[0.35em]
                                             text-modura-secondary
@@ -635,6 +864,8 @@ export default function Career() {
                                         OPPORTUNITIES
                                     </span>
                                 </div>
+
+                                {/* HEADING */}
 
                                 <h2
                                     className="
@@ -656,7 +887,7 @@ export default function Career() {
 
                             <p
                                 className="
-                                    max-w-[420px]
+                                    max-w-[430px]
                                     text-[14px]
                                     leading-7
                                     text-modura-gray-600
@@ -668,118 +899,593 @@ export default function Career() {
                             </p>
                         </div>
 
-                        <div
-                            className="
-                                border-t
-                                border-modura-gray-300
-                            "
-                        >
+
+                        {/* =================================================
+                            POSITIONS
+                        ================================================= */}
+
+                        <div className="space-y-8">
+
                             {positions.map((position) => (
-                                <div
+                                <article
                                     key={position.title}
                                     className="
                                         career-job
                                         group
-                                        grid
-                                        gap-5
-                                        border-b
+                                        overflow-hidden
+                                        border
                                         border-modura-gray-300
-                                        py-7
-
-                                        md:grid-cols-[1fr_180px_180px_150px]
-                                        md:items-center
+                                        bg-modura-white
+                                        transition-all
+                                        duration-500
+                                        hover:border-modura-secondary
+                                        hover:shadow-[0_18px_50px_rgba(11,29,51,0.06)]
                                     "
                                 >
-                                    <div>
-                                        <h3
-                                            className="
-                                                text-[20px]
-                                                font-bold
-                                                text-modura-primary
-                                                transition-colors
-                                                duration-300
-                                                group-hover:text-modura-secondary
-                                            "
-                                        >
-                                            {position.title}
-                                        </h3>
 
-                                        <p
-                                            className="
-                                                mt-1
-                                                text-[12px]
-                                                font-medium
-                                                tracking-[0.08em]
-                                                text-modura-secondary
-                                                uppercase
-                                            "
-                                        >
-                                            {position.department}
-                                        </p>
-                                    </div>
+                                    {/* =================================================
+                                        JOB HEADER
+                                    ================================================= */}
 
                                     <div
                                         className="
-                                            flex
-                                            items-center
-                                            gap-2
-                                            text-[13px]
-                                            text-modura-gray-600
+                                            relative
+                                            border-b
+                                            border-modura-gray-200
+                                            px-6
+                                            py-6
+
+                                            md:px-8
+                                            md:py-7
                                         "
                                     >
-                                        <FiMapPin size={15} />
 
-                                        {position.location}
-                                    </div>
-
-                                    <div
-                                        className="
-                                            text-[11px]
-                                            font-bold
-                                            tracking-[0.12em]
-                                            text-modura-secondary
-                                            uppercase
-                                        "
-                                    >
-                                        {position.type}
-                                    </div>
-
-                                    <Link
-                                        href="#application"
-                                        className="
-                                            inline-flex
-                                            w-fit
-                                            items-center
-                                            gap-3
-                                            text-[11px]
-                                            font-bold
-                                            tracking-[0.15em]
-                                            text-modura-primary
-                                            uppercase
-                                        "
-                                    >
-                                        Apply
+                                        {/* TOP ACCENT */}
 
                                         <span
                                             className="
-                                                flex
-                                                h-8
-                                                w-8
-                                                items-center
-                                                justify-center
-                                                border
-                                                border-modura-gray-300
+                                                absolute
+                                                top-0
+                                                left-0
+                                                h-[3px]
+                                                w-16
+                                                bg-modura-secondary
                                                 transition-all
-                                                duration-300
-                                                group-hover:border-modura-secondary
-                                                group-hover:bg-modura-secondary
-                                                group-hover:text-modura-white
+                                                duration-500
+                                                group-hover:w-28
+                                            "
+                                        />
+
+                                        <div
+                                            className="
+                                                flex
+                                                flex-col
+                                                gap-5
+
+                                                md:flex-row
+                                                md:items-center
+                                                md:justify-between
                                             "
                                         >
-                                            <FiArrowUpRight size={14} />
-                                        </span>
-                                    </Link>
-                                </div>
+
+                                            {/* TITLE */}
+
+                                            <div>
+                                                <h3
+                                                    className="
+                                                        text-[23px]
+                                                        leading-tight
+                                                        font-bold
+                                                        text-modura-primary
+
+                                                        md:text-[26px]
+                                                    "
+                                                >
+                                                    {position.title}
+                                                </h3>
+
+                                                <p
+                                                    className="
+                                                        mt-2
+                                                        text-[13px]
+                                                        font-bold
+                                                        tracking-[0.18em]
+                                                        text-modura-secondary
+                                                        uppercase
+                                                    "
+                                                >
+                                                    {position.department}
+                                                </p>
+                                            </div>
+
+
+                                            {/* JOB META */}
+
+                                            <div
+                                                className="
+                                                    flex
+                                                    flex-wrap
+                                                    items-center
+                                                    gap-x-7
+                                                    gap-y-3
+                                                "
+                                            >
+
+                                                <div
+                                                    className="
+                                                        flex
+                                                        items-center
+                                                        gap-2
+                                                        text-[14px]
+                                                        text-modura-gray-600
+                                                    "
+                                                >
+                                                    <FiMapPin
+                                                        size={15}
+                                                        className="text-modura-secondary"
+                                                    />
+
+                                                    {position.location}
+                                                </div>
+
+                                                <div
+                                                    className="
+                                                        h-4
+                                                        w-px
+                                                        bg-modura-gray-300
+                                                    "
+                                                />
+
+                                                <span
+                                                    className="
+                                                        text-[13px]
+                                                        font-bold
+                                                        tracking-[0.15em]
+                                                        text-modura-secondary
+                                                        uppercase
+                                                    "
+                                                >
+                                                    {position.type}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    {/* =================================================
+                                        DESCRIPTION
+                                    ================================================= */}
+
+                                    <div
+                                        className="
+                                            px-6
+                                            py-5
+
+                                            md:px-8
+                                            md:py-6
+                                        "
+                                    >
+                                        <p
+                                            className="
+                                                max-w-[1000px]
+                                                text-[14px]
+                                                leading-6
+                                                text-modura-gray-600
+
+                                                md:text-[15px]
+                                            "
+                                        >
+                                            {position.description}
+                                        </p>
+
+
+                                        {/* =================================================
+                                                SKILLS + RESPONSIBILITIES
+                                            ================================================= */}
+
+                                            {(position.skills?.length > 0 ||
+                                                position.responsibilities?.length > 0) && (
+                                                <div
+                                                    className="
+                                                        mt-8
+                                                        grid
+                                                        gap-8
+                                                        border-t
+                                                        border-modura-gray-200
+                                                        pt-8
+
+                                                        md:grid-cols-2
+                                                        md:gap-10
+                                                    "
+                                                >
+
+                                                    {/* =================================================
+                                                        KEY SKILLS
+                                                    ================================================= */}
+
+                                                    {position.skills?.length > 0 && (
+                                                        <div
+                                                            className={`
+                                                                ${
+                                                                    position.responsibilities?.length > 0
+                                                                        ? `
+                                                                            md:border-r
+                                                                            md:border-modura-gray-200
+                                                                            md:pr-10
+                                                                        `
+                                                                        : ''
+                                                                }
+                                                            `}
+                                                        >
+                                                            <h4
+                                                                className="
+                                                                    text-[16px]
+                                                                    font-bold
+                                                                    tracking-[0.18em]
+                                                                    text-modura-primary
+                                                                    uppercase
+                                                                "
+                                                            >
+                                                                Key Skills
+                                                            </h4>
+
+                                                            <ul
+                                                                className="
+                                                                    mt-2
+                                                                    space-y-3
+                                                                "
+                                                            >
+                                                                {position.skills.map(
+                                                                    (
+                                                                        skill: string,
+                                                                        skillIndex: number,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={skillIndex}
+                                                                            className="
+                                                                                flex
+                                                                                items-start
+                                                                                gap-3
+                                                                                text-[14px]
+                                                                                leading-6
+                                                                                text-modura-gray-600
+                                                                                mb-0
+                                                                            "
+                                                                        >
+                                                                            <span
+                                                                                className="
+                                                                                    mt-[9px]
+                                                                                    h-[5px]
+                                                                                    w-[5px]
+                                                                                    shrink-0
+                                                                                    bg-modura-secondary
+                                                                                "
+                                                                            />
+
+                                                                            <span>
+                                                                                {skill}
+                                                                            </span>
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+
+
+                                                    {/* =================================================
+                                                        RESPONSIBILITIES
+                                                    ================================================= */}
+
+                                                    {position.responsibilities?.length > 0 && (
+                                                        <div>
+                                                            <h4
+                                                                className="
+                                                                    text-[16px]
+                                                                    font-bold
+                                                                    tracking-[0.18em]
+                                                                    text-modura-primary
+                                                                    uppercase
+                                                                "
+                                                            >
+                                                                Responsibilities
+                                                            </h4>
+
+                                                            <ul
+                                                                className="
+                                                                    mt-2
+                                                                    space-y-3
+                                                                "
+                                                            >
+                                                                {position.responsibilities.map(
+                                                                    (
+                                                                        responsibility: string,
+                                                                        responsibilityIndex: number,
+                                                                    ) => (
+                                                                        <li
+                                                                            key={responsibilityIndex}
+                                                                            className="
+                                                                                flex
+                                                                                items-start
+                                                                                gap-3
+                                                                                text-[14px]
+                                                                                leading-6
+                                                                                text-modura-gray-600
+                                                                                mb-0
+                                                                            "
+                                                                        >
+                                                                            <span
+                                                                                className="
+                                                                                    mt-[9px]
+                                                                                    h-[5px]
+                                                                                    w-[5px]
+                                                                                    shrink-0
+                                                                                    bg-modura-secondary
+                                                                                "
+                                                                            />
+
+                                                                            <span>
+                                                                                {responsibility}
+                                                                            </span>
+                                                                        </li>
+                                                                    ),
+                                                                )}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                        {/* =================================================
+                                            BOTTOM INFORMATION
+                                        ================================================= */}
+
+                                        <div
+                                            className="
+                                                mt-8
+                                                flex
+                                                flex-col
+                                                gap-6
+                                                border-t
+                                                border-modura-gray-200
+                                                pt-7
+
+                                                md:flex-row
+                                                md:items-end
+                                                md:justify-between
+                                            "
+                                        >
+
+                                            {/* INFORMATION */}
+
+                                            <div
+                                                className="
+                                                    grid
+                                                    gap-6
+
+                                                    sm:grid-cols-3
+                                                    sm:gap-10
+                                                "
+                                            >
+
+                                                {/* QUALIFICATION */}
+
+                                                <div>
+                                                    <p
+                                                        className="
+                                                            text-[15px]
+                                                            font-bold
+                                                            tracking-[0.2em]
+                                                            text-modura-secondary
+                                                            uppercase
+                                                        "
+                                                    >
+                                                        Qualification
+                                                    </p>
+
+                                                    <p
+                                                        className="
+                                                            mt-2
+                                                            max-w-[190px]
+                                                            text-[13px]
+                                                            leading-4
+                                                            text-modura-gray-600
+                                                        "
+                                                    >
+                                                        {position.qualification}
+                                                    </p>
+                                                </div>
+
+
+                                                {/* EXPERIENCE */}
+
+                                                <div>
+                                                    <p
+                                                        className="
+                                                            text-[15px]
+                                                            font-bold
+                                                            tracking-[0.2em]
+                                                            text-modura-secondary
+                                                            uppercase
+                                                        "
+                                                    >
+                                                        Experience
+                                                    </p>
+
+                                                    <p
+                                                        className="
+                                                            mt-2
+                                                            text-[13px]
+                                                            leading-5
+                                                            text-modura-gray-600
+                                                        "
+                                                    >
+                                                        {position.experience}
+                                                    </p>
+                                                </div>
+
+
+                                                {/* VACANCY */}
+
+                                                <div>
+                                                    <p
+                                                        className="
+                                                            text-[15px]
+                                                            font-bold
+                                                            tracking-[0.2em]
+                                                            text-modura-secondary
+                                                            uppercase
+                                                        "
+                                                    >
+                                                        No. Of Vacancy
+                                                    </p>
+
+                                                    <p
+                                                        className="
+                                                            mt-2
+                                                            text-[13px]
+                                                            leading-5
+                                                            text-modura-gray-600
+                                                        "
+                                                    >
+                                                        {position.vacancy}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+
+                                            {/* =================================================
+                                                APPLY BUTTON
+                                            ================================================= */}
+
+                                            <Link
+                                                href="#application"
+                                                className="
+                                                    group/apply
+                                                    border-modura-primary
+                                                    bg-modura-white
+                                                    text-modura-primary
+                                                    relative
+                                                    inline-flex
+                                                    h-[52px]
+                                                    w-fit
+                                                    shrink-0
+                                                    items-center
+                                                    overflow-hidden
+                                                    border
+                                                    pr-[62px]
+                                                    pl-5
+                                                "
+                                            >
+
+                                                {/* PRIMARY FILL */}
+
+                                                <span
+                                                    className="
+                                                        bg-modura-primary
+                                                        absolute
+                                                        inset-y-0
+                                                        left-0
+                                                        w-0
+                                                        transition-all
+                                                        duration-500
+                                                        group-hover/apply:w-full
+                                                    "
+                                                />
+
+                                                {/* TOP LINE */}
+
+                                                <span
+                                                    className="
+                                                        bg-modura-secondary
+                                                        absolute
+                                                        top-0
+                                                        left-0
+                                                        z-10
+                                                        h-[3px]
+                                                        w-8
+                                                        transition-all
+                                                        duration-500
+                                                        group-hover/apply:w-full
+                                                    "
+                                                />
+
+                                                {/* TECHNICAL MARK */}
+
+                                                <span
+                                                    className="
+                                                        relative
+                                                        z-10
+                                                        mr-3
+                                                        flex
+                                                        items-center
+                                                    "
+                                                >
+                                                    <span
+                                                        className="
+                                                            bg-modura-secondary
+                                                            group-hover/apply:bg-modura-white
+                                                            h-[5px]
+                                                            w-[5px]
+                                                            rotate-45
+                                                            transition-colors
+                                                            duration-300
+                                                        "
+                                                    />
+                                                </span>
+
+                                                {/* TEXT */}
+
+                                                <span
+                                                    className="
+                                                        group-hover/apply:text-modura-white
+                                                        relative
+                                                        z-10
+                                                        text-[11px]
+                                                        font-bold
+                                                        tracking-[0.12em]
+                                                        whitespace-nowrap
+                                                        uppercase
+                                                        transition-colors
+                                                        duration-300
+                                                    "
+                                                >
+                                                    Apply Now
+                                                </span>
+
+                                                {/* ARROW */}
+
+                                                <span
+                                                    className="
+                                                        bg-modura-primary
+                                                        text-modura-white
+                                                        group-hover/apply:bg-modura-secondary
+                                                        absolute
+                                                        top-0
+                                                        right-0
+                                                        z-10
+                                                        flex
+                                                        h-full
+                                                        w-[48px]
+                                                        items-center
+                                                        justify-center
+                                                        transition-colors
+                                                        duration-300
+                                                    "
+                                                >
+                                                    <FiArrowUpRight
+                                                        className="
+                                                            text-[18px]
+                                                            transition-transform
+                                                            duration-300
+                                                            group-hover/apply:rotate-45
+                                                        "
+                                                    />
+                                                </span>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                </article>
                             ))}
                         </div>
                     </div>
@@ -794,9 +1500,9 @@ export default function Career() {
                     className="
                         career-application
                         bg-modura-white
-                        py-16
-                        md:py-20
-                        lg:py-24
+                        py-10
+                        md:py-14
+                        
                     "
                 >
                     <div
@@ -821,23 +1527,16 @@ export default function Career() {
                             <div>
                                 <div
                                     className="
-                                        mb-4
+                                        mb-2
                                         flex
                                         items-center
                                         gap-3
                                     "
                                 >
+                                    
                                     <span
                                         className="
-                                            h-[2px]
-                                            w-12
-                                            bg-modura-secondary
-                                        "
-                                    />
-
-                                    <span
-                                        className="
-                                            text-[10px]
+                                            text-[13px]
                                             font-bold
                                             tracking-[0.35em]
                                             text-modura-secondary
@@ -867,10 +1566,10 @@ export default function Career() {
 
                                 <p
                                     className="
-                                        mt-6
+                                        mt-4
                                         max-w-[430px]
                                         text-[15px]
-                                        leading-8
+                                        leading-6
                                         text-modura-gray-600
                                     "
                                 >
@@ -922,34 +1621,33 @@ export default function Career() {
                                 </div>
                             </div>
 
-                            {/* FORM */}
+                            {/* =================================================
+                                APPLICATION FORM
+                            ================================================= */}
 
-                            <form
-                                className="
-                                    grid
-                                    gap-5
-                                "
-                            >
-                                {/* NAME + EMAIL */}
+                            <form className="grid gap-6">
+
+                                {/* =================================================
+                                    NAME + EMAIL
+                                ================================================= */}
 
                                 <div
                                     className="
                                         grid
                                         gap-5
-
                                         md:grid-cols-2
                                     "
                                 >
+                                    {/* NAME */}
+
                                     <div>
                                         <label
                                             className="
                                                 mb-2
                                                 block
-                                                text-[10px]
-                                                font-bold
-                                                tracking-[0.16em]
+                                                text-[14px]
+                                                font-semibold
                                                 text-modura-primary
-                                                uppercase
                                             "
                                         >
                                             Name *
@@ -965,26 +1663,30 @@ export default function Career() {
                                                 border-modura-gray-300
                                                 bg-modura-white
                                                 px-4
-                                                text-sm
+                                                text-[14px]
                                                 text-modura-primary
                                                 outline-none
-                                                transition
+                                                transition-all
+                                                duration-300
                                                 placeholder:text-modura-gray-400
                                                 focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
                                             "
                                         />
                                     </div>
+
+
+                                    {/* EMAIL */}
 
                                     <div>
                                         <label
                                             className="
                                                 mb-2
                                                 block
-                                                text-[10px]
-                                                font-bold
-                                                tracking-[0.16em]
+                                                text-[14px]
+                                                font-semibold
                                                 text-modura-primary
-                                                uppercase
                                             "
                                         >
                                             Email *
@@ -1000,37 +1702,42 @@ export default function Career() {
                                                 border-modura-gray-300
                                                 bg-modura-white
                                                 px-4
-                                                text-sm
+                                                text-[14px]
                                                 text-modura-primary
                                                 outline-none
-                                                transition
+                                                transition-all
+                                                duration-300
                                                 placeholder:text-modura-gray-400
                                                 focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
                                             "
                                         />
                                     </div>
                                 </div>
 
-                                {/* PHONE + POSITION */}
+
+                                {/* =================================================
+                                    PHONE + EXPERIENCE
+                                ================================================= */}
 
                                 <div
                                     className="
                                         grid
                                         gap-5
-
                                         md:grid-cols-2
                                     "
                                 >
+                                    {/* PHONE */}
+
                                     <div>
                                         <label
                                             className="
                                                 mb-2
                                                 block
-                                                text-[10px]
-                                                font-bold
-                                                tracking-[0.16em]
+                                                text-[14px]
+                                                font-semibold
                                                 text-modura-primary
-                                                uppercase
                                             "
                                         >
                                             Phone *
@@ -1046,32 +1753,93 @@ export default function Career() {
                                                 border-modura-gray-300
                                                 bg-modura-white
                                                 px-4
-                                                text-sm
+                                                text-[14px]
                                                 text-modura-primary
                                                 outline-none
-                                                transition
+                                                transition-all
+                                                duration-300
                                                 placeholder:text-modura-gray-400
                                                 focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
                                             "
                                         />
                                     </div>
+
+
+                                    {/* EXPERIENCE */}
 
                                     <div>
                                         <label
                                             className="
                                                 mb-2
                                                 block
-                                                text-[10px]
-                                                font-bold
-                                                tracking-[0.16em]
+                                                text-[14px]
+                                                font-semibold
                                                 text-modura-primary
-                                                uppercase
                                             "
                                         >
-                                            Position
+                                            Experience *
                                         </label>
 
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. 3 years"
+                                            className="
+                                                h-14
+                                                w-full
+                                                border
+                                                border-modura-gray-300
+                                                bg-modura-white
+                                                px-4
+                                                text-[14px]
+                                                text-modura-primary
+                                                outline-none
+                                                transition-all
+                                                duration-300
+                                                placeholder:text-modura-gray-400
+                                                focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
+                                            "
+                                        />
+                                    </div>
+                                </div>
+
+
+                                {/* =================================================
+                                    POSITION
+                                ================================================= */}
+
+                                <div>
+                                    <label
+                                        className="
+                                            mb-2
+                                            block
+                                            text-[14px]
+                                            font-semibold
+                                            text-modura-primary
+                                        "
+                                    >
+                                        Position *
+                                    </label>
+
+                                    <div className="relative">
+                                        <FiBriefcase
+                                            size={18}
+                                            className="
+                                                text-modura-secondary
+                                                pointer-events-none
+                                                absolute
+                                                top-1/2
+                                                left-4
+                                                z-10
+                                                -translate-y-1/2
+                                            "
+                                        />
+
                                         <select
+                                            defaultValue=""
                                             className="
                                                 h-14
                                                 w-full
@@ -1079,15 +1847,22 @@ export default function Career() {
                                                 border
                                                 border-modura-gray-300
                                                 bg-modura-white
-                                                px-4
-                                                text-sm
+                                                px-12
+                                                pr-12
+                                                text-[14px]
                                                 text-modura-primary
                                                 outline-none
+                                                transition-all
+                                                duration-300
                                                 focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
                                             "
-                                            defaultValue=""
                                         >
-                                            <option value="" disabled>
+                                            <option
+                                                value=""
+                                                disabled
+                                            >
                                                 Select position
                                             </option>
 
@@ -1100,69 +1875,241 @@ export default function Career() {
                                                 </option>
                                             ))}
                                         </select>
+
+                                        <span
+                                            className="
+                                                pointer-events-none
+                                                absolute
+                                                top-1/2
+                                                right-4
+                                                -translate-y-1/2
+                                                text-modura-secondary
+                                            "
+                                        >
+                                            <svg
+                                                width="16"
+                                                height="16"
+                                                viewBox="0 0 16 16"
+                                                fill="none"
+                                            >
+                                                <path
+                                                    d="M4 6L8 10L12 6"
+                                                    stroke="currentColor"
+                                                    strokeWidth="1.5"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                />
+                                            </svg>
+                                        </span>
                                     </div>
                                 </div>
 
-                                {/* RESUME */}
 
-                                <div>
-                                    <label
-                                        className="
-                                            mb-2
-                                            block
-                                            text-[10px]
-                                            font-bold
-                                            tracking-[0.16em]
-                                            text-modura-primary
-                                            uppercase
-                                        "
-                                    >
-                                        Resume / CV *
-                                    </label>
+                                {/* =================================================
+                                    CURRENT CTC + EXPECTED CTC
+                                ================================================= */}
 
-                                    <input
-                                        type="file"
-                                        className="
-                                            block
-                                            h-14
-                                            w-full
-                                            border
-                                            border-modura-gray-300
-                                            bg-modura-white
-                                            px-4
-                                            py-4
-                                            text-sm
-                                            text-modura-gray-500
-                                            file:mr-4
-                                            file:border-0
-                                            file:bg-transparent
-                                            file:text-xs
-                                            file:font-bold
-                                            file:text-modura-primary
-                                        "
-                                    />
+                                <div
+                                    className="
+                                        grid
+                                        gap-5
+                                        md:grid-cols-2
+                                    "
+                                >
+                                    {/* CURRENT CTC */}
+
+                                    <div>
+                                        <label
+                                            className="
+                                                mb-2
+                                                block
+                                                text-[14px]
+                                                font-semibold
+                                                text-modura-primary
+                                            "
+                                        >
+                                            Current CTC *
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            placeholder="Enter current CTC"
+                                            className="
+                                                h-14
+                                                w-full
+                                                border
+                                                border-modura-gray-300
+                                                bg-modura-white
+                                                px-4
+                                                text-[14px]
+                                                text-modura-primary
+                                                outline-none
+                                                transition-all
+                                                duration-300
+                                                placeholder:text-modura-gray-400
+                                                focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
+                                            "
+                                        />
+                                    </div>
+
+
+                                    {/* EXPECTED CTC */}
+
+                                    <div>
+                                        <label
+                                            className="
+                                                mb-2
+                                                block
+                                                text-[14px]
+                                                font-semibold
+                                                text-modura-primary
+                                            "
+                                        >
+                                            Expected CTC *
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            placeholder="Enter expected CTC"
+                                            className="
+                                                h-14
+                                                w-full
+                                                border
+                                                border-modura-gray-300
+                                                bg-modura-white
+                                                px-4
+                                                text-[14px]
+                                                text-modura-primary
+                                                outline-none
+                                                transition-all
+                                                duration-300
+                                                placeholder:text-modura-gray-400
+                                                focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
+                                            "
+                                        />
+                                    </div>
                                 </div>
 
-                                {/* MESSAGE */}
+
+                                {/* =================================================
+                                    NOTICE PERIOD + PORTFOLIO
+                                ================================================= */}
+
+                                <div
+                                    className="
+                                        grid
+                                        gap-5
+                                        md:grid-cols-2
+                                    "
+                                >
+                                    {/* NOTICE PERIOD */}
+
+                                    <div>
+                                        <label
+                                            className="
+                                                mb-2
+                                                block
+                                                text-[14px]
+                                                font-semibold
+                                                text-modura-primary
+                                            "
+                                        >
+                                            Notice Period *
+                                        </label>
+
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                placeholder="Enter notice period in months"
+                                                className="
+                                                    h-14
+                                                    w-full
+                                                    border
+                                                    border-modura-gray-300
+                                                    bg-modura-white
+                                                    px-4
+                                                    text-[14px]
+                                                    text-modura-primary
+                                                    outline-none
+                                                    transition-all
+                                                    duration-300
+                                                    placeholder:text-modura-gray-400
+                                                    focus:border-modura-secondary
+                                                    focus:ring-1
+                                                    focus:ring-modura-secondary/20
+                                                "
+                                            />
+
+                                            
+                                        </div>
+                                    </div>
+
+
+                                    {/* PORTFOLIO */}
+
+                                    <div>
+                                        <label
+                                            className="
+                                                mb-2
+                                                block
+                                                text-[14px]
+                                                font-semibold
+                                                text-modura-primary
+                                            "
+                                        >
+                                            Portfolio Link
+                                        </label>
+
+                                        <input
+                                            type="url"
+                                            placeholder="https://yourportfolio.com"
+                                            className="
+                                                h-14
+                                                w-full
+                                                border
+                                                border-modura-gray-300
+                                                bg-modura-white
+                                                px-4
+                                                text-[14px]
+                                                text-modura-primary
+                                                outline-none
+                                                transition-all
+                                                duration-300
+                                                placeholder:text-modura-gray-400
+                                                focus:border-modura-secondary
+                                                focus:ring-1
+                                                focus:ring-modura-secondary/20
+                                            "
+                                        />
+                                    </div>
+                                </div>
+
+
+                                {/* =================================================
+                                    COVER LETTER
+                                ================================================= */}
 
                                 <div>
                                     <label
                                         className="
                                             mb-2
                                             block
-                                            text-[10px]
-                                            font-bold
-                                            tracking-[0.16em]
+                                            text-[14px]
+                                            font-semibold
                                             text-modura-primary
-                                            uppercase
                                         "
                                     >
-                                        Tell Us About Yourself
+                                        Cover Letter *
                                     </label>
 
                                     <textarea
-                                        rows={6}
-                                        placeholder="Share your experience, expertise and what you would like to contribute..."
+                                        rows={7}
+                                        placeholder="Tell us about yourself, your experience, expertise and why you would be a good fit for this position..."
                                         className="
                                             w-full
                                             resize-none
@@ -1171,44 +2118,355 @@ export default function Career() {
                                             bg-modura-white
                                             px-4
                                             py-4
-                                            text-sm
+                                            text-[14px]
                                             leading-7
                                             text-modura-primary
                                             outline-none
-                                            transition
+                                            transition-all
+                                            duration-300
                                             placeholder:text-modura-gray-400
                                             focus:border-modura-secondary
+                                            focus:ring-1
+                                            focus:ring-modura-secondary/20
                                         "
                                     />
                                 </div>
 
-                                {/* SUBMIT */}
 
-                                <button
-                                    type="submit"
-                                    className="
-                                        mt-2
-                                        flex
-                                        h-14
-                                        items-center
-                                        justify-center
-                                        gap-4
-                                        bg-modura-primary
-                                        px-8
-                                        text-[11px]
-                                        font-bold
-                                        tracking-[0.2em]
-                                        text-modura-white
-                                        uppercase
-                                        transition-all
-                                        duration-300
-                                        hover:bg-modura-secondary
-                                    "
-                                >
-                                    Submit Application
+                                {/* =================================================
+                                    CREATIVE RESUME UPLOAD
+                                ================================================= */}
 
-                                    <FiArrowUpRight size={17} />
-                                </button>
+                                <div>
+                                    <label
+                                        className="
+                                            mb-2
+                                            block
+                                            text-[14px]
+                                            font-semibold
+                                            text-modura-primary
+                                        "
+                                    >
+                                        Upload Resume *
+                                    </label>
+
+                                    <label
+                                        className="
+                                            group
+                                            relative
+                                            flex
+                                            min-h-[145px]
+                                            cursor-pointer
+                                            items-center
+                                            justify-center
+                                            overflow-hidden
+                                            border
+                                            border-dashed
+                                            border-modura-gray-300
+                                            bg-modura-off-white
+                                            px-6
+                                            py-8
+                                            transition-all
+                                            duration-300
+                                            hover:border-modura-secondary
+                                            hover:bg-modura-light
+                                        "
+                                    >
+                                        {/* BACKGROUND ACCENT */}
+
+                                        <span
+                                            className="
+                                                pointer-events-none
+                                                absolute
+                                                top-0
+                                                left-0
+                                                h-[3px]
+                                                w-14
+                                                bg-modura-secondary
+                                                transition-all
+                                                duration-500
+                                                group-hover:w-full
+                                            "
+                                        />
+
+                                        <span
+                                            className="
+                                                pointer-events-none
+                                                absolute
+                                                right-0
+                                                bottom-0
+                                                h-14
+                                                w-14
+                                                border-t
+                                                border-l
+                                                border-modura-secondary/20
+                                            "
+                                        />
+
+                                        <div
+                                            className="
+                                                relative
+                                                z-10
+                                                flex
+                                                flex-col
+                                                items-center
+                                                text-center
+                                            "
+                                        >
+                                            {/* =================================================
+                                                FILE ICON
+                                            ================================================= */}
+
+                                            <span
+                                                className={`
+                                                    mb-4
+                                                    flex
+                                                    h-12
+                                                    w-12
+                                                    items-center
+                                                    justify-center
+                                                    border
+                                                    bg-modura-white
+                                                    transition-all
+                                                    duration-300
+
+                                                    ${
+                                                        resume
+                                                            ? 'border-modura-primary bg-modura-primary text-modura-white'
+                                                            : 'border-modura-secondary text-modura-secondary group-hover:bg-modura-primary group-hover:text-modura-white'
+                                                    }
+                                                `}
+                                            >
+                                                {resume ? (
+                                                    <FiCheck size={22} />
+                                                ) : (
+                                                    <FiUploadCloud size={22} />
+                                                )}
+                                            </span>
+
+
+                                            {/* =================================================
+                                                FILE NAME / DEFAULT TEXT
+                                            ================================================= */}
+
+                                            {resume ? (
+                                                <>
+                                                    <span
+                                                        className="
+                                                            max-w-[400px]
+                                                            truncate
+                                                            text-[14px]
+                                                            font-semibold
+                                                            text-modura-primary
+                                                        "
+                                                    >
+                                                        {resume.name}
+                                                    </span>
+
+                                                    <span
+                                                        className="
+                                                            mt-1
+                                                            text-[12px]
+                                                            text-modura-gray-500
+                                                        "
+                                                    >
+                                                        {(resume.size / 1024 / 1024).toFixed(2)} MB
+                                                    </span>
+
+                                                    <span
+                                                        className="
+                                                            mt-2
+                                                            text-[11px]
+                                                            font-medium
+                                                            text-modura-secondary
+                                                        "
+                                                    >
+                                                        Click to change file
+                                                    </span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span
+                                                        className="
+                                                            text-[14px]
+                                                            font-semibold
+                                                            text-modura-primary
+                                                        "
+                                                    >
+                                                        Click to upload your resume
+                                                    </span>
+
+                                                    <span
+                                                        className="
+                                                            mt-1
+                                                            text-[12px]
+                                                            text-modura-gray-500
+                                                        "
+                                                    >
+                                                        PDF, DOC or DOCX • Maximum 2 MB
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+
+
+                                        {/* =================================================
+                                            FILE INPUT
+                                        ================================================= */}
+
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.doc,.docx"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+
+                                                if (!file) return;
+
+                                                const maxSize = 2 * 1024 * 1024; // 2 MB
+
+                                                if (file.size > maxSize) {
+                                                    alert('File size must be less than 2 MB.');
+                                                    e.target.value = '';
+                                                    setResume(null);
+                                                    return;
+                                                }
+
+                                                setResume(file);
+                                            }}
+                                        />
+                                    </label>
+                                </div>
+
+
+                                {/* =================================================
+                                    SUBMIT
+                                ================================================= */}
+
+                                <div className="pt-2">
+                                    <button
+                                        type="submit"
+                                        className="
+                                            group
+                                            border-modura-primary
+                                            bg-modura-white
+                                            text-modura-primary
+                                            relative
+                                            inline-flex
+                                            h-[52px]
+                                            items-center
+                                            overflow-hidden
+                                            border
+                                            pr-[62px]
+                                            pl-5
+                                        "
+                                    >
+                                        {/* PRIMARY FILL */}
+
+                                        <span
+                                            className="
+                                                bg-modura-primary
+                                                absolute
+                                                inset-y-0
+                                                left-0
+                                                w-0
+                                                transition-all
+                                                duration-500
+                                                group-hover:w-full
+                                            "
+                                        />
+
+                                        {/* TOP LINE */}
+
+                                        <span
+                                            className="
+                                                bg-modura-secondary
+                                                absolute
+                                                top-0
+                                                left-0
+                                                z-10
+                                                h-[3px]
+                                                w-8
+                                                transition-all
+                                                duration-500
+                                                group-hover:w-full
+                                            "
+                                        />
+
+                                        {/* TECHNICAL MARK */}
+
+                                        <span
+                                            className="
+                                                relative
+                                                z-10
+                                                mr-3
+                                                flex
+                                                items-center
+                                            "
+                                        >
+                                            <span
+                                                className="
+                                                    bg-modura-secondary
+                                                    group-hover:bg-modura-white
+                                                    h-[5px]
+                                                    w-[5px]
+                                                    rotate-45
+                                                    transition-colors
+                                                    duration-300
+                                                "
+                                            />
+                                        </span>
+
+                                        {/* TEXT */}
+
+                                        <span
+                                            className="
+                                                group-hover:text-modura-white
+                                                relative
+                                                z-10
+                                                text-[12px]
+                                                font-bold
+                                                tracking-[0.08em]
+                                                whitespace-nowrap
+                                                uppercase
+                                                transition-colors
+                                                duration-300
+                                            "
+                                        >
+                                            Submit Application
+                                        </span>
+
+                                        {/* ARROW */}
+
+                                        <span
+                                            className="
+                                                bg-modura-primary
+                                                text-modura-white
+                                                group-hover:bg-modura-secondary
+                                                absolute
+                                                top-0
+                                                right-0
+                                                z-10
+                                                flex
+                                                h-full
+                                                w-[48px]
+                                                items-center
+                                                justify-center
+                                                transition-colors
+                                                duration-300
+                                            "
+                                        >
+                                            <FiArrowUpRight
+                                                className="
+                                                    text-[18px]
+                                                    transition-transform
+                                                    duration-300
+                                                    group-hover:rotate-45
+                                                "
+                                            />
+                                        </span>
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>

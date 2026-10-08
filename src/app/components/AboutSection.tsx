@@ -187,7 +187,7 @@ const AboutSection = () => {
 
                         <div className="mt-7">
                             <Link
-                                href="#"
+                                href="/company#about-us"
                                 className="group/about-btn border-modura-primary bg-modura-white text-modura-primary relative inline-flex h-[54px] items-center overflow-hidden border pr-[64px] pl-5"
                             >
                                 {/* HOVER BACKGROUND */}

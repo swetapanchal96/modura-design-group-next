@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { FiArrowRight, FiArrowUpRight, FiChevronDown, FiChevronRight, FiMenu, FiX } from 'react-icons/fi';
+import { FiArrowRight, FiArrowUpRight, FiBox, FiChevronDown, FiChevronRight, FiFileText, FiGrid, FiHome, FiLayers, FiMenu, FiSettings, FiX } from 'react-icons/fi';
 
 import { PiBlueprint, PiBuildings, PiBridge, PiCube, PiGear, PiStack } from 'react-icons/pi';
 
@@ -33,7 +33,7 @@ type ServiceCategory = {
 const companyLinks = [
     {
         title: 'About Modura',
-        href: '#',
+        href: '/company#about-us',
     },
     {
         title: 'Why Choose Us',
@@ -511,39 +511,50 @@ const softwareLinks = [
 const portfolioLinks = [
     {
         title: 'Steel Detailing Samples',
-        href: '#',
+        href: '/portfolio',
+        icon: FiLayers,
     },
     {
         title: 'Rebar Detailing Samples',
-        href: '#',
+        href: '/portfolio/rebar-detailing',
+        icon: FiLayers,
     },
     {
         title: 'Architectural Samples',
-        href: '#',
+        href: '/portfolio/architectural',
+        icon: FiHome,
     },
     {
         title: 'Structural Samples',
-        href: '#',
+        href: '/portfolio/structural',
+        icon: FiLayers,
     },
     {
         title: 'Facade Shop Drawings',
-        href: '#',
+        href: '/portfolio/facade',
+        icon: FiBox,
     },
     {
         title: 'Precast Shop Drawings',
-        href: '#',
+        href: '/portfolio/precast',
+        icon: FiGrid,
+    },
+
+    // More items...
+    {
+        title: 'MEP Coordination',
+        href: '/portfolio/mep',
+        icon: FiSettings,
     },
     {
-        title: 'BIM Samples',
-        href: '#',
+        title: 'BIM Coordination',
+        href: '/portfolio/bim',
+        icon: FiLayers,
     },
     {
-        title: 'Mechanical Detailing',
-        href: '#',
-    },
-    {
-        title: 'Millwork / Joinery',
-        href: '#',
+        title: 'Shop Drawing Services',
+        href: '/portfolio/shop-drawings',
+        icon: FiFileText,
     },
 ];
 
@@ -1002,139 +1013,452 @@ export default function Header() {
                         </div>
 
                         {/* =================================================
-    PORTFOLIO DROPDOWN
-================================================== */}
+                            PORTFOLIO DROPDOWN
+                        ================================================= */}
 
                         <div className="group/portfolio relative h-full">
+
+                            {/* =================================================
+                                PORTFOLIO TRIGGER
+                            ================================================= */}
+
                             <DesktopDropdownTrigger title="Portfolio" />
 
-                            <div className="invisible absolute top-full right-0 w-[760px] translate-y-3 opacity-0 transition-all duration-300 group-hover/portfolio:visible group-hover/portfolio:translate-y-0 group-hover/portfolio:opacity-100">
-                                {/* =========================================
-            TOP ACCENT
-        ========================================== */}
 
-                                <div className="bg-modura-primary relative h-[5px]">
-                                    <span className="bg-modura-secondary absolute top-0 right-0 h-full w-[150px]" />
-                                </div>
+                            {/* =================================================
+                                DROPDOWN
+                            ================================================= */}
 
-                                {/* =========================================
-            MAIN DROPDOWN
-        ========================================== */}
+                            <div
+                                className="
+                                    invisible
+                                    absolute
+                                    top-full
+                                    right-0
+                                    z-50
+                                    w-[390px]
+                                    translate-y-3
+                                    opacity-0
+                                    transition-all
+                                    duration-300
 
-                                <div className="border-modura-gray-200 bg-modura-white overflow-hidden border-x border-b shadow-xl">
-                                    {/* =====================================
-                HEADER
-            ====================================== */}
+                                    group-hover/portfolio:visible
+                                    group-hover/portfolio:translate-y-0
+                                    group-hover/portfolio:opacity-100
+                                "
+                            >
 
-                                    <div className="border-modura-gray-200 relative flex items-center justify-between overflow-hidden border-b px-7 py-5">
+                                {/* =================================================
+                                    MAIN DROPDOWN
+                                ================================================= */}
+
+                                <div
+                                    className="
+                                        overflow-hidden
+                                        border
+                                        border-modura-gray-200
+                                        bg-modura-white
+                                        shadow-[0_20px_50px_rgba(11,29,51,0.14)]
+                                    "
+                                >
+
+                                    {/* =================================================
+                                        TOP ACCENT
+                                    ================================================= */}
+
+                                    <div
+                                        className="
+                                            relative
+                                            h-[5px]
+                                            bg-modura-primary
+                                        "
+                                    >
+                                        <span
+                                            className="
+                                                absolute
+                                                top-0
+                                                right-0
+                                                h-full
+                                                w-[120px]
+                                                bg-modura-secondary
+                                            "
+                                        />
+                                    </div>
+
+
+                                    {/* =================================================
+                                        HEADER
+                                    ================================================= */}
+
+                                    <div
+                                        className="
+                                            flex
+                                            items-center
+                                            justify-between
+                                            border-b
+                                            border-modura-gray-200
+                                            px-5
+                                            py-4
+                                        "
+                                    >
+
                                         <div>
-                                            <span className="text-modura-secondary text-[9px] font-bold tracking-[0.2em] uppercase">
-                                                Our Work
+
+                                            <span
+                                                className="
+                                                    block
+                                                    text-[9px]
+                                                    font-bold
+                                                    tracking-[0.25em]
+                                                    text-modura-secondary
+                                                    uppercase
+                                                "
+                                            >
+                                                Portfolio
                                             </span>
 
-                                            <h3 className="text-modura-primary mt-1 text-[21px] font-semibold tracking-[-0.02em]">
-                                                Explore Our Project Portfolio
+                                            <h3
+                                                className="
+                                                    mt-1
+                                                    text-[17px]
+                                                    font-bold
+                                                    tracking-[-0.01em]
+                                                    text-modura-primary
+                                                "
+                                            >
+                                                Explore Our Work
                                             </h3>
+
                                         </div>
+
+
+                                        {/* VIEW ALL */}
 
                                         <Link
                                             href="/portfolio"
-                                            className="group/view-portfolio text-modura-primary flex items-center gap-3 text-[11px] font-semibold"
+                                            className="
+                                                group/view-all
+                                                flex
+                                                items-center
+                                                gap-2
+                                                text-[10px]
+                                                font-bold
+                                                tracking-[0.08em]
+                                                text-modura-primary
+                                                uppercase
+                                            "
                                         >
-                                            View Complete Portfolio
-                                            <span className="border-modura-gray-200 group-hover/view-portfolio:border-modura-primary group-hover/view-portfolio:bg-modura-primary group-hover/view-portfolio:text-modura-white flex h-8 w-8 items-center justify-center border transition-all duration-300">
-                                                <FiArrowUpRight className="text-[15px] transition-transform duration-300 group-hover/view-portfolio:translate-x-[2px] group-hover/view-portfolio:-translate-y-[2px]" />
+                                            <span>
+                                                View All
+                                            </span>
+
+                                            <span
+                                                className="
+                                                    flex
+                                                    h-7
+                                                    w-7
+                                                    items-center
+                                                    justify-center
+                                                    border
+                                                    border-modura-gray-300
+                                                    transition-all
+                                                    duration-300
+
+                                                    group-hover/view-all:border-modura-primary
+                                                    group-hover/view-all:bg-modura-primary
+                                                    group-hover/view-all:text-modura-white
+                                                "
+                                            >
+                                                <FiArrowUpRight
+                                                    size={14}
+                                                    className="
+                                                        transition-transform
+                                                        duration-300
+                                                        group-hover/view-all:translate-x-[2px]
+                                                        group-hover/view-all:-translate-y-[2px]
+                                                    "
+                                                />
                                             </span>
                                         </Link>
+
                                     </div>
 
-                                    {/* =====================================
-                PORTFOLIO GRID
-            ====================================== */}
 
-                                    <div className="grid grid-cols-3">
-                                        {portfolioLinks.map((item) => (
+                                    {/* =================================================
+                                        SCROLLABLE PORTFOLIO LIST
+                                    ================================================= */}
+
+                                    <div
+                                        className="
+                                            max-h-[430px]
+                                            overflow-y-auto
+                                            overscroll-contain
+
+                                            [&::-webkit-scrollbar]:w-[5px]
+                                            [&::-webkit-scrollbar-track]:bg-modura-gray-100
+                                            [&::-webkit-scrollbar-thumb]:bg-modura-secondary
+                                            [&::-webkit-scrollbar-thumb:hover]:bg-modura-primary
+                                        "
+                                    >
+
+                                        {portfolioLinks.map((item, index) => (
+
                                             <Link
                                                 key={item.title}
                                                 href={item.href}
-                                                className="group/portfolio-item border-modura-gray-200 hover:bg-modura-off-white relative flex min-h-[92px] items-center overflow-hidden border-r border-b px-5 transition-colors duration-300 [&:nth-child(3n)]:border-r-0"
+                                                className="
+                                                    group/portfolio-item
+                                                    relative
+                                                    flex
+                                                    min-h-[68px]
+                                                    items-center
+                                                    border-b
+                                                    border-modura-gray-200
+                                                    bg-modura-white
+                                                    px-5
+                                                    transition-all
+                                                    duration-300
+
+                                                    hover:bg-modura-off-white
+                                                "
                                             >
-                                                {/* LEFT ARCHITECTURAL MARK */}
 
-                                                <span className="relative mr-4 h-[28px] w-[18px] shrink-0">
-                                                    <span className="bg-modura-gray-300 group-hover/portfolio-item:bg-modura-secondary absolute bottom-0 left-0 h-full w-px transition-all duration-300" />
+                                                {/* =================================================
+                                                    LEFT ARCHITECTURAL MARK
+                                                ================================================= */}
 
-                                                    <span className="bg-modura-gray-300 group-hover/portfolio-item:bg-modura-secondary absolute bottom-0 left-0 h-px w-[12px] transition-all duration-300 group-hover/portfolio-item:w-[18px]" />
+                                                <span
+                                                    className="
+                                                        relative
+                                                        mr-4
+                                                        flex
+                                                        h-[34px]
+                                                        w-[34px]
+                                                        shrink-0
+                                                        items-center
+                                                        justify-center
+                                                        border
+                                                        border-modura-gray-300
+                                                        text-modura-secondary
+                                                        transition-all
+                                                        duration-300
 
-                                                    <span className="bg-modura-gray-200 group-hover/portfolio-item:bg-modura-secondary-light absolute top-[7px] left-[6px] h-[21px] w-px transition-all duration-300 group-hover/portfolio-item:h-[15px]" />
+                                                        group-hover/portfolio-item:border-modura-primary
+                                                        group-hover/portfolio-item:bg-modura-primary
+                                                        group-hover/portfolio-item:text-modura-white
+                                                    "
+                                                >
 
-                                                    <span className="bg-modura-gray-200 group-hover/portfolio-item:bg-modura-secondary-light absolute top-[13px] left-[12px] h-[15px] w-px transition-all duration-300 group-hover/portfolio-item:h-[9px]" />
+                                                    {/* Use your actual item icon if available */}
+
+                                                    {item.icon ? (
+                                                        <item.icon size={17} />
+                                                    ) : (
+                                                        <FiLayers size={17} />
+                                                    )}
+
                                                 </span>
 
-                                                {/* TITLE */}
 
-                                                <span className="text-modura-gray-700 group-hover/portfolio-item:text-modura-primary relative z-10 flex-1 text-[12px] leading-[1.5] font-semibold transition-colors duration-300">
+                                                {/* =================================================
+                                                    ACTIVE LEFT LINE
+                                                ================================================= */}
+
+                                                <span
+                                                    className="
+                                                        absolute
+                                                        top-1/2
+                                                        left-0
+                                                        h-0
+                                                        w-[3px]
+                                                        -translate-y-1/2
+                                                        bg-modura-secondary
+                                                        transition-all
+                                                        duration-300
+
+                                                        group-hover/portfolio-item:h-[32px]
+                                                    "
+                                                />
+
+
+                                                {/* =================================================
+                                                    TITLE
+                                                ================================================= */}
+
+                                                <span
+                                                    className="
+                                                        flex-1
+                                                        pr-8
+                                                        text-[12px]
+                                                        font-semibold
+                                                        leading-5
+                                                        text-modura-gray-700
+                                                        transition-colors
+                                                        duration-300
+
+                                                        group-hover/portfolio-item:text-modura-primary
+                                                    "
+                                                >
                                                     {item.title}
                                                 </span>
 
-                                                {/* ARROW */}
 
-                                                <FiArrowUpRight className="text-modura-primary absolute top-4 right-4 -translate-x-1 translate-y-1 text-[15px] opacity-0 transition-all duration-300 group-hover/portfolio-item:translate-x-0 group-hover/portfolio-item:translate-y-0 group-hover/portfolio-item:opacity-100" />
+                                                {/* =================================================
+                                                    ARROW
+                                                ================================================= */}
 
-                                                {/* HOVER LINE */}
+                                                <span
+                                                    className="
+                                                        absolute
+                                                        right-5
+                                                        flex
+                                                        h-7
+                                                        w-7
+                                                        items-center
+                                                        justify-center
+                                                        border
+                                                        border-transparent
+                                                        text-modura-primary
+                                                        opacity-0
+                                                        translate-x-[-5px]
+                                                        transition-all
+                                                        duration-300
 
-                                                <span className="bg-modura-secondary absolute bottom-[-1px] left-0 z-10 h-[2px] w-0 transition-all duration-500 group-hover/portfolio-item:w-full" />
+                                                        group-hover/portfolio-item:translate-x-0
+                                                        group-hover/portfolio-item:opacity-100
+                                                    "
+                                                >
+                                                    <FiArrowUpRight
+                                                        size={14}
+                                                    />
+                                                </span>
+
+
+                                                {/* =================================================
+                                                    BOTTOM HOVER LINE
+                                                ================================================= */}
+
+                                                <span
+                                                    className="
+                                                        absolute
+                                                        right-0
+                                                        bottom-[-1px]
+                                                        left-0
+                                                        z-10
+                                                        h-[2px]
+                                                        w-0
+                                                        bg-modura-secondary
+                                                        transition-all
+                                                        duration-500
+
+                                                        group-hover/portfolio-item:w-full
+                                                    "
+                                                />
+
                                             </Link>
+
                                         ))}
+
                                     </div>
 
-                                    {/* =====================================
-                BOTTOM FEATURE STRIP
-            ====================================== */}
 
-                                    <div className="bg-modura-primary relative flex min-h-[82px] items-center justify-between overflow-hidden px-7">
-                                        {/* subtle structural drawing */}
+                                    {/* =================================================
+                                        BOTTOM STRIP
+                                    ================================================= */}
 
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 w-[280px]">
-                                            <span className="bg-modura-secondary-dark absolute right-[45px] bottom-0 h-[65px] w-px" />
+                                    <div
+                                        className="
+                                            flex
+                                            items-center
+                                            justify-between
+                                            bg-modura-primary
+                                            px-5
+                                            py-4
+                                        "
+                                    >
 
-                                            <span className="bg-modura-secondary-dark absolute right-[90px] bottom-0 h-[42px] w-px" />
-
-                                            <span className="bg-modura-secondary-dark absolute right-0 bottom-[22px] h-px w-[150px]" />
-
-                                            <span className="bg-modura-secondary-dark absolute right-0 bottom-[43px] h-px w-[105px]" />
-                                        </div>
-
-                                        {/* LEFT */}
-
-                                        <div className="relative z-10 flex items-center gap-5">
-                                            <span className="bg-modura-secondary h-[34px] w-[3px]" />
+                                        <div
+                                            className="
+                                                flex
+                                                items-center
+                                                gap-3
+                                            "
+                                        >
+                                            <span
+                                                className="
+                                                    h-[28px]
+                                                    w-[2px]
+                                                    bg-modura-secondary
+                                                "
+                                            />
 
                                             <div>
-                                                <span className="text-modura-gray-300 block text-[9px] font-bold tracking-[0.18em] uppercase">
-                                                    Design Documentation
+
+                                                <span
+                                                    className="
+                                                        block
+                                                        text-[8px]
+                                                        font-bold
+                                                        tracking-[0.18em]
+                                                        text-modura-gray-300
+                                                        uppercase
+                                                    "
+                                                >
+                                                    Modura Design Group
                                                 </span>
 
-                                                <span className="text-modura-white mt-1 block text-[14px] font-semibold">
-                                                    From concept to construction-ready detail.
+                                                <span
+                                                    className="
+                                                        mt-1
+                                                        block
+                                                        text-[11px]
+                                                        font-medium
+                                                        text-modura-white
+                                                    "
+                                                >
+                                                    Design • Engineering • BIM
                                                 </span>
+
                                             </div>
                                         </div>
 
-                                        {/* RIGHT */}
 
                                         <Link
                                             href="/inquiry"
-                                            className="group/portfolio-talk text-modura-white relative z-10 flex items-center gap-4 text-[11px] font-semibold"
+                                            className="
+                                                group/discuss
+                                                flex
+                                                items-center
+                                                gap-2
+                                                text-[9px]
+                                                font-bold
+                                                tracking-[0.1em]
+                                                text-modura-white
+                                                uppercase
+                                            "
                                         >
-                                            Discuss Your Project
-                                            <span className="border-modura-secondary-dark group-hover/portfolio-talk:border-modura-secondary group-hover/portfolio-talk:bg-modura-secondary flex h-9 w-9 items-center justify-center border transition-all duration-300">
-                                                <FiArrowUpRight className="text-[16px] transition-transform duration-300 group-hover/portfolio-talk:translate-x-[2px] group-hover/portfolio-talk:-translate-y-[2px]" />
+                                            <span>
+                                                Discuss Project
                                             </span>
+
+                                            <FiArrowUpRight
+                                                size={14}
+                                                className="
+                                                    text-modura-secondary
+                                                    transition-transform
+                                                    duration-300
+                                                    group-hover/discuss:translate-x-1
+                                                    group-hover/discuss:-translate-y-1
+                                                "
+                                            />
                                         </Link>
+
                                     </div>
+
                                 </div>
+
                             </div>
+
                         </div>
 
                         <DesktopLink title="Career" href="/career" />
