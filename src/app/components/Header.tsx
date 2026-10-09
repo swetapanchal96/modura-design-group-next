@@ -37,27 +37,27 @@ const companyLinks = [
     },
     {
         title: 'Why Choose Us',
-        href: '#',
+        href: '/company#why-us',
     },
     {
         title: 'Our Team',
-        href: '#',
+        href: '/company#our-team',
     },
     {
         title: 'Quality Policy',
-        href: '#',
+        href: '/company#quality-policy',
     },
     {
         title: 'Certifications',
-        href: '#',
-    },
-    {
-        title: 'Testimonials',
-        href: '#',
+        href: '/company#certifications',
     },
     {
         title: 'FAQs',
-        href: '#',
+        href: '/company#faqs',
+    },
+    {
+        title: 'Blog',
+        href: '/company#blog',
     },
 ];
 
@@ -74,7 +74,7 @@ const serviceCategories: ServiceCategory[] = [
         services: [
             {
                 title: '2D CAD Drafting',
-                href: '#',
+                href: '/services',
             },
             {
                 title: 'CAD Conversion',
@@ -476,7 +476,7 @@ const softwareLinks = [
         title: 'AutoCAD',
         subtitle: 'CAD Drafting',
         icon: PiBlueprint,
-        href: '#',
+        href: '/expertise',
     },
     {
         title: 'Autodesk Revit',
