@@ -257,33 +257,7 @@ export default function IndustriesServe() {
                 md:py-12
             "
         >
-            {/* ==================================================
-                BACKGROUND GRID
-            ================================================== */}
-
-            <div
-                className="
-                    pointer-events-none
-                    absolute
-                    inset-0
-                    opacity-[0.035]
-                "
-                style={{
-                    backgroundImage: `
-                        linear-gradient(
-                            rgba(11,29,51,0.55) 1px,
-                            transparent 1px
-                        ),
-                        linear-gradient(
-                            90deg,
-                            rgba(11,29,51,0.55) 1px,
-                            transparent 1px
-                        )
-                    `,
-                    backgroundSize: '72px 72px',
-                }}
-            />
-
+            
             {/* ==================================================
                 HEADER
             ================================================== */}
@@ -653,25 +627,25 @@ export default function IndustriesServe() {
                                         ================================================== */}
 
                                         <div
-    className={`
-        absolute
-        bottom-0
-        left-[15px]
-        right-0
-        z-20
-        flex
-        items-center
-        bg-modura-white
-        px-5
-        shadow-[0_12px_35px_rgba(11,29,51,0.12)]
-        md:px-6
-        ${
-            position === 0
-                ? 'h-[95px] md:h-[100px]'
-                : 'h-[82px] md:h-[90px]'
-        }
-    `}
->
+                                                className={`
+                                                    absolute
+                                                    bottom-0
+                                                    left-[15px]
+                                                    right-0
+                                                    z-20
+                                                    flex
+                                                    items-center
+                                                    bg-modura-white
+                                                    px-5
+                                                    shadow-[0_12px_35px_rgba(11,29,51,0.12)]
+                                                    md:px-6
+                                                    ${
+                                                        position === 0
+                                                            ? 'h-[95px] md:h-[100px]'
+                                                            : 'h-[82px] md:h-[90px]'
+                                                    }
+                                                `}
+                                            >
                                             <span
                                                 className="
                                                     absolute

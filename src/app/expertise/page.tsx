@@ -12,12 +12,36 @@ import {
     FiCheck,
     FiLayers,
     FiPenTool,
+    FiArrowUpRight,
 } from 'react-icons/fi';
 
 import Breadcrumb from '../components/Breadcrumb';
 
 import breadcrumb from '@/app/assets/images/breadcrumb.jpg';
 import autocadImage from '@/app/assets/images/autocad.jpg';
+import blog1 from '@/app/assets/images/about-1.jpg';
+import blog3 from '@/app/assets/images/about-3.jpg';
+
+const blogs = [
+    {
+        title: 'How BIM Is Transforming Modern Construction',
+        date: 'June 24, 2026',
+        image: blog1.src,
+        desc: 'Building Information Modeling (BIM) is revolutionizing the construction industry by improving project coordination, reducing errors.',
+    },
+    {
+        title: 'Future Trends In Architectural Design',
+        date: 'May 18, 2026',
+        image: blog3.src,
+        desc: 'Modern architectural design is evolving with sustainable materials, advanced technologies, and innovative planning approaches.',
+    },
+    {
+        title: 'Key Trends In Structural Engineering',
+        date: 'April 12, 2026',
+        image: blog1.src,
+        desc: 'Structural engineering is moving towards smarter solutions with advanced analysis tools, sustainable practices, and improved construction techniques.',
+    },
+];
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -198,6 +222,41 @@ export default function SoftwareExpertise() {
         return () => ctx.revert();
     }, []);
 
+    const sectionRef = useRef(null);
+    
+        useLayoutEffect(() => {
+            const ctx = gsap.context(() => {
+                gsap.from('.blog-heading', {
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+    
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 80%',
+                    },
+                });
+    
+                gsap.from('.blog-card', {
+                    y: 80,
+                    opacity: 0,
+    
+                    stagger: 0.18,
+    
+                    duration: 0.8,
+    
+                    ease: 'power3.out',
+    
+                    scrollTrigger: {
+                        trigger: sectionRef.current,
+                        start: 'top 75%',
+                    },
+                });
+            }, sectionRef);
+    
+            return () => ctx.revert();
+        }, []);
+
     return (
         <div ref={pageRef}>
 
@@ -223,7 +282,6 @@ export default function SoftwareExpertise() {
                 ]}
             />
 
-
             {/* =================================================
                 SOFTWARE INTRO
             ================================================= */}
@@ -234,11 +292,9 @@ export default function SoftwareExpertise() {
                     relative
                     overflow-hidden
                     bg-modura-white
-                    py-14
+                    py-12
 
-                    md:py-18
-
-                    lg:py-20
+                    md:py-14
                 "
             >
 
@@ -272,21 +328,7 @@ export default function SoftwareExpertise() {
                     "
                 />
 
-                <span
-                    className="
-                        pointer-events-none
-                        absolute
-                        right-[-80px]
-                        top-[15%]
-                        hidden
-                        h-[240px]
-                        w-[240px]
-                        rounded-full
-                        border
-                        border-modura-gray-200
-                        lg:block
-                    "
-                />
+
 
 
                 {/* CONTAINER */}
@@ -467,90 +509,97 @@ export default function SoftwareExpertise() {
                         className="
                             software-intro-image
                             relative
-                            mt-12
+                            mt-8
+                            flex
+                            justify-center
 
-                            md:mt-14
-
-                            
+                            md:mt-10
                         "
                     >
-
-                        {/* CORNER */}
-
-                        <span
-                            className="
-                                absolute
-                                top-[-12px]
-                                left-[-12px]
-                                z-0
-                                h-[90px]
-                                w-[90px]
-                                border-t-[4px]
-                                border-l-[4px]
-                                border-modura-primary
-                            "
-                        />
-
-                        <span
-                            className="
-                                absolute
-                                right-[-12px]
-                                bottom-[-12px]
-                                z-0
-                                h-[90px]
-                                w-[90px]
-                                border-r
-                                border-b
-                                border-modura-secondary
-                            "
-                        />
-
-
-                        {/* IMAGE */}
+                        {/* =================================================
+                            IMAGE FRAME
+                        ================================================= */}
 
                         <div
                             className="
                                 relative
-                                z-10
-                                h-[280px]
-                                w-full
-                                flex
-                                items-center
-                                justify-center
-                                overflow-hidden
-                                bg-modura-light
-
-                                sm:h-[340px]
-
-                                md:h-[420px]
-
-                                lg:h-[500px]
+                                inline-block
+                                max-w-full
                             "
                         >
+
+                            {/* =================================================
+                                TOP LEFT BORDER
+                            ================================================= */}
+
+                            <span
+                                className="
+                                    pointer-events-none
+                                    absolute
+                                    top-[-15px]
+                                    left-[-15px]
+                                    z-20
+
+                                    h-[75px]
+                                    w-[75px]
+
+                                    border-t-[4px]
+                                    border-l-[4px]
+                                    border-modura-primary
+
+                                    md:h-[90px]
+                                    md:w-[90px]
+                                "
+                            />
+
+                            {/* =================================================
+                                BOTTOM RIGHT BORDER
+                            ================================================= */}
+
+                            <span
+                                className="
+                                    pointer-events-none
+                                    absolute
+                                    right-[-12px]
+                                    bottom-[-12px]
+                                    z-20
+
+                                    h-[75px]
+                                    w-[75px]
+
+                                    border-r
+                                    border-b
+                                    border-modura-secondary
+
+                                    md:h-[90px]
+                                    md:w-[90px]
+                                "
+                            />
+
+                            {/* =================================================
+                                ACTUAL IMAGE
+                            ================================================= */}
 
                             <Image
                                 src={software.image}
                                 alt={`${software.name} software expertise`}
-                                
-                                fill
+                                width={software.image.width}
+                                height={software.image.height}
                                 priority
-                                sizes="auto"
-                                
+                                sizes="
+                                    (max-width: 640px) 92vw,
+                                    (max-width: 1024px) 85vw,
+                                    1200px
+                                "
                                 className="
-                                    
+                                    block
+                                    h-auto
+                                    w-auto
+                                    max-w-full
                                     object-contain
                                     transition-transform
                                     duration-700
                                     hover:scale-[1.02]
-                                "
-                            />
-
-                            <div
-                                className="
-                                    pointer-events-none
-                                    absolute
-                                    inset-0
-                                    bg-modura-primary/5
                                 "
                             />
 
@@ -561,7 +610,6 @@ export default function SoftwareExpertise() {
                 </div>
 
             </section>
-
 
             {/* =================================================
                 DETAIL DESCRIPTION
@@ -576,10 +624,7 @@ export default function SoftwareExpertise() {
                     border-modura-gray-200
                     bg-modura-white
                     py-12
-
                     md:py-14
-
-                  
                 "
             >
 
@@ -588,9 +633,7 @@ export default function SoftwareExpertise() {
                         mx-auto
                         max-w-[1180px]
                         px-5
-
                         md:px-8
-
                         xl:px-10
                     "
                 >
@@ -601,18 +644,18 @@ export default function SoftwareExpertise() {
 
                     <div
                         className="
-                            mb-4
+                            mb-2
                             flex
                             items-center
                             gap-4
                         "
                     >
 
-                       
+
 
                         <span
                             className="
-                                text-[13px]
+                                text-[15px]
                                 font-bold
                                 tracking-[0.30em]
                                 text-modura-secondary
@@ -635,7 +678,7 @@ export default function SoftwareExpertise() {
                             max-w-[1080px]
 
                             [&_h4]:mb-4
-                            [&_h4]:mt-10
+                            [&_h4]:mt-4
                             [&_h4]:text-[25px]
                             [&_h4]:leading-[1.15]
                             [&_h4]:font-bold
@@ -645,7 +688,7 @@ export default function SoftwareExpertise() {
                             first:[&_h4]:mt-0
 
                             [&_h5]:mb-3
-                            [&_h5]:mt-8
+                            [&_h5]:mt-3
                             [&_h5]:text-[19px]
                             [&_h5]:leading-tight
                             [&_h5]:font-bold
@@ -664,28 +707,45 @@ export default function SoftwareExpertise() {
 
                             md:[&_ul]:grid-cols-2
 
+                            /* =================================================
+                            SOFTWARE EXPERTISE — CREATIVE POINTER
+                            ================================================= */
+
                             [&_li]:relative
                             [&_li]:pl-7
                             [&_li]:text-[14px]
                             [&_li]:leading-6
                             [&_li]:text-modura-gray-600
 
+                            /* OUTER CROSS */
+
                             [&_li]:before:absolute
                             [&_li]:before:left-0
-                            [&_li]:before:top-[10px]
-                            [&_li]:before:h-[6px]
-                            [&_li]:before:w-[6px]
-                            [&_li]:before:bg-modura-primary
+                            [&_li]:before:top-1/2
+                            [&_li]:before:h-3.5
+                            [&_li]:before:w-3.5
+                            [&_li]:before:-translate-y-1/2
+                            [&_li]:before:border
+                            [&_li]:before:border-modura-primary
+                            [&_li]:before:rotate-45
+
+                            /* CENTER DOT */
+
+                            [&_li]:after:absolute
+                            [&_li]:after:left-1.25
+                            [&_li]:after:top-1/2
+                            [&_li]:after:h-1
+                            [&_li]:after:w-1
+                            [&_li]:after:-translate-y-1/2
+                            [&_li]:after:rounded-full
+                            [&_li]:after:bg-modura-secondary
                         "
                         dangerouslySetInnerHTML={{
                             __html: software.description,
                         }}
                     />
-
                 </div>
-
             </section>
-
 
             {/* =================================================
                 FAQ
@@ -699,11 +759,8 @@ export default function SoftwareExpertise() {
                     border-t
                     border-modura-gray-200
                     bg-modura-light
-                    py-16
-
-                    md:py-20
-
-                    lg:py-24
+                    py-12
+                    md:py-14
                 "
             >
 
@@ -819,7 +876,7 @@ export default function SoftwareExpertise() {
 
                             <span
                                 className="
-                                    text-[11px]
+                                    text-[13px]
                                     font-bold
                                     tracking-[0.35em]
                                     text-modura-secondary
@@ -938,8 +995,8 @@ export default function SoftwareExpertise() {
                                             duration-300
                                             hover:bg-modura-light
 
-                                            md:px-7
-                                            md:py-6
+                                            md:px-5
+                                            md:py-5
                                         "
                                     >
 
@@ -961,14 +1018,13 @@ export default function SoftwareExpertise() {
                                                     shrink-0
                                                     items-center
                                                     justify-center
-                                                    text-[10px]
+                                                    text-[12px]
                                                     font-bold
                                                     transition-all
                                                     duration-300
-                                                    ${
-                                                        isOpen
-                                                            ? 'bg-modura-primary text-white'
-                                                            : 'bg-modura-light text-modura-primary'
+                                                    ${isOpen
+                                                        ? 'bg-modura-primary text-white'
+                                                        : 'bg-modura-light text-modura-primary'
                                                     }
                                                 `}
                                             >
@@ -1010,10 +1066,9 @@ export default function SoftwareExpertise() {
                                                 text-modura-secondary
                                                 transition-transform
                                                 duration-300
-                                                ${
-                                                    isOpen
-                                                        ? 'rotate-180'
-                                                        : ''
+                                                ${isOpen
+                                                    ? 'rotate-180'
+                                                    : ''
                                                 }
                                             `}
                                         >
@@ -1032,10 +1087,9 @@ export default function SoftwareExpertise() {
                                             grid
                                             transition-all
                                             duration-300
-                                            ${
-                                                isOpen
-                                                    ? 'grid-rows-[1fr]'
-                                                    : 'grid-rows-[0fr]'
+                                            ${isOpen
+                                                ? 'grid-rows-[1fr]'
+                                                : 'grid-rows-[0fr]'
                                             }
                                         `}
                                     >
@@ -1050,8 +1104,8 @@ export default function SoftwareExpertise() {
                                                     py-5
                                                     pl-[68px]
 
-                                                    md:px-7
-                                                    md:py-6
+                                                    md:px-5
+                                                    md:py-5
                                                     md:pl-[84px]
                                                 "
                                             >
@@ -1059,8 +1113,8 @@ export default function SoftwareExpertise() {
                                                 <p
                                                     className="
                                                         max-w-[760px]
-                                                        text-[14px]
-                                                        leading-7
+                                                        text-[15px]
+                                                        leading-5
                                                         text-modura-gray-600
                                                     "
                                                 >
@@ -1083,6 +1137,404 @@ export default function SoftwareExpertise() {
 
             </section>
 
+
+            {/* =================================================
+                RELATED BLOGS / LATEST INSIGHTS
+            ================================================= */}
+
+            <section
+                ref={sectionRef}
+                className="
+                                relative
+                                overflow-hidden
+                                bg-modura-white
+                                py-12
+                                md:py-14
+                            "
+            >
+                {/* =================================================
+                                BLUEPRINT BACKGROUND
+                            ================================================= */}
+
+                <div
+                    className="
+                                    pointer-events-none
+                                    absolute
+                                    inset-0
+                                    bg-[url('/images/blueprint-bg.png')]
+                                    bg-cover
+                                    bg-center
+                                    opacity-[0.07]
+                                "
+                />
+
+
+                {/* =================================================
+                                MAIN CONTAINER
+                            ================================================= */}
+
+                <div
+                    className="
+                                    relative
+                                    z-10
+                                    mx-auto
+                                    max-w-[1300px]
+                                    px-5
+                                    md:px-8
+                                    xl:px-10
+                                "
+                >
+
+                    {/* =================================================
+                                    HEADER
+                                ================================================= */}
+
+                    <div
+                        className="
+                                        company-blog-heading
+                                        mb-10
+                                        flex
+                                        flex-col
+                                        items-start
+                                        justify-between
+                                        gap-6
+            
+                                        lg:mb-12
+                                        lg:flex-row
+                                        lg:items-end
+                                    "
+                    >
+
+                        <div>
+
+                            {/* LABEL */}
+
+                            <div
+                                className="
+                                                mb-3
+                                                flex
+                                                items-center
+                                                gap-3
+                                            "
+                            >
+
+
+
+                                <span
+                                    className="
+                                                    text-[11px]
+                                                    font-bold
+                                                    tracking-[0.35em]
+                                                    text-modura-secondary
+                                                    uppercase
+            
+                                                    md:text-[14px]
+                                                "
+                                >
+                                    Related BLOGS
+                                </span>
+
+                            </div>
+
+
+                            {/* HEADING */}
+
+                            <h2
+                                className="
+                                                text-[36px]
+                                                leading-[1]
+                                                font-bold
+                                                tracking-[-0.035em]
+                                                text-modura-primary
+                                                uppercase
+            
+                                                md:text-[44px]
+            
+                                                lg:text-[48px]
+                                            "
+                            >
+                                Insights That
+
+                                <span
+                                    className="
+                                                    ml-2
+                                                    text-modura-secondary
+                                                "
+                                >
+                                    Shape Better Projects
+                                </span>
+                            </h2>
+
+                        </div>
+
+
+                        {/* =================================================
+                                        VIEW MORE
+                                    ================================================= */}
+
+                        <button
+                            type="button"
+                            className="
+                                            group
+                                            flex
+                                            shrink-0
+                                            items-center
+                                            gap-4
+                                            border
+                                            border-modura-primary
+                                            px-5
+                                            py-3
+                                            text-[11px]
+                                            font-bold
+                                            tracking-[0.15em]
+                                            text-modura-primary
+                                            uppercase
+                                            transition-all
+                                            duration-500
+                                            hover:bg-modura-primary
+                                            hover:text-modura-white
+                                        "
+                        >
+
+                            <span>
+                                View More
+                            </span>
+
+                            <span
+                                className="
+                                                flex
+                                                h-7
+                                                w-7
+                                                items-center
+                                                justify-center
+                                                border
+                                                border-current
+                                                transition-transform
+                                                duration-500
+                                                group-hover:rotate-45
+                                            "
+                            >
+                                <FiArrowUpRight
+                                    size={15}
+                                />
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    {/* =================================================
+                                    BLOG GRID
+                                ================================================= */}
+
+                    <div
+                        className="
+                                        grid
+                                        gap-6
+            
+                                        md:grid-cols-2
+            
+                                        lg:grid-cols-3
+                                        lg:gap-8
+                                    "
+                    >
+
+                        {blogs.map((blog, index) => (
+
+                            <article
+                                key={index}
+                                className="
+                                                blog-card
+                                                group
+                                                relative
+                                                overflow-hidden
+                                                bg-white
+                                                shadow-[0_15px_40px_rgba(11,29,51,0.08)]
+                                            "
+                            >
+
+                                {/* =================================================
+                                                IMAGE
+                                            ================================================= */}
+
+                                <div
+                                    className="
+                                                    relative
+                                                    h-[220px]
+                                                    overflow-hidden
+            
+                                                    md:h-[230px]
+                                                "
+                                >
+
+                                    <Image
+                                        src={blog.image}
+                                        fill
+                                        alt={blog.title}
+                                        sizes="
+                                                        (max-width: 768px) 100vw,
+                                                        (max-width: 1024px) 50vw,
+                                                        33vw
+                                                    "
+                                        className="
+                                                        object-cover
+                                                        transition-transform
+                                                        duration-700
+                                                        group-hover:scale-110
+                                                    "
+                                    />
+
+
+                                    {/* IMAGE OVERLAY */}
+
+                                    <div
+                                        className="
+                                                        pointer-events-none
+                                                        absolute
+                                                        inset-0
+                                                        bg-gradient-to-t
+                                                        from-modura-primary/50
+                                                        to-transparent
+                                                        opacity-0
+                                                        transition-opacity
+                                                        duration-500
+                                                        group-hover:opacity-100
+                                                    "
+                                    />
+
+                                </div>
+
+
+                                {/* =================================================
+                                                CONTENT
+                                            ================================================= */}
+
+                                <div
+                                    className="
+                                                    p-6
+            
+                                                    md:p-7
+                                                "
+                                >
+
+                                    {/* DATE */}
+
+                                    <p
+                                        className="
+                                                        text-modura-secondary
+                                                        text-[11px]
+                                                        font-semibold
+                                                        tracking-[0.2em]
+                                                        uppercase
+                                                    "
+                                    >
+                                        {blog.date}
+                                    </p>
+
+
+                                    {/* TITLE */}
+
+                                    <h3
+                                        className="
+                                                        mt-2
+                                                        text-[20px]
+                                                        leading-7
+                                                        font-bold
+                                                        tracking-[-0.02em]
+                                                        text-modura-primary
+                                                    "
+                                    >
+                                        {blog.title}
+                                    </h3>
+
+
+                                    {/* DESCRIPTION */}
+
+                                    <p
+                                        className="
+                                                        mt-4
+                                                        text-[14px]
+                                                        leading-6
+                                                        text-modura-secondary
+                                                    "
+                                    >
+                                        {blog.desc}
+                                    </p>
+
+
+                                    {/* =================================================
+                                                    READ MORE
+                                                ================================================= */}
+
+                                    <button
+                                        type="button"
+                                        className="
+                                                        group/btn
+                                                        mt-7
+                                                        flex
+                                                        items-center
+                                                        gap-3
+                                                        text-[12px]
+                                                        font-bold
+                                                        tracking-[0.12em]
+                                                        text-modura-primary
+                                                        uppercase
+                                                    "
+                                    >
+
+                                        <span
+                                            className="
+                                                            relative
+                                                            after:absolute
+                                                            after:bottom-[-6px]
+                                                            after:left-0
+                                                            after:h-[2px]
+                                                            after:w-full
+                                                            after:bg-modura-secondary
+                                                            after:transition-all
+                                                            after:duration-500
+                                                            group-hover/btn:after:w-[40%]
+                                                        "
+                                        >
+                                            Read More
+                                        </span>
+
+
+                                        <span
+                                            className="
+                                                            flex
+                                                            h-8
+                                                            w-8
+                                                            items-center
+                                                            justify-center
+                                                            border
+                                                            border-modura-secondary
+                                                            text-modura-secondary
+                                                            transition-all
+                                                            duration-500
+                                                            group-hover/btn:bg-modura-secondary
+                                                            group-hover/btn:text-white
+                                                        "
+                                        >
+                                            <FiArrowUpRight
+                                                size={15}
+                                            />
+                                        </span>
+
+                                    </button>
+
+                                </div>
+
+                            </article>
+
+                        ))}
+
+                    </div>
+
+                </div>
+
+            </section>
         </div>
     );
 }
