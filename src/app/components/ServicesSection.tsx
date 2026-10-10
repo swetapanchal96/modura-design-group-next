@@ -84,7 +84,7 @@ const ServicesSection = () => {
     return (
         <section
             ref={sectionRef}
-            className="bg-modura-off-white relative overflow-hidden py-14 lg:py-16 xl:pt-20 xl:pb-10"
+            className="bg-modura-off-white relative overflow-hidden py-14 lg:pt-14 lg:pb-0!  xl:pt-20 xl:pb-10"
         >
             {/* =====================================================
                 BACKGROUND TECHNICAL DETAIL
@@ -276,6 +276,269 @@ const ServicesSection = () => {
                     />
                 </div>
             </div>
+            {/* =================================================
+    MODURA ARCHITECTURAL SECTION SEPARATOR
+    SERVICES → PROJECTS
+================================================= */}
+
+<div
+    className="
+        relative
+        flex
+        h-[90px]
+        w-full
+        items-center
+        justify-center
+        overflow-hidden
+        lg:h-[90px]
+    "
+>
+    {/* =================================================
+        LEFT SHORT STRUCTURAL LINE
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            left-[8%]
+            top-1/2
+            h-px
+            w-[18%]
+            bg-modura-primary/20
+        "
+    />
+
+    {/* =================================================
+        LEFT ACCENT LINE
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            left-[22%]
+            top-1/2
+            h-[2px]
+            w-[8%]
+            -translate-y-1/2
+            bg-modura-primary
+        "
+    />
+
+    {/* =================================================
+        LEFT VERTICAL STRUCTURE
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            left-[30%]
+            top-[30px]
+            h-[30px]
+            w-px
+            bg-modura-primary/40
+        "
+    />
+
+    {/* =================================================
+        LEFT DIAGONAL
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            left-[30%]
+            top-[59px]
+            h-[42px]
+            w-px
+            origin-top
+            rotate-[55deg]
+            bg-modura-secondary/50
+        "
+    />
+
+
+    {/* =================================================
+        RIGHT SHORT STRUCTURAL LINE
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            right-[8%]
+            top-1/2
+            h-px
+            w-[18%]
+            bg-modura-primary/20
+        "
+    />
+
+    {/* =================================================
+        RIGHT ACCENT LINE
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            right-[22%]
+            top-1/2
+            h-[2px]
+            w-[8%]
+            -translate-y-1/2
+            bg-modura-primary
+        "
+    />
+
+    {/* =================================================
+        RIGHT VERTICAL STRUCTURE
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            right-[30%]
+            top-[30px]
+            h-[30px]
+            w-px
+            bg-modura-primary/40
+        "
+    />
+
+    {/* =================================================
+        RIGHT DIAGONAL
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            right-[30%]
+            top-[59px]
+            h-[42px]
+            w-px
+            origin-top
+            rotate-[-55deg]
+            bg-modura-secondary/50
+        "
+    />
+
+
+    {/* =================================================
+        CENTER ARCHITECTURAL NODE
+    ================================================= */}
+
+    <div
+        className="
+            relative
+            z-10
+            flex
+            h-[42px]
+            w-[42px]
+            items-center
+            justify-center
+            bg-modura-off-white
+        "
+    >
+
+        {/* Outer diamond */}
+
+        <span
+            className="
+                absolute
+                h-[28px]
+                w-[28px]
+                rotate-45
+                border
+                border-modura-primary
+            "
+        />
+
+        {/* Inner diamond */}
+
+        <span
+            className="
+                absolute
+                h-[12px]
+                w-[12px]
+                rotate-45
+                bg-modura-primary
+            "
+        />
+
+        {/* Accent point */}
+
+        <span
+            className="
+                absolute
+                h-[4px]
+                w-[4px]
+                rounded-full
+                bg-modura-secondary
+            "
+        />
+
+    </div>
+
+
+    {/* =================================================
+        CENTER HORIZONTAL AXIS
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            left-1/2
+            top-1/2
+            z-0
+            h-px
+            w-[120px]
+            -translate-x-1/2
+            bg-modura-primary/25
+
+            sm:w-[150px]
+
+            lg:w-[180px]
+        "
+    />
+
+
+    {/* =================================================
+        SMALL TECHNICAL NODES
+    ================================================= */}
+
+    <span
+        className="
+            absolute
+            left-[calc(50%-100px)]
+            top-1/2
+            h-[6px]
+            w-[6px]
+            -translate-y-1/2
+            rounded-full
+            bg-modura-secondary
+
+            sm:left-[calc(50%-125px)]
+
+            lg:left-[calc(50%-150px)]
+        "
+    />
+
+    <span
+        className="
+            absolute
+            right-[calc(50%-100px)]
+            top-1/2
+            h-[6px]
+            w-[6px]
+            -translate-y-1/2
+            rounded-full
+            bg-modura-secondary
+
+            sm:right-[calc(50%-125px)]
+
+            lg:right-[calc(50%-150px)]
+        "
+    />
+
+</div>
         </section>
     );
 };
