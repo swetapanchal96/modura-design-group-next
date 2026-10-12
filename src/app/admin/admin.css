@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+/*
+ * Modura brand colours (from the logo) – the ONLY place colours are defined.
+ * Use them as Tailwind classes, e.g. bg-primary, text-secondary, border-line, bg-surface.
+ */
+@theme {
+  --color-primary: #14223d;      /* logo dark navy */
+  --color-primary-600: #1d2f52;  /* hover */
+  --color-secondary: #5b6b84;    /* logo slate blue */
+  --color-steel: #8e9bb0;
+  --color-surface: #f2f4f8;      /* page background */
+  --color-line: #cfd6e1;         /* borders */
+  --color-soft: #e7ebf1;         /* light borders / dividers */
+  --color-fill: #eef1f6;         /* light fills */
+  --color-ink: #1b2435;          /* main text */
+  --color-mute: #6b778c;         /* secondary text */
+  --color-success: #2f7d5b;
+  --color-off: #9aa3b2;
+  --color-danger: #c0392b;
+  --color-warning: #b7791f;
+  --color-info: #2b6cb0;
+
+  --font-sans: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-surface text-ink font-sans text-sm antialiased; }
+}
