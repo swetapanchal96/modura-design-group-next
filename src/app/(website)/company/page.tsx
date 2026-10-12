@@ -8,8 +8,6 @@ import gsap from 'gsap';
 import about1 from '@/app/(website)/assets/images/about-1.jpg';
 import about2 from '@/app/(website)/assets/images/about-2.jpg';
 import about3 from '@/app/(website)/assets/images/about-3.jpg';
-import blog1 from '@/app/(website)/assets/images/about-1.jpg';
-import blog3 from '@/app/(website)/assets/images/about-3.jpg';
 import Breadcrumb from '../../../components/Breadcrumb';
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
 import raviPatel from '@/app/(website)/assets/images/client-4.jpg';
@@ -18,79 +16,219 @@ import bimImage from '@/app/(website)/assets/images/client-5.jpg';
 import architectImage from '@/app/(website)/assets/images/client-6.jpg';
 import qualityImage from '@/app/(website)/assets/images/qualityImage.jpg'
 
-import certificate1 from '@/app/(website)/assets/images/quality.jpg';
-import certificate2 from '@/app/(website)/assets/images/Environmental.jpg';
-import certificate3 from '@/app/(website)/assets/images/Safety .jpg';
+
+
+import axios from 'axios';
+import { apiUrl } from '@/app/(website)/config';
+import DOMPurify from 'dompurify';
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { FaCheckCircle, FaHandshake, FaLaptopCode, FaLayerGroup, FaLightbulb, FaUsers, FaCogs, FaGem, FaChartLine } from 'react-icons/fa';
 
-const faqs = [
-    {
-        question: 'What services does Modura provide?',
-        answer:
-            'We provide integrated architecture, engineering, BIM and outsourcing solutions, including design development, construction documentation, coordination, and digital delivery support.',
-    },
-    {
-        question: 'Which industries do you work with?',
-        answer:
-            'We work across architecture, infrastructure, oil and gas, steel and metal, water treatment, transportation and other construction-related industries.',
-    },
-    {
-        question: 'How does the project process work?',
-        answer:
-            'Our process begins with understanding the project requirements and continues through planning, design, coordination, documentation and technical delivery.',
-    },
-    {
-        question: 'Do you offer customized solutions?',
-        answer:
-            'Yes. Our solutions are tailored around the project scope, technical requirements, workflow and delivery objectives of each client.',
-    },
-    {
-        question: 'How can we get started?',
-        answer:
-            'You can contact our team with your project requirements. We will review your needs and discuss the appropriate services and next steps.',
-    },
-    {
-        question: 'Can Modura support ongoing projects?',
-        answer:
-            'Yes. We can support ongoing projects with architecture, engineering, BIM, drafting, coordination and construction documentation requirements.',
-    },
-    {
-        question: 'What project information should we provide?',
-        answer:
-            'Project drawings, scope, requirements, timelines and available reference documents can help us understand the project and provide the right support.',
-    },
-];
+interface FAQ {
+    id: number;
+    question: string;
+    answer: string;
+}
 
-const companyBlogs = [
-    {
-        title: 'How BIM Is Transforming Modern Construction',
-        date: 'June 24, 2026',
-        image: blog1,
-        desc: 'Building Information Modeling (BIM) is revolutionizing the construction industry by improving project coordination, reducing errors.',
-        slug: 'how-bim-is-transforming-modern-construction',
-    },
-    {
-        title: 'Future Trends In Architectural Design',
-        date: 'May 18, 2026',
-        image: blog3,
-        desc: 'Modern architectural design is evolving with sustainable materials, advanced technologies, and innovative planning approaches.',
-        slug: 'future-trends-in-architectural-design',
-    },
-    {
-        title: 'Key Trends In Structural Engineering',
-        date: 'April 12, 2026',
-        image: blog1,
-        desc: 'Structural engineering is moving towards smarter solutions with advanced analysis tools, sustainable practices, and improved construction techniques.',
-        slug: 'key-trends-in-structural-engineering',
-    },
-];
+interface Certification {
+    id: number;
+    title: string;
+    issuedBy: string;
+    year: number;
+    description: string;
+    file: string;
+    fileUrl: string;
+}
+
+interface CompanyBlog {
+    id: number;
+    title: string;
+    slug: string;
+    description: string;
+    imageUrl: string;
+    publishedAt: string;
+}
+
+
 
 export default function CompanyPage() {
     const [activeFaq, setActiveFaq] = useState(0);
+    const [faqs, setFaqs] = useState<FAQ[]>([]);
+    const [faqLoading, setFaqLoading] = useState(true);
+    const [certifications, setCertifications] = useState<Certification[]>([]);
+    const [certificationLoading, setCertificationLoading] = useState(true);
+    const [companyBlogs, setCompanyBlogs] = useState<CompanyBlog[]>([]);
+    const [blogLoading, setBlogLoading] = useState(true);
     const [selectedMember, setSelectedMember] = useState<any>(null);
     const blogSectionRef = useRef<HTMLElement | null>(null);
+
+    // faq api call
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchFaqs = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/faqs`,
+                    {},
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data.data)
+                ) {
+                    setFaqs(response.data.data);
+                } else {
+                    setFaqs([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('FAQs API Error:', error);
+                    setFaqs([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setFaqLoading(false);
+                }
+            }
+        };
+
+        fetchFaqs();
+
+        return () => controller.abort();
+    }, []);
+
+    // certificate api call
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchCertifications = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/certifications`,
+                    {},
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data.data)
+                ) {
+                    setCertifications(response.data.data);
+                } else {
+                    setCertifications([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Certifications API Error:', error);
+                    setCertifications([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setCertificationLoading(false);
+                }
+            }
+        };
+
+        fetchCertifications();
+
+        return () => controller.abort();
+    }, []);
+
+    const formatCompanyBlogDate = (date: string) => {
+        if (!date) return '';
+
+        const parsedDate = new Date(date);
+
+        if (Number.isNaN(parsedDate.getTime())) return '';
+
+        return parsedDate.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            timeZone: 'UTC',
+        });
+    };
+
+    const getCompanyBlogExcerpt = (
+        html: string,
+        limit: number = 130
+    ) => {
+        if (!html) return '';
+
+        const text = html
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/&amp;/gi, '&')
+            .replace(/&quot;/gi, '"')
+            .replace(/&#39;/gi, "'")
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        return text.length > limit
+            ? `${text.slice(0, limit).trimEnd()}...`
+            : text;
+    };
+
+    // blog api call
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchCompanyBlogs = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/blogs`,
+                    {
+                        page: 1,
+                        limit: 3,
+                    },
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data?.data?.items)
+                ) {
+                    const latestBlogs: CompanyBlog[] = response.data.data.items
+                        .filter(
+                            (blog: CompanyBlog) =>
+                                blog.slug && blog.publishedAt
+                        )
+                        .sort(
+                            (a: CompanyBlog, b: CompanyBlog) =>
+                                new Date(b.publishedAt).getTime() -
+                                new Date(a.publishedAt).getTime()
+                        )
+                        .slice(0, 3);
+
+                    setCompanyBlogs(latestBlogs);
+                } else {
+                    setCompanyBlogs([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Company Blogs API Error:', error);
+                    setCompanyBlogs([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setBlogLoading(false);
+                }
+            }
+        };
+
+        fetchCompanyBlogs();
+
+        return () => controller.abort();
+    }, []);
 
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
@@ -1508,7 +1646,7 @@ export default function CompanyPage() {
                                     gap-3
                                 "
                             >
-                                
+
 
                                 <span
                                     className="
@@ -2149,7 +2287,7 @@ export default function CompanyPage() {
                                                     uppercase
                                                 "
                                             >
-                                               The Modura Team
+                                                The Modura Team
                                             </span>
                                         </div>
 
@@ -2218,9 +2356,9 @@ export default function CompanyPage() {
                                         md:mt-7
                                     "
                                 >
-                                   
 
-                                    
+
+
                                 </div>
 
                                 {/* =================================================
@@ -2269,7 +2407,7 @@ export default function CompanyPage() {
 
                                                     <div className="flex items-center gap-4">
 
-                                                        
+
 
                                                         <h4
                                                             className="
@@ -2651,7 +2789,7 @@ export default function CompanyPage() {
                                         gap-3
                                     "
                                             >
-                                                
+
 
                                                 <span
                                                     className="
@@ -2933,7 +3071,7 @@ export default function CompanyPage() {
                                     gap-3
                                 "
                             >
-                                
+
 
                                 <span
                                     className="
@@ -3806,8 +3944,8 @@ export default function CompanyPage() {
             ================================================= */}
 
             <section
-                    id="certifications"
-                    className="
+                id="certifications"
+                className="
                         relative
                         overflow-hidden
                         bg-modura-off-white
@@ -3815,25 +3953,25 @@ export default function CompanyPage() {
                         md:py-14
                         
                     "
-                >
-                    {/* =================================================
+            >
+                {/* =================================================
                         SUBTLE ARCHITECTURAL BACKGROUND
                     ================================================= */}
 
-                    <div
-                        className="
+                <div
+                    className="
                             pointer-events-none
                             absolute
                             inset-0
                             overflow-hidden
                         "
-                    >
-                        
+                >
 
-                        
 
-                        <span
-                            className="
+
+
+                    <span
+                        className="
                                 absolute
                                 bottom-[-120px]
                                 left-[-100px]
@@ -3843,10 +3981,10 @@ export default function CompanyPage() {
                                 border-t
                                 border-modura-gray-200
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 bottom-[-80px]
                                 left-[40px]
@@ -3855,12 +3993,12 @@ export default function CompanyPage() {
                                 rotate-[25deg]
                                 bg-modura-gray-200
                             "
-                        />
+                    />
 
-                        {/* RIGHT ARCHITECTURAL LINES */}
+                    {/* RIGHT ARCHITECTURAL LINES */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[4%]
                                 right-[-40px]
@@ -3870,10 +4008,10 @@ export default function CompanyPage() {
                                 border-t
                                 border-modura-gray-200
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[12%]
                                 right-[5%]
@@ -3882,20 +4020,20 @@ export default function CompanyPage() {
                                 rotate-[35deg]
                                 bg-modura-gray-200
                             "
-                        />
-
-                    
-
-                    
-                    </div>
+                    />
 
 
-                    {/* =================================================
+
+
+                </div>
+
+
+                {/* =================================================
                         MAIN CONTAINER
                     ================================================= */}
 
-                    <div
-                        className="
+                <div
+                    className="
                             relative
                             z-10
                             mx-auto
@@ -3904,69 +4042,69 @@ export default function CompanyPage() {
                             md:px-8
                             xl:px-10
                         "
-                    >
+                >
 
-                        {/* =================================================
+                    {/* =================================================
                             HEADER
                         ================================================= */}
 
-                        <div
-                            className="
+                    <div
+                        className="
                                 mx-auto
                                 mb-10
                                 max-w-[850px]
                                 text-center
                                 md:mb-12
                             "
-                        >
+                    >
 
-                            {/* LABEL */}
+                        {/* LABEL */}
 
-                            <div
-                                className="
+                        <div
+                            className="
                                     mb-2
                                     flex
                                     items-center
                                     justify-center
                                     gap-4
                                 "
-                            >
+                        >
 
-                                <span
-                                    className="
+                            <span
+                                className="
                                         h-[2px]
                                         w-12
                                         bg-modura-primary
                                     "
-                                />
+                            />
 
-                                <span
-                                    className="
+                            <span
+                                className="
                                         text-[13px]
                                         font-bold
                                         tracking-[0.35em]
                                         text-modura-secondary
                                         uppercase
                                     "
-                                >
-                                    Our Certifications
-                                </span>
+                            >
+                                Our Certifications
+                            </span>
 
-                                <span
-                                    className="
+                            <span
+                                className="
                                         h-[2px]
                                         w-12
                                         bg-modura-primary
                                     "
-                                />
+                            />
 
-                            </div>
+                        </div>
 
 
-                            {/* HEADING */}
+                        {/* HEADING */}
 
-                            <h2
-                                className="
+                        <h2
+                            className="
                                     text-[40px]
                                     leading-[0.95]
                                     font-bold
@@ -3978,24 +4116,24 @@ export default function CompanyPage() {
                                     md:text-[52px]
                                     
                                 "
-                            >
-                                Recognized For
+                        >
+                            Recognized For
 
-                                <span
-                                    className="
+                            <span
+                                className="
                                         block
                                         text-modura-secondary
                                     "
-                                >
-                                    Our Standards
-                                </span>
-                            </h2>
+                            >
+                                Our Standards
+                            </span>
+                        </h2>
 
 
-                            {/* DESCRIPTION */}
+                        {/* DESCRIPTION */}
 
-                            <p
-                                className="
+                        <p
+                            className="
                                     mx-auto
                                     mt-2
                                     max-w-[680px]
@@ -4005,21 +4143,21 @@ export default function CompanyPage() {
 
                                     md:text-[15px]
                                 "
-                            >
-                                Our commitment to quality and excellence is
-                                supported by recognized standards, structured
-                                processes and continuous improvement.
-                            </p>
+                        >
+                            Our commitment to quality and excellence is
+                            supported by recognized standards, structured
+                            processes and continuous improvement.
+                        </p>
 
-                        </div>
+                    </div>
 
 
-                        {/* =================================================
+                    {/* =================================================
                             CERTIFICATION GRID
                         ================================================= */}
 
-                        <div
-                            className="
+                    <div
+                        className="
                                 grid
                                 gap-6
 
@@ -4028,68 +4166,84 @@ export default function CompanyPage() {
                                 lg:grid-cols-3
                                 lg:gap-7
                             "
-                        >
+                    >
 
-                            {/* =================================================
-                                CERTIFICATE 01
-                            ================================================= */}
+                        {certificationLoading ? (
+                            <div className="py-12 text-center md:col-span-2 lg:col-span-3">
+                                <p className="text-[14px] text-modura-gray-600">
+                                    Loading certifications...
+                                </p>
+                            </div>
+                        ) : certifications.length === 0 ? (
+                            <div className="py-12 text-center md:col-span-2 lg:col-span-3">
+                                <p className="text-[16px] font-semibold text-modura-primary">
+                                    No certifications are currently available.
+                                </p>
 
-                            <article
-                                className="
-                                    group
-                                    relative
-                                    overflow-hidden
-                                    border
-                                    border-modura-gray-200
-                                    bg-modura-white
-                                    shadow-[0_15px_45px_rgba(11,29,51,0.06)]
-                                    transition-all
-                                    duration-500
-                                    hover:-translate-y-1
-                                    hover:shadow-[0_20px_55px_rgba(11,29,51,0.10)]
-                                "
-                            >
-
-                                {/* IMAGE */}
-
-                                <div
+                                <p className="mt-2 text-[14px] text-modura-gray-600">
+                                    Please check back later for updates.
+                                </p>
+                            </div>
+                        ) : (
+                            certifications.map((certificate) => (
+                                <article
+                                    key={certificate.id}
                                     className="
+                                        group
+                                        relative
+                                        overflow-hidden
+                                        border
+                                        border-modura-gray-200
+                                        bg-modura-white
+                                        shadow-[0_15px_45px_rgba(11,29,51,0.06)]
+                                        transition-all
+                                        duration-500
+                                        hover:-translate-y-1
+                                        hover:shadow-[0_20px_55px_rgba(11,29,51,0.10)]
+                                    "
+                                >
+                                    {/* IMAGE */}
+
+                                    <div
+                                        className="
                                         relative
                                         h-[245px]
                                         overflow-hidden
                                         bg-modura-light
                                     "
-                                >
+                                    >
 
-                                    <Image
-                                        src={certificate1}
-                                        alt="ISO 9001:2015 Certificate"
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, 33vw"
-                                        className="
+                                        {certificate.fileUrl && (
+                                            <Image
+                                                src={certificate.fileUrl}
+                                                alt={`${certificate.title} Certificate`}
+                                                fill
+                                                sizes="(max-width: 768px) 100vw, 33vw"
+                                                className="
                                             object-contain
                                             transition-transform
                                             duration-700
                                             group-hover:scale-[1.04]
                                         "
-                                    />
+                                            />
+                                        )}
 
-                                    {/* IMAGE OVERLAY */}
+                                        {/* IMAGE OVERLAY */}
 
-                                    <div
-                                        className="
+                                        <div
+                                            className="
                                             absolute
                                             inset-0
                                             bg-gradient-to-t
                                             from-modura-primary/20
                                             to-transparent
                                         "
-                                    />
+                                        />
 
-                                    {/* TOP ACCENT */}
+                                        {/* TOP ACCENT */}
 
-                                    <span
-                                        className="
+                                        <span
+                                            className="
                                             absolute
                                             top-0
                                             left-0
@@ -4100,73 +4254,73 @@ export default function CompanyPage() {
                                             duration-500
                                             group-hover:w-full
                                         "
-                                    />
+                                        />
 
-                                </div>
+                                    </div>
 
 
-                                {/* CONTENT */}
-
-                                <div
-                                    className="
-                                        p-7
-                                        md:p-8
-                                    "
-                                >
-
-                                    {/* LABEL */}
+                                    {/* CONTENT */}
 
                                     <div
                                         className="
+                                        p-7
+                                        md:p-8
+                                    "
+                                    >
+
+                                        {/* LABEL */}
+
+                                        <div
+                                            className="
                                             mb-4
                                             flex
                                             items-center
                                             gap-3
                                         "
-                                    >
+                                        >
 
-                                        <span
-                                            className="
+                                            <span
+                                                className="
                                                 h-[2px]
                                                 w-8
                                                 bg-modura-primary
                                             "
-                                        />
+                                            />
 
-                                        <span
-                                            className="
+                                            <span
+                                                className="
                                                 text-[10px]
                                                 font-bold
                                                 tracking-[0.25em]
                                                 text-modura-secondary
                                                 uppercase
                                             "
-                                        >
-                                            Certification
-                                        </span>
+                                            >
+                                                Certification
+                                            </span>
 
-                                    </div>
+                                        </div>
 
 
-                                    {/* TITLE */}
+                                        {/* TITLE */}
 
-                                    <h3
-                                        className="
+                                        <h3
+                                            className="
                                             text-[24px]
                                             leading-tight
                                             font-bold
                                             tracking-[-0.025em]
                                             text-modura-primary
                                         "
-                                    >
-                                        ISO 9001:2015
-                                    </h3>
+                                        >
+                                            {certificate.title}
+                                        </h3>
 
 
-                                    {/* SUBTITLE */}
+                                        {/* SUBTITLE */}
 
-                                    <p
-                                        className="
+                                        <p
+                                            className="
                                             mt-2
                                             text-[11px]
                                             font-bold
@@ -4174,31 +4328,29 @@ export default function CompanyPage() {
                                             text-modura-secondary
                                             uppercase
                                         "
-                                    >
-                                        Quality Management System
-                                    </p>
+                                        >
+                                            {certificate.issuedBy}
+                                        </p>
 
 
-                                    {/* DESCRIPTION */}
+                                        {/* DESCRIPTION */}
 
-                                    <p
-                                        className="
+                                        <p
+                                            className="
                                             mt-4
                                             text-[14px]
                                             leading-6
                                             text-modura-gray-600
                                         "
-                                    >
-                                        Our quality management practices support
-                                        consistent processes, accurate deliverables
-                                        and dependable project outcomes.
-                                    </p>
+                                        >
+                                            {certificate.description}
+                                        </p>
 
 
-                                    {/* YEAR */}
+                                        {/* YEAR */}
 
-                                    <div
-                                        className="
+                                        <div
+                                            className="
                                             mt-6
                                             flex
                                             items-center
@@ -4207,460 +4359,50 @@ export default function CompanyPage() {
                                             border-modura-gray-200
                                             pt-5
                                         "
-                                    >
-
-                                        <FiCalendar
-                                            className="
-                                                text-modura-secondary
-                                            "
-                                            size={20}
-                                        />
-
-                                        <div>
-
-                                            <span
-                                                className="
-                                                    block
-                                                    text-[10px]
-                                                    tracking-[0.2em]
-                                                    text-modura-gray-500
-                                                    uppercase
-                                                "
-                                            >
-                                                Certified Since
-                                            </span>
-
-                                            <span
-                                                className="
-                                                    text-[16px]
-                                                    font-bold
-                                                    text-modura-primary
-                                                "
-                                            >
-                                                2018
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </article>
-
-
-                            {/* =================================================
-                                CERTIFICATE 02
-                            ================================================= */}
-
-                            <article
-                                className="
-                                    group
-                                    relative
-                                    overflow-hidden
-                                    border
-                                    border-modura-gray-200
-                                    bg-modura-white
-                                    shadow-[0_15px_45px_rgba(11,29,51,0.06)]
-                                    transition-all
-                                    duration-500
-                                    hover:-translate-y-1
-                                    hover:shadow-[0_20px_55px_rgba(11,29,51,0.10)]
-                                "
-                            >
-
-                                {/* IMAGE */}
-
-                                <div
-                                    className="
-                                        relative
-                                        h-[245px]
-                                        overflow-hidden
-                                        bg-modura-light
-                                    "
-                                >
-
-                                    <Image
-                                        src={certificate2}
-                                        alt="ISO 14001:2015 Certificate"
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, 33vw"
-                                        className="
-                                            object-contain
-                                            transition-transform
-                                            duration-700
-                                            group-hover:scale-[1.04]
-                                        "
-                                    />
-
-                                    <div
-                                        className="
-                                            absolute
-                                            inset-0
-                                            bg-gradient-to-t
-                                            from-modura-primary/20
-                                            to-transparent
-                                        "
-                                    />
-
-                                    <span
-                                        className="
-                                            absolute
-                                            top-0
-                                            left-0
-                                            h-[4px]
-                                            w-20
-                                            bg-modura-secondary
-                                            transition-all
-                                            duration-500
-                                            group-hover:w-full
-                                        "
-                                    />
-
-                                </div>
-
-
-                                {/* CONTENT */}
-
-                                <div
-                                    className="
-                                        p-7
-                                        md:p-8
-                                    "
-                                >
-
-                                    <div
-                                        className="
-                                            mb-4
-                                            flex
-                                            items-center
-                                            gap-3
-                                        "
-                                    >
-
-                                        <span
-                                            className="
-                                                h-[2px]
-                                                w-8
-                                                bg-modura-secondary
-                                            "
-                                        />
-
-                                        <span
-                                            className="
-                                                text-[10px]
-                                                font-bold
-                                                tracking-[0.25em]
-                                                text-modura-secondary
-                                                uppercase
-                                            "
                                         >
-                                            Certification
-                                        </span>
 
-                                    </div>
-
-
-                                    <h3
-                                        className="
-                                            text-[24px]
-                                            leading-tight
-                                            font-bold
-                                            tracking-[-0.025em]
-                                            text-modura-primary
-                                        "
-                                    >
-                                        ISO 14001:2015
-                                    </h3>
-
-
-                                    <p
-                                        className="
-                                            mt-2
-                                            text-[11px]
-                                            font-bold
-                                            tracking-[0.18em]
-                                            text-modura-secondary
-                                            uppercase
-                                        "
-                                    >
-                                        Environmental Management System
-                                    </p>
-
-
-                                    <p
-                                        className="
-                                            mt-4
-                                            text-[14px]
-                                            leading-6
-                                            text-modura-gray-600
-                                        "
-                                    >
-                                        Our environmental management approach
-                                        promotes responsible practices and supports
-                                        sustainable project delivery.
-                                    </p>
-
-
-                                    <div
-                                        className="
-                                            mt-6
-                                            flex
-                                            items-center
-                                            gap-3
-                                            border-t
-                                            border-modura-gray-200
-                                            pt-5
-                                        "
-                                    >
-
-                                        <FiCalendar
-                                            className="
+                                            <FiCalendar
+                                                className="
                                                 text-modura-secondary
                                             "
-                                            size={20}
-                                        />
+                                                size={20}
+                                            />
 
-                                        <div>
+                                            <div>
 
-                                            <span
-                                                className="
+                                                <span
+                                                    className="
                                                     block
                                                     text-[10px]
                                                     tracking-[0.2em]
                                                     text-modura-gray-500
                                                     uppercase
                                                 "
-                                            >
-                                                Certified Since
-                                            </span>
+                                                >
+                                                    Certified Since
+                                                </span>
 
-                                            <span
-                                                className="
+                                                <span
+                                                    className="
                                                     text-[16px]
                                                     font-bold
                                                     text-modura-primary
                                                 "
-                                            >
-                                                2019
-                                            </span>
+                                                >
+                                                    {certificate.year}
+                                                </span>
+
+                                            </div>
 
                                         </div>
 
                                     </div>
-
-                                </div>
-
-                            </article>
-
-
-                            {/* =================================================
-                                CERTIFICATE 03
-                            ================================================= */}
-
-                            <article
-                                className="
-                                    group
-                                    relative
-                                    overflow-hidden
-                                    border
-                                    border-modura-gray-200
-                                    bg-modura-white
-                                    shadow-[0_15px_45px_rgba(11,29,51,0.06)]
-                                    transition-all
-                                    duration-500
-                                    hover:-translate-y-1
-                                    hover:shadow-[0_20px_55px_rgba(11,29,51,0.10)]
-                                "
-                            >
-
-                                {/* IMAGE */}
-
-                                <div
-                                    className="
-                                        relative
-                                        h-[245px]
-                                        overflow-hidden
-                                        bg-modura-light
-                                    "
-                                >
-
-                                    <Image
-                                        src={certificate3}
-                                        alt="ISO 45001:2018 Certificate"
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, 33vw"
-                                        className="
-                                            object-contain
-                                            transition-transform
-                                            duration-700
-                                            group-hover:scale-[1.04]
-                                        "
-                                    />
-
-                                    <div
-                                        className="
-                                            absolute
-                                            inset-0
-                                            bg-gradient-to-t
-                                            from-modura-primary/20
-                                            to-transparent
-                                        "
-                                    />
-
-                                    <span
-                                        className="
-                                            absolute
-                                            top-0
-                                            left-0
-                                            h-[4px]
-                                            w-20
-                                            bg-modura-primary
-                                            transition-all
-                                            duration-500
-                                            group-hover:w-full
-                                        "
-                                    />
-
-                                </div>
-
-
-                                {/* CONTENT */}
-
-                                <div
-                                    className="
-                                        p-7
-                                        md:p-8
-                                    "
-                                >
-
-                                    <div
-                                        className="
-                                            mb-4
-                                            flex
-                                            items-center
-                                            gap-3
-                                        "
-                                    >
-
-                                        <span
-                                            className="
-                                                h-[2px]
-                                                w-8
-                                                bg-modura-primary
-                                            "
-                                        />
-
-                                        <span
-                                            className="
-                                                text-[10px]
-                                                font-bold
-                                                tracking-[0.25em]
-                                                text-modura-secondary
-                                                uppercase
-                                            "
-                                        >
-                                            Certification
-                                        </span>
-
-                                    </div>
-
-
-                                    <h3
-                                        className="
-                                            text-[24px]
-                                            leading-tight
-                                            font-bold
-                                            tracking-[-0.025em]
-                                            text-modura-primary
-                                        "
-                                    >
-                                        ISO 45001:2018
-                                    </h3>
-
-
-                                    <p
-                                        className="
-                                            mt-2
-                                            text-[11px]
-                                            font-bold
-                                            tracking-[0.18em]
-                                            text-modura-secondary
-                                            uppercase
-                                        "
-                                    >
-                                        Occupational Health & Safety
-                                    </p>
-
-
-                                    <p
-                                        className="
-                                            mt-4
-                                            text-[14px]
-                                            leading-6
-                                            text-modura-gray-600
-                                        "
-                                    >
-                                        Our safety-focused systems help maintain
-                                        responsible working practices and a safer
-                                        environment for our teams and partners.
-                                    </p>
-
-
-                                    <div
-                                        className="
-                                            mt-6
-                                            flex
-                                            items-center
-                                            gap-3
-                                            border-t
-                                            border-modura-gray-200
-                                            pt-5
-                                        "
-                                    >
-
-                                        <FiCalendar
-                                            className="
-                                                text-modura-secondary
-                                            "
-                                            size={20}
-                                        />
-
-                                        <div>
-
-                                            <span
-                                                className="
-                                                    block
-                                                    text-[10px]
-                                                    tracking-[0.2em]
-                                                    text-modura-gray-500
-                                                    uppercase
-                                                "
-                                            >
-                                                Certified Since
-                                            </span>
-
-                                            <span
-                                                className="
-                                                    text-[16px]
-                                                    font-bold
-                                                    text-modura-primary
-                                                "
-                                            >
-                                                2020
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </article>
-
-                        </div>
+                                </article>
+                            ))
+                        )}
 
                     </div>
+                </div>
             </section>
 
             {/* =================================================
@@ -4985,14 +4727,28 @@ export default function CompanyPage() {
 
                                 <div className="space-y-2 pb-1">
 
-                                    {faqs.map((faq, index) => {
-                                        const isOpen =
-                                            activeFaq === index;
+                                    {faqLoading ? (
+                                        <p className="py-10 text-center text-[14px] text-modura-gray-600">
+                                            Loading FAQs...
+                                        </p>
+                                    ) : faqs.length === 0 ? (
+                                        <div className="py-12 text-center">
+                                            <p className="text-[16px] font-semibold text-modura-primary">
+                                                FAQs are currently not available.
+                                            </p>
+                                            <p className="mt-2 text-[14px] text-modura-gray-600">
+                                                Please check back later for more information.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        faqs.map((faq, index) => {
+                                            const isOpen =
+                                                activeFaq === index;
 
-                                        return (
-                                            <div
-                                                key={faq.question}
-                                                className="
+                                            return (
+                                                <div
+                                                    key={faq.id}
+                                                    className="
                                                     group
                                                     relative
                                                     overflow-hidden
@@ -5002,12 +4758,12 @@ export default function CompanyPage() {
                                                     transition-all
                                                     duration-300
                                                 "
-                                            >
+                                                >
 
-                                                {/* ACTIVE LINE */}
+                                                    {/* ACTIVE LINE */}
 
-                                                <span
-                                                    className={`
+                                                    <span
+                                                        className={`
                                                         absolute
                                                         top-0
                                                         bottom-0
@@ -5017,25 +4773,25 @@ export default function CompanyPage() {
                                                         transition-transform
                                                         duration-300
                                                         ${isOpen
-                                                            ? 'translate-x-0'
-                                                            : '-translate-x-full'
-                                                        }
+                                                                ? 'translate-x-0'
+                                                                : '-translate-x-full'
+                                                            }
                                                     `}
-                                                />
+                                                    />
 
 
-                                                {/* QUESTION */}
+                                                    {/* QUESTION */}
 
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setActiveFaq(
-                                                            isOpen
-                                                                ? -1
-                                                                : index,
-                                                        )
-                                                    }
-                                                    className="
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setActiveFaq(
+                                                                isOpen
+                                                                    ? -1
+                                                                    : index,
+                                                            )
+                                                        }
+                                                        className="
                                                         flex
                                                         min-h-[76px]
                                                         w-full
@@ -5045,12 +4801,12 @@ export default function CompanyPage() {
                                                         text-left
                                                         md:px-6
                                                     "
-                                                >
+                                                    >
 
-                                                    {/* NUMBER */}
+                                                        {/* NUMBER */}
 
-                                                    <span
-                                                        className={`
+                                                        <span
+                                                            className={`
                                                             flex
                                                             h-9
                                                             w-9
@@ -5063,22 +4819,22 @@ export default function CompanyPage() {
                                                             transition-all
                                                             duration-300
                                                             ${isOpen
-                                                                ? 'bg-modura-primary text-modura-white'
-                                                                : 'bg-modura-light text-modura-primary'
-                                                            }
+                                                                    ? 'bg-modura-primary text-modura-white'
+                                                                    : 'bg-modura-light text-modura-primary'
+                                                                }
                                                         `}
-                                                    >
-                                                        {String(index + 1).padStart(
-                                                            2,
-                                                            '0',
-                                                        )}
-                                                    </span>
+                                                        >
+                                                            {String(index + 1).padStart(
+                                                                2,
+                                                                '0',
+                                                            )}
+                                                        </span>
 
 
-                                                    {/* QUESTION */}
+                                                        {/* QUESTION */}
 
-                                                    <span
-                                                        className="
+                                                        <span
+                                                            className="
                                                             flex-1
                                                             pr-3
                                                             text-[15px]
@@ -5087,15 +4843,15 @@ export default function CompanyPage() {
                                                             text-modura-primary
                                                             md:text-[16px]
                                                         "
-                                                    >
-                                                        {faq.question}
-                                                    </span>
+                                                        >
+                                                            {faq.question}
+                                                        </span>
 
 
-                                                    {/* ICON */}
+                                                        {/* ICON */}
 
-                                                    <span
-                                                        className="
+                                                        <span
+                                                            className="
                                                             flex
                                                             h-8
                                                             w-8
@@ -5104,42 +4860,42 @@ export default function CompanyPage() {
                                                             justify-center
                                                             text-modura-primary
                                                         "
-                                                    >
-                                                        {isOpen ? (
-                                                            <FiMinus size={19} />
-                                                        ) : (
-                                                            <FiPlus size={19} />
-                                                        )}
-                                                    </span>
+                                                        >
+                                                            {isOpen ? (
+                                                                <FiMinus size={19} />
+                                                            ) : (
+                                                                <FiPlus size={19} />
+                                                            )}
+                                                        </span>
 
-                                                </button>
+                                                    </button>
 
 
-                                                {/* =================================================
+                                                    {/* =================================================
                                                     ANSWER
                                                 ================================================= */}
 
-                                                <div
-                                                    className={`
+                                                    <div
+                                                        className={`
                                                         grid
                                                         transition-[grid-template-rows]
                                                         duration-300
                                                         ease-in-out
                                                         ${isOpen
-                                                            ? 'grid-rows-[1fr]'
-                                                            : 'grid-rows-[0fr]'
-                                                        }
+                                                                ? 'grid-rows-[1fr]'
+                                                                : 'grid-rows-[0fr]'
+                                                            }
                                                     `}
-                                                >
-
-                                                    <div
-                                                        className="
-                                                            overflow-hidden
-                                                        "
                                                     >
 
                                                         <div
                                                             className="
+                                                            overflow-hidden
+                                                        "
+                                                        >
+
+                                                            <div
+                                                                className="
                                                                 border-t
                                                                 border-modura-gray-200
                                                                 px-5
@@ -5148,29 +4904,31 @@ export default function CompanyPage() {
                                                                 md:px-6
                                                                 md:pl-[89px]
                                                             "
-                                                        >
+                                                            >
 
-                                                            <p
-                                                                className="
+                                                                <div
+                                                                    className="
                                                                     max-w-[650px]
                                                                     text-[13px]
                                                                     leading-[1.8]
                                                                     text-modura-gray-600
                                                                     md:text-[14px]
                                                                 "
-                                                            >
-                                                                {faq.answer}
-                                                            </p>
+                                                                    dangerouslySetInnerHTML={{
+                                                                        __html: DOMPurify.sanitize(faq.answer || ''),
+                                                                    }}
+                                                                />
+
+                                                            </div>
 
                                                         </div>
 
                                                     </div>
 
                                                 </div>
-
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })
+                                    )}
 
                                 </div>
 
@@ -5449,8 +5207,24 @@ export default function CompanyPage() {
                             lg:gap-8
                         "
                     >
+                        {blogLoading ? (
+                            <div className="py-12 text-center md:col-span-2 lg:col-span-3">
+                                <p className="text-[14px] text-modura-gray-600">
+                                    Loading blogs...
+                                </p>
+                            </div>
+                        ) : companyBlogs.length === 0 ? (
+                            <div className="py-12 text-center md:col-span-2 lg:col-span-3">
+                                <p className="text-[16px] font-semibold text-modura-primary">
+                                    Blogs are currently not available.
+                                </p>
 
-                        {companyBlogs.map((blog, index) => (
+                                <p className="mt-2 text-[14px] text-modura-gray-600">
+                                    Please check back later for new insights.
+                                </p>
+                            </div>
+                        ) : (
+                        companyBlogs.map((blog, index) => (
 
                             <article
                                 key={blog.slug}
@@ -5469,7 +5243,7 @@ export default function CompanyPage() {
                     ================================================= */}
 
                                 <Link
-                                    href={`/blog/${blog.slug}`}
+                                    href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
                                     className="
                             relative
                             block
@@ -5480,7 +5254,7 @@ export default function CompanyPage() {
                                 >
 
                                     <Image
-                                        src={blog.image}
+                                        src={blog.imageUrl}
                                         alt={blog.title}
                                         fill
                                         sizes="
@@ -5534,7 +5308,7 @@ export default function CompanyPage() {
                                 uppercase
                             "
                                     >
-                                        {blog.date}
+                                        {formatCompanyBlogDate(blog.publishedAt)}
                                     </p>
 
 
@@ -5543,7 +5317,7 @@ export default function CompanyPage() {
                         ================================================= */}
 
                                     <Link
-                                        href={`/blog/${blog.slug}`}
+                                        href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
                                         className="
                                 block
                                 transition-colors
@@ -5575,7 +5349,7 @@ export default function CompanyPage() {
                                 text-modura-gray-600
                             "
                                     >
-                                        {blog.desc}
+                                        {getCompanyBlogExcerpt(blog.description, 130)}
                                     </p>
 
 
@@ -5584,7 +5358,7 @@ export default function CompanyPage() {
                         ================================================= */}
 
                                     <Link
-                                        href={`/blog/${blog.slug}`}
+                                        href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
                                         className="
                                 group/blog-btn
                                 mt-7
@@ -5641,7 +5415,8 @@ export default function CompanyPage() {
 
                             </article>
 
-                        ))}
+                        ))
+                        )}
 
                     </div>
 

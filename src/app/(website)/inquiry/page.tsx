@@ -7,6 +7,10 @@ import Link from 'next/link';
 import Breadcrumb from '../../../components/Breadcrumb';
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
 
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { apiUrl } from '@/app/(website)/config';
+
 import {
     FiUser,
     FiBriefcase,
@@ -140,6 +144,8 @@ function InputField({
                     onChange={onChange}
                     placeholder={placeholder}
                     autoComplete="off"
+                    maxLength={name === 'phone' ? 10 : 50}
+                    inputMode={name === 'phone' ? 'numeric' : undefined}
                     className="
                         h-full
                         w-full
@@ -178,306 +184,7 @@ function InputField({
     );
 }
 
-/* =========================================================
-   SELECT FIELD
-========================================================= */
 
-function SelectField({
-    label,
-    name,
-    icon,
-    value,
-    onChange,
-    options,
-    error,
-}: {
-    label: string;
-    name: keyof FormData;
-    icon: React.ReactNode;
-    value: string;
-    onChange: (
-        e: React.ChangeEvent<HTMLSelectElement>
-    ) => void;
-    options: string[];
-    error?: string;
-}) {
-    const [open, setOpen] = useState(false);
-
-    const selectedLabel =
-        value || `Select ${label.toLowerCase()}`;
-
-    const handleSelect = (option: string) => {
-        const event = {
-            target: {
-                name,
-                value: option,
-            },
-        } as React.ChangeEvent<HTMLSelectElement>;
-
-        onChange(event);
-        setOpen(false);
-    };
-
-    return (
-        <div className="group relative">
-            {/* LABEL */}
-
-            <label
-                htmlFor={name}
-                className="
-                    mb-2.5
-                    block
-                    text-[12px]
-                    font-semibold
-                    uppercase
-                    tracking-[0.12em]
-                    text-modura-primary
-
-                    md:text-[13px]
-                "
-            >
-                {label}
-
-                <span className="ml-1 text-red-600">
-                    *
-                </span>
-            </label>
-
-            {/* SELECT FIELD */}
-
-            <button
-                type="button"
-                onClick={() => setOpen((prev) => !prev)}
-                className={`
-                    relative
-                    flex
-                    h-[58px]
-                    w-full
-                    items-center
-                    overflow-hidden
-                    border
-                    bg-modura-white
-                    text-left
-                    transition-all
-                    duration-300
-                    focus:outline-none
-
-                    ${error
-                        ? 'border-red-500'
-                        : open
-                            ? 'border-modura-primary'
-                            : 'border-modura-gray-200 hover:border-modura-secondary'
-                    }
-                `}
-            >
-                {/* ICON */}
-
-                <span
-                    className={`
-                        flex
-                        h-full
-                        w-[54px]
-                        shrink-0
-                        items-center
-                        justify-center
-                        border-r
-                        border-modura-gray-200
-                        transition-all
-                        duration-300
-
-                        ${open
-                            ? 'bg-modura-primary text-modura-white'
-                            : 'text-modura-secondary'
-                        }
-                    `}
-                >
-                    {icon}
-                </span>
-
-                {/* SELECTED VALUE */}
-
-                <span
-                    className={`
-                        flex-1
-                        px-5
-                        text-[15px]
-                        font-medium
-
-                        ${value
-                            ? 'text-modura-primary'
-                            : 'text-modura-gray-400'
-                        }
-                    `}
-                >
-                    {selectedLabel}
-                </span>
-
-                {/* SIMPLE CHEVRON */}
-
-                <span
-                    className="
-                        mr-5
-                        flex
-                        h-5
-                        w-5
-                        shrink-0
-                        items-center
-                        justify-center
-                    "
-                >
-                    <span
-                        className={`
-                            h-[8px]
-                            w-[8px]
-                            border-b
-                            border-r
-                            border-modura-primary
-                            transition-transform
-                            duration-300
-
-                            ${open
-                                ? 'translate-y-[2px] rotate-[225deg]'
-                                : '-translate-y-[2px] rotate-45'
-                            }
-                        `}
-                    />
-                </span>
-
-                {/* BOTTOM LINE */}
-
-                <span
-                    className={`
-                        absolute
-                        bottom-0
-                        left-0
-                        h-[2px]
-                        bg-modura-primary
-                        transition-all
-                        duration-500
-
-                        ${open ? 'w-full' : 'w-0'}
-                    `}
-                />
-            </button>
-
-            {/* CUSTOM OPTIONS */}
-
-            <div
-                className={`
-                    absolute
-                    left-0
-                    right-0
-                    z-[100]
-                    mt-2
-                    origin-top
-                    overflow-hidden
-                    border
-                    border-modura-gray-200
-                    bg-modura-white
-                    shadow-[0_18px_45px_rgba(11,29,51,0.12)]
-                    transition-all
-                    duration-300
-
-                    ${open
-                        ? 'visible translate-y-0 scale-y-100 opacity-100'
-                        : 'invisible -translate-y-2 scale-y-95 opacity-0'
-                    }
-                `}
-            >
-                <div className="max-h-[260px] overflow-y-auto py-1">
-                    {options.map((option) => {
-                        const selected = value === option;
-
-                        return (
-                            <button
-                                key={option}
-                                type="button"
-                                onClick={() =>
-                                    handleSelect(option)
-                                }
-                                className={`
-                                    group/option
-                                    relative
-                                    flex
-                                    min-h-[50px]
-                                    w-full
-                                    items-center
-                                    px-5
-                                    text-left
-                                    transition-all
-                                    duration-200
-
-                                    ${selected
-                                        ? 'bg-modura-primary text-modura-white'
-                                        : 'text-modura-primary hover:bg-modura-off-white'
-                                    }
-                                `}
-                            >
-                                {/* LEFT ACTIVE LINE */}
-
-                                <span
-                                    className={`
-                                        absolute
-                                        bottom-0
-                                        left-0
-                                        top-0
-                                        w-[3px]
-                                        bg-modura-secondary-light
-                                        transition-opacity
-                                        duration-200
-
-                                        ${selected
-                                            ? 'opacity-100'
-                                            : 'opacity-0 group-hover/option:opacity-100'
-                                        }
-                                    `}
-                                />
-
-                                {/* OPTION TEXT */}
-
-                                <span
-                                    className="
-                                        text-[14px]
-                                        font-medium
-                                        transition-transform
-                                        duration-200
-                                        group-hover/option:translate-x-1
-                                    "
-                                >
-                                    {option}
-                                </span>
-
-                                {/* SIMPLE CHECK */}
-
-                                {selected && (
-                                    <span
-                                        className="
-                                            ml-auto
-                                            h-[7px]
-                                            w-[12px]
-                                            rotate-[-45deg]
-                                            border-b
-                                            border-l
-                                            border-modura-white
-                                        "
-                                    />
-                                )}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* ERROR */}
-
-            {error && (
-                <p className="mt-1.5 text-[12px] font-medium text-red-600">
-                    {error}
-                </p>
-            )}
-        </div>
-    );
-}
 
 /* =========================================================
    INQUIRY PAGE
@@ -510,7 +217,10 @@ export default function InquiryPage() {
         Record<string, string>
     >({});
 
-    const [submitted, setSubmitted] = useState(false);
+    const router = useRouter();
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
 
     /* =========================================================
        CAPTCHA
@@ -541,9 +251,17 @@ export default function InquiryPage() {
     ) => {
         const { name, value } = e.target;
 
+        let updatedValue = value;
+
+        if (name === 'phone') {
+            updatedValue = value.replace(/\D/g, '').slice(0, 10);
+        } else {
+            updatedValue = value.slice(0, 50);
+        }
+
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: updatedValue,
         }));
 
         setErrors((prev) => ({
@@ -579,9 +297,11 @@ export default function InquiryPage() {
     const handleDescriptionChange = (
         e: React.ChangeEvent<HTMLTextAreaElement>
     ) => {
+        const value = e.target.value.slice(0, 1000);
+
         setFormData((prev) => ({
             ...prev,
-            description: e.target.value,
+            description: value,
         }));
 
         setErrors((prev) => ({
@@ -594,73 +314,74 @@ export default function InquiryPage() {
        VALIDATION
     ========================================================= */
 
+
     const validate = () => {
         const newErrors: Record<string, string> = {};
 
-        if (!formData.name.trim()) {
-            newErrors.name = 'Name is required';
-        }
+        const requiredFields: {
+            key: keyof FormData;
+            label: string;
+        }[] = [
+                { key: 'name', label: 'Name' },
+                { key: 'company', label: 'Company' },
+                { key: 'email', label: 'Email' },
+                { key: 'phone', label: 'Phone' },
+                { key: 'cityAddress', label: 'City / Address' },
+                { key: 'stateProvince', label: 'State / Province' },
+                { key: 'natureOfProject', label: 'Nature of Project' },
+                { key: 'country', label: 'Country' },
+                { key: 'description', label: 'Description' },
+                { key: 'teams', label: 'Teams' },
+                { key: 'hangout', label: 'Hangout' },
+                { key: 'other', label: 'Other' },
+            ];
 
-        if (!formData.company.trim()) {
-            newErrors.company = 'Company is required';
-        }
+        // Required and maximum length validation
+        requiredFields.forEach(({ key, label }) => {
+            const value = formData[key].trim();
 
-        if (!formData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-                formData.email
-            )
+            if (!value) {
+                newErrors[key] = `${label} is required`;
+            } else if (
+                key !== 'phone' &&
+                key !== 'description' &&
+                value.length > 50
+            ) {
+                newErrors[key] = `${label} cannot exceed 50 characters`;
+            } else if (
+                key === 'description' &&
+                value.length > 1000
+            ) {
+                newErrors[key] =
+                    'Description cannot exceed 1000 characters';
+            }
+        });
+
+        // Email validation
+        if (
+            formData.email.trim() &&
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())
         ) {
-            newErrors.email = 'Enter a valid email';
+            newErrors.email = 'Enter a valid email address';
         }
 
-        if (!formData.phone.trim()) {
-            newErrors.phone = 'Phone is required';
+        // Phone validation
+        if (
+            formData.phone.trim() &&
+            !/^\d{10}$/.test(formData.phone)
+        ) {
+            newErrors.phone = 'Phone number must contain exactly 10 digits';
         }
 
-        if (!formData.cityAddress.trim()) {
-            newErrors.cityAddress =
-                'City / Address is required';
-        }
-
-        if (!formData.stateProvince.trim()) {
-            newErrors.stateProvince =
-                'State / Province is required';
-        }
-
-        if (!formData.natureOfProject) {
-            newErrors.natureOfProject =
-                'Select nature of project';
-        }
-
-        if (!formData.country) {
-            newErrors.country = 'Select country';
-        }
-
-        if (!formData.description.trim()) {
-            newErrors.description =
-                'Description is required';
-        }
-
-        if (!formData.teams.trim()) {
-            newErrors.teams = 'Teams is required';
-        }
-
-        if (!formData.hangout.trim()) {
-            newErrors.hangout = 'Hangout is required';
-        }
-
-        if (!formData.other.trim()) {
-            newErrors.other = 'Other is required';
-        }
-
+        // CAPTCHA validation
         if (!captchaInput.trim()) {
             newErrors.captcha = 'Enter captcha';
         } else if (
+            !/^\d+$/.test(captchaInput) ||
             Number(captchaInput) !== captcha.answer
         ) {
             newErrors.captcha = 'Incorrect captcha';
+            generateCaptcha();
         }
 
         setErrors(newErrors);
@@ -668,43 +389,72 @@ export default function InquiryPage() {
         return Object.keys(newErrors).length === 0;
     };
 
+
     /* =========================================================
        SUBMIT
     ========================================================= */
 
-    const handleSubmit = (
+    const handleSubmit = async (
         e: FormEvent<HTMLFormElement>
     ) => {
         e.preventDefault();
 
+        if (isSubmitting) return;
+
+        setSubmitError('');
+
+        // Keep existing form validation and CAPTCHA verification
         if (!validate()) {
             return;
         }
 
-        console.log('Inquiry:', formData);
+        setIsSubmitting(true);
 
-        setSubmitted(true);
+        try {
+            const payload = {
+                name: formData.name.trim(),
+                company: formData.company.trim(),
+                email: formData.email.trim(),
+                phone: formData.phone.trim(),
+                city: formData.cityAddress.trim(),
+                state: formData.stateProvince.trim(),
+                country: formData.country.trim(),
+                natureOfProject: formData.natureOfProject.trim(),
+                description: formData.description.trim(),
+                teams: formData.teams.trim(),
+                hangout: formData.hangout.trim(),
+                other: formData.other.trim(),
+            };
 
-        setFormData({
-            name: '',
-            company: '',
-            email: '',
-            phone: '',
-            cityAddress: '',
-            stateProvince: '',
-            natureOfProject: '',
-            country: '',
-            description: '',
-            teams: '',
-            hangout: '',
-            other: '',
-        });
+            const response = await axios.post(
+                `${apiUrl}/projectInquiry`,
+                payload
+            );
 
-        generateCaptcha();
+            if (response.data?.success === true) {
+                router.push('/thankyou/inquiry');
+            } else {
+                setSubmitError(
+                    response.data?.message ||
+                    'Unable to submit your inquiry. Please try again.'
+                );
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                setSubmitError(
+                    error.response?.data?.message ||
+                    'Unable to submit your inquiry. Please try again.'
+                );
+            } else {
+                setSubmitError(
+                    'Something went wrong. Please try again.'
+                );
+            }
 
-        setTimeout(() => {
-            setSubmitted(false);
-        }, 5000);
+            console.error('Project Inquiry API Error:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -978,56 +728,23 @@ export default function InquiryPage() {
                                         md:grid-cols-2
                                     "
                                 >
-                                    <SelectField
+                                    <InputField
                                         label="Nature of Project"
                                         name="natureOfProject"
-                                        icon={
-                                            <FiLayers
-                                                size={18}
-                                            />
-                                        }
-                                        value={
-                                            formData.natureOfProject
-                                        }
-                                        onChange={
-                                            handleSelectChange
-                                        }
-                                        options={[
-                                            'Architecture Design',
-                                            'BIM Solutions',
-                                            'Structural Engineering',
-                                            'Project Management',
-                                            'Steel Detailing',
-                                            'Shop Drawing',
-                                            'Other',
-                                        ]}
-                                        error={
-                                            errors.natureOfProject
-                                        }
+                                        icon={<FiLayers size={18} />}
+                                        placeholder="Enter nature of project"
+                                        value={formData.natureOfProject}
+                                        onChange={handleInputChange}
+                                        error={errors.natureOfProject}
                                     />
 
-                                    <SelectField
+                                    <InputField
                                         label="Country"
                                         name="country"
-                                        icon={
-                                            <FiGlobe
-                                                size={18}
-                                            />
-                                        }
+                                        icon={<FiGlobe size={18} />}
+                                        placeholder="Enter country"
                                         value={formData.country}
-                                        onChange={
-                                            handleSelectChange
-                                        }
-                                        options={[
-                                            'India',
-                                            'United States',
-                                            'United Kingdom',
-                                            'Australia',
-                                            'Canada',
-                                            'United Arab Emirates',
-                                            'Singapore',
-                                            'Other',
-                                        ]}
+                                        onChange={handleInputChange}
                                         error={errors.country}
                                     />
 
@@ -1272,7 +989,7 @@ export default function InquiryPage() {
                                             </span>
                                         </label>
 
-                                        <div  className="
+                                        <div className="
                                                         grid
                                                         grid-cols-[minmax(0,1fr)_58px]
                                                         gap-3
@@ -1344,12 +1061,18 @@ export default function InquiryPage() {
                                                 value={
                                                     captchaInput
                                                 }
-                                                onChange={(e) =>
-                                                    setCaptchaInput(
-                                                        e.target
-                                                            .value
-                                                    )
-                                                }
+                                                onChange={(e) => {
+                                                    const value = e.target.value
+                                                        .replace(/\D/g, '')
+                                                        .slice(0, 2);
+
+                                                    setCaptchaInput(value);
+
+                                                    setErrors((prev) => ({
+                                                        ...prev,
+                                                        captcha: '',
+                                                    }));
+                                                }}
                                                 placeholder="Enter captcha answer"
                                                 inputMode="numeric"
                                                 className="
@@ -1386,8 +1109,9 @@ export default function InquiryPage() {
                                     {/* SUBMIT */}
 
                                     <button
-                                            type="submit"
-                                            className="
+                                        disabled={isSubmitting}
+                                        type="submit"
+                                        className="
                                                 group
                                                 relative
                                                 flex
@@ -1414,9 +1138,9 @@ export default function InquiryPage() {
                                                 sm:px-8
                                                 sm:text-[12px]
                                             "
-                                        >
+                                    >
                                         <span className="relative z-10">
-                                            Submit Inquiry
+                                            {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
                                         </span>
 
                                         <FiSend
@@ -1449,26 +1173,25 @@ export default function InquiryPage() {
                             </div>
 
                             {/* =================================================
-                                SUCCESS
+                                ERROR
                             ================================================= */}
 
-                            {submitted && (
+                            {submitError && (
                                 <div
+                                    role="alert"
                                     className="
                                         mt-6
                                         border
-                                        border-modura-secondary/30
-                                        bg-modura-off-white
+                                        border-red-200
+                                        bg-red-50
                                         px-5
                                         py-4
                                         text-[13px]
                                         font-medium
-                                        text-modura-primary
+                                        text-red-600
                                     "
                                 >
-                                    Your inquiry has been submitted
-                                    successfully. We will get back
-                                    to you shortly.
+                                    {submitError}
                                 </div>
                             )}
                         </form>

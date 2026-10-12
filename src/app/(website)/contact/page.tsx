@@ -1,7 +1,9 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { apiUrl } from '@/app/(website)/config';
 import Breadcrumb from '../../../components/Breadcrumb';
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
 
@@ -29,19 +31,7 @@ type FormData = {
     description: string;
 };
 
-/* =========================================================
-   DATA
-========================================================= */
 
-const projectOptions = [
-    'Architecture Design',
-    'BIM Solutions',
-    'Structural Engineering',
-    'Project Management',
-    'Steel Detailing',
-    'Shop Drawing',
-    'Other',
-];
 
 const contactDetails = [
     {
@@ -70,159 +60,7 @@ const contactDetails = [
     },
 ];
 
-/* =========================================================
-   CUSTOM DROPDOWN
-========================================================= */
 
-function ProjectDropdown({
-    value,
-    onChange,
-}: {
-    value: string;
-    onChange: (value: string) => void;
-}) {
-    const [open, setOpen] = useState(false);
-
-    return (
-        <div className="relative">
-            <label
-                className="
-                    mb-2.5 block
-                    text-[11px]
-                    font-bold
-                    uppercase
-                    tracking-[0.16em]
-                    text-modura-primary
-                "
-            >
-                Nature Of Project
-                <span className="ml-1 text-red-600">*</span>
-            </label>
-
-            <button
-                type="button"
-                onClick={() => setOpen((prev) => !prev)}
-                className={`
-                    relative flex h-[60px] w-full items-center
-                    border bg-modura-white text-left
-                    transition-all duration-300
-                    ${open
-                        ? 'border-modura-primary'
-                        : 'border-modura-gray-200 hover:border-modura-secondary'
-                    }
-                `}
-            >
-                <span
-                    className={`
-                        flex h-full w-[58px] shrink-0 items-center justify-center
-                        border-r border-modura-gray-200
-                        transition-all duration-300
-                        ${open
-                            ? 'bg-modura-primary text-modura-white'
-                            : 'text-modura-secondary'
-                        }
-                    `}
-                >
-                    <FiBriefcase size={18} />
-                </span>
-
-                <span
-                    className={`
-                        flex-1 px-5 text-[14px] font-medium
-                        ${value
-                            ? 'text-modura-primary'
-                            : 'text-modura-gray-400'
-                        }
-                    `}
-                >
-                    {value || 'Select nature of project'}
-                </span>
-
-                <span className="mr-5 flex h-5 w-5 items-center justify-center">
-                    <span
-                        className={`
-                            h-[8px] w-[8px]
-                            border-b border-r border-modura-primary
-                            transition-transform duration-300
-                            ${open
-                                ? 'translate-y-[2px] rotate-[225deg]'
-                                : '-translate-y-[2px] rotate-45'
-                            }
-                        `}
-                    />
-                </span>
-
-                <span
-                    className={`
-                        absolute bottom-0 left-0 h-[2px]
-                        bg-modura-primary transition-all duration-500
-                        ${open ? 'w-full' : 'w-0'}
-                    `}
-                />
-            </button>
-
-            <div
-                className={`
-                    absolute left-0 right-0 z-50 mt-2
-                    overflow-hidden border border-modura-gray-200
-                    bg-modura-white
-                    shadow-[0_20px_50px_rgba(11,29,51,0.14)]
-                    transition-all duration-300
-                    ${open
-                        ? 'visible translate-y-0 opacity-100'
-                        : 'invisible -translate-y-2 opacity-0'
-                    }
-                `}
-            >
-                {projectOptions.map((option) => {
-                    const selected = value === option;
-
-                    return (
-                        <button
-                            key={option}
-                            type="button"
-                            onClick={() => {
-                                onChange(option);
-                                setOpen(false);
-                            }}
-                            className={`
-                                group relative flex min-h-[49px] w-full
-                                items-center px-5 text-left
-                                transition-all duration-200
-                                ${selected
-                                    ? 'bg-modura-primary text-modura-white'
-                                    : 'text-modura-primary hover:bg-modura-off-white'
-                                }
-                            `}
-                        >
-                            <span
-                                className={`
-                                    absolute bottom-0 left-0 top-0 w-[3px]
-                                    bg-modura-secondary-light
-                                    ${selected
-                                        ? 'opacity-100'
-                                        : 'opacity-0 group-hover:opacity-100'
-                                    }
-                                `}
-                            />
-
-                            <span className="text-[14px] font-medium">
-                                {option}
-                            </span>
-
-                            {selected && (
-                                <FiChevronRight
-                                    size={16}
-                                    className="ml-auto"
-                                />
-                            )}
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
-}
 
 /* =========================================================
    INPUT
@@ -327,7 +165,10 @@ export default function ContactPage() {
         description: '',
     });
 
-    const [submitted, setSubmitted] = useState(false);
+    const router = useRouter();
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
 
     const updateField = (
         field: keyof FormData,
@@ -339,16 +180,56 @@ export default function ContactPage() {
         }));
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        console.log(formData);
+        if (isSubmitting) return;
 
-        setSubmitted(true);
+        setSubmitError('');
+        setIsSubmitting(true);
 
-        setTimeout(() => {
-            setSubmitted(false);
-        }, 5000);
+        try {
+            const payload = {
+                name: formData.name.trim(),
+                email: formData.email.trim(),
+                companyName: formData.company.trim(),
+                phone: formData.phone.trim(),
+                natureOfProject: formData.natureOfProject.trim(),
+                projectDetails: formData.description.trim(),
+            };
+
+            if (Object.values(payload).some((value) => !value)) {
+                setSubmitError('Please fill in all required fields.');
+                return;
+            }
+
+            const response = await axios.post(
+                `${apiUrl}/contactInquiry`,
+                payload
+            );
+
+            if (response.data?.success === true) {
+                router.push('/thankyou/inquiry');
+            } else {
+                setSubmitError(
+                    response.data?.message ||
+                    'Unable to submit your inquiry. Please try again.'
+                );
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                setSubmitError(
+                    error.response?.data?.message ||
+                    'Unable to submit your inquiry. Please try again.'
+                );
+            } else {
+                setSubmitError('Something went wrong. Please try again.');
+            }
+
+            console.error('Contact Inquiry Error:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -367,7 +248,7 @@ export default function ContactPage() {
             ===================================================== */}
 
             <section className="relative overflow-hidden bg-modura-white py-16 md:py-16">
-                
+
                 <div className="relative mx-auto w-full max-w-[1320px] px-5 md:px-8">
 
                     {/* =================================================
@@ -377,7 +258,7 @@ export default function ContactPage() {
                     <div className="mb-10 grid gap-8 lg:grid-cols-[1fr_380px] lg:items-end">
                         <div>
                             <div className="mb-3 flex items-center gap-3">
-                               
+
 
                                 <span
                                     className="
@@ -457,7 +338,7 @@ export default function ContactPage() {
                                 lg:p-12
                             "
                         >
-                            
+
                             <form
                                 onSubmit={handleSubmit}
                                 className="space-y-6"
@@ -550,16 +431,14 @@ export default function ContactPage() {
 
                                 {/* PROJECT */}
 
-                                <ProjectDropdown
-                                    value={
-                                        formData.natureOfProject
+                                <InputField
+                                    label="Nature Of Project"
+                                    placeholder="Enter nature of project"
+                                    value={formData.natureOfProject}
+                                    onChange={(e) =>
+                                        updateField('natureOfProject', e.target.value)
                                     }
-                                    onChange={(value) =>
-                                        updateField(
-                                            'natureOfProject',
-                                            value
-                                        )
-                                    }
+                                    icon={<FiBriefcase size={18} />}
                                 />
 
                                 {/* DESCRIPTION */}
@@ -637,6 +516,7 @@ export default function ContactPage() {
 
                                 <button
                                     type="submit"
+                                    disabled={isSubmitting}
                                     className="
                                         group
                                         relative
@@ -660,7 +540,7 @@ export default function ContactPage() {
                                     "
                                 >
                                     <span className="relative z-10">
-                                        Send Inquiry
+                                         {isSubmitting ? 'Submitting...' : 'Send Inquiry'}
                                     </span>
 
                                     <FiSend
@@ -689,22 +569,21 @@ export default function ContactPage() {
                                     />
                                 </button>
 
-                                {submitted && (
+                                {submitError && (
                                     <div
+                                        role="alert"
                                         className="
                                             border
-                                            border-modura-secondary/30
-                                            bg-modura-off-white
+                                            border-red-200
+                                            bg-red-50
                                             px-5
                                             py-4
                                             text-[13px]
                                             font-medium
-                                            text-modura-primary
+                                            text-red-600
                                         "
                                     >
-                                        Thank you. Your inquiry
-                                        has been submitted
-                                        successfully.
+                                        {submitError}
                                     </div>
                                 )}
                             </form>
@@ -833,7 +712,7 @@ export default function ContactPage() {
 
                                     <div className="mb-3 flex items-center gap-3">
 
-                                        
+
 
                                         <span
                                             className="
@@ -989,7 +868,7 @@ export default function ContactPage() {
                                         </span>
 
 
-                                        
+
 
                                     </a>
 
@@ -1088,7 +967,7 @@ export default function ContactPage() {
                                         </span>
 
 
-                                        
+
                                     </a>
 
 
@@ -1184,7 +1063,7 @@ export default function ContactPage() {
                                         </span>
 
 
-                                        
+
 
                                     </div>
 
@@ -1461,7 +1340,7 @@ export default function ContactPage() {
                         </div>
                     </div>
 
-                    
+
                 </div>
             </section>
         </>

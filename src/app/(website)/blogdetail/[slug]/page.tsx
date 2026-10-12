@@ -2,60 +2,53 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLayoutEffect, useRef } from 'react';
-
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import DOMPurify from 'dompurify';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
+import { useParams } from 'next/navigation';
+import axios from 'axios';
+import { apiUrl } from '@/app/(website)/config';
 import {
     FiArrowUpRight,
     FiCalendar,
 } from 'react-icons/fi';
 
-import Breadcrumb from '../../../components/Breadcrumb';
+import Breadcrumb from '../../../../components/Breadcrumb';
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
 
-import blog1 from '@/app/(website)/assets/images/about-1.jpg';
-import blog2 from '@/app/(website)/assets/images/about-2.jpg';
-import blog3 from '@/app/(website)/assets/images/about-3.jpg';
-import blog4 from '@/app/(website)/assets/images/bim-services.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* =========================================================
-   CURRENT BLOG
-========================================================= */
+interface RelatedBlog {
+    id: number;
+    title: string;
+    slug: string;
+    imageUrl: string;
+    publishedAt: string;
+}
 
-const currentBlog = {
-    title: 'How BIM Is Transforming Modern Construction',
-    date: 'June 24, 2026',
-    image: blog1,
+interface BlogDetailData {
+    id: number;
+    title: string;
+    slug: string;
+    description: string;
+    imageUrl: string;
+    publishedAt: string;
+    recent: RelatedBlog[];
+}
+
+const formatBlogDate = (date: string) => {
+    if (!date) return '';
+
+    return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+    });
 };
 
-/* =========================================================
-   RELATED BLOGS
-========================================================= */
 
-const relatedBlogs = [
-    {
-        title: 'Future Trends In Architectural Design',
-        date: 'May 18, 2026',
-        image: blog3,
-        slug: 'future-trends-in-architectural-design',
-    },
-    {
-        title: 'Key Trends In Structural Engineering',
-        date: 'April 12, 2026',
-        image: blog2,
-        slug: 'key-trends-in-structural-engineering',
-    },
-    {
-        title: 'The Growing Importance Of BIM Coordination',
-        date: 'March 28, 2026',
-        image: blog4,
-        slug: 'the-growing-importance-of-bim-coordination',
-    },
-];
 
 /* =========================================================
    BLOG DETAIL
@@ -64,7 +57,20 @@ const relatedBlogs = [
 export default function BlogDetail() {
     const sectionRef = useRef<HTMLDivElement | null>(null);
 
+    const params = useParams<{ slug: string }>();
+
+    const slug = params.slug;
+
+    const [currentBlog, setCurrentBlog] = useState<BlogDetailData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    const relatedBlogs = currentBlog?.recent ?? [];
+
     useLayoutEffect(() => {
+
+        if (!currentBlog) return;
+
         const ctx = gsap.context(() => {
             /* =============================================
                HEADER
@@ -176,7 +182,62 @@ export default function BlogDetail() {
         }, sectionRef);
 
         return () => ctx.revert();
-    }, []);
+    }, [currentBlog]);
+
+    useEffect(() => {
+        if (!slug) return;
+
+        const controller = new AbortController();
+
+        const fetchBlogDetail = async () => {
+            setLoading(true);
+            setError('');
+            setCurrentBlog(null);
+
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/blogDetail`,
+                    {
+                        slug: slug,
+                    },
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (response.data.success && response.data.data) {
+                    setCurrentBlog(response.data.data);
+                } else {
+                    setError('Blog not found.');
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Blog Detail API Error:', error);
+                    setError('Unable to load blog details.');
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchBlogDetail();
+
+        return () => controller.abort();
+    }, [slug]);
+
+    if (loading) {
+        return <div className="min-h-screen bg-modura-white" />;
+    }
+
+    if (error || !currentBlog) {
+        return (
+            <div className="min-h-screen py-20 text-center">
+                {error || 'Blog not found.'}
+            </div>
+        );
+    }
 
     return (
         <>
@@ -197,7 +258,7 @@ export default function BlogDetail() {
                         href: '/blog',
                     },
                     {
-                        label: 'How BIM Is Transforming Modern Construction',
+                        label: currentBlog.title,
                     },
                 ]}
             />
@@ -323,7 +384,7 @@ export default function BlogDetail() {
                                     uppercase
                                 "
                             >
-                                {currentBlog.date}
+                                {formatBlogDate(currentBlog.publishedAt)}
                             </span>
                         </div>
                     </div>
@@ -348,7 +409,7 @@ export default function BlogDetail() {
                         "
                     >
                         <Image
-                            src={currentBlog.image}
+                            src={currentBlog.imageUrl}
                             alt={currentBlog.title}
                             fill
                             priority
@@ -418,349 +479,66 @@ export default function BlogDetail() {
                                 [&::-webkit-scrollbar-thumb]:hover:bg-modura-primary
                             "
                         >
-                            {/* =================================================
-                                INTRO
-                            ================================================= */}
-
-                            <p
-                                className="
-                                    max-w-[850px]
-                                    text-[18px]
-                                    leading-8
-                                    font-medium
-                                    text-modura-primary
-
-                                    md:text-[20px]
-                                    md:leading-9
-                                "
-                            >
-                                Building Information Modeling is
-                                transforming the way modern construction
-                                projects are planned, coordinated and
-                                delivered. By bringing different
-                                disciplines together within a connected
-                                digital environment, BIM creates a more
-                                efficient and coordinated project workflow.
-                            </p>
-
-                            {/* =================================================
-                                DIVIDER
-                            ================================================= */}
-
                             <div
                                 className="
-                                    my-10
-                                    flex
-                                    items-center
-                                    gap-4
-                                "
-                            >
-                                <span
-                                    className="
-                                        h-[2px]
-                                        w-12
-                                        bg-modura-secondary
-                                    "
-                                />
-
-                                <span
-                                    className="
-                                        h-px
-                                        flex-1
-                                        bg-modura-gray-200
-                                    "
-                                />
-                            </div>
-
-                            {/* =================================================
-                                H3
-                            ================================================= */}
-
-                            <h3
-                                className="
-                                    text-[27px]
-                                    leading-tight
-                                    font-bold
-                                    text-modura-primary
-
-                                    md:text-[32px]
-                                "
-                            >
-                                A More Connected Approach To Construction
-                            </h3>
-
-                            <p
-                                className="
-                                    mt-5
-                                    text-[15px]
-                                    leading-8
+                                    max-w-full
                                     text-modura-gray-600
+
+                                    [&_p]:mt-5
+                                    [&_p]:text-[15px]
+                                    [&_p]:leading-6
+                                    [&_p]:text-modura-gray-600
+
+                                    [&_p:first-child]:mt-0
+
+                                    [&_h3]:mt-12
+                                    [&_h3]:text-[27px]
+                                    [&_h3]:leading-tight
+                                    [&_h3]:font-bold
+                                    [&_h3]:text-modura-primary
+                                    md:[&_h3]:text-[32px]
+
+                                    [&_h4]:mt-10
+                                    [&_h4]:text-[20px]
+                                    [&_h4]:font-bold
+                                    [&_h4]:text-modura-primary
+
+                                    [&_ul]:mt-5
+                                    [&_ul]:list-none
+                                    [&_ul]:space-y-4
+                                    [&_ul]:pl-0
+
+                                    [&_li]:relative
+                                    [&_li]:pl-5
+                                    [&_li]:text-[15px]
+                                    [&_li]:leading-7
+                                    [&_li]:mb-0
+                                    [&_li]:text-modura-gray-600
+
+                                    [&_li]:before:absolute
+                                    [&_li]:before:top-[10px]
+                                    [&_li]:before:left-1
+                                    [&_li]:before:h-[7px]
+                                    [&_li]:before:w-[7px]
+                                    [&_li]:before:rotate-45
+                                    [&_li]:before:bg-modura-secondary
+                                    [&_li]:before:content-['']
+
+                                    [&_ol]:mt-5
+                                    [&_ol]:list-decimal
+                                    [&_ol]:pl-6
+
+                                    [&_ol_li]:pl-2
+                                    [&_ol_li]:before:hidden
+
+                                    [&_strong]:font-bold
                                 "
-                            >
-                                Traditional construction workflows often
-                                require multiple teams to work with separate
-                                drawings, documents and project information.
-                                BIM brings these elements together into a
-                                coordinated digital model, allowing project
-                                teams to work with a shared understanding of
-                                the design.
-                            </p>
-
-                            <p
-                                className="
-                                    mt-5
-                                    text-[15px]
-                                    leading-8
-                                    text-modura-gray-600
-                                "
-                            >
-                                This connected approach can improve
-                                communication between architects, engineers,
-                                contractors and other stakeholders while
-                                making it easier to identify potential
-                                conflicts before construction begins.
-                            </p>
-
-                            {/* =================================================
-                                H4
-                            ================================================= */}
-
-                            <h4
-                                className="
-                                    mt-10
-                                    text-[20px]
-                                    font-bold
-                                    text-modura-primary
-                                "
-                            >
-                                Key Benefits Of BIM
-                            </h4>
-
-                            {/* =================================================
-                                LIST
-                            ================================================= */}
-
-                            <ul className="mt-5 space-y-4">
-                                <li
-                                    className="
-                                        flex
-                                        gap-4
-                                        text-[15px]
-                                        leading-7
-                                        text-modura-gray-600
-                                    "
-                                >
-                                    <span
-                                        className="
-                                            mt-[10px]
-                                            h-[7px]
-                                            w-[7px]
-                                            shrink-0
-                                            rotate-45
-                                            bg-modura-secondary
-                                        "
-                                    />
-
-                                    <span>
-                                        Better coordination between
-                                        architectural, structural and
-                                        engineering disciplines.
-                                    </span>
-                                </li>
-
-                                <li
-                                    className="
-                                        flex
-                                        gap-4
-                                        text-[15px]
-                                        leading-7
-                                        text-modura-gray-600
-                                    "
-                                >
-                                    <span
-                                        className="
-                                            mt-[10px]
-                                            h-[7px]
-                                            w-[7px]
-                                            shrink-0
-                                            rotate-45
-                                            bg-modura-secondary
-                                        "
-                                    />
-
-                                    <span>
-                                        Early identification of design
-                                        conflicts and potential project
-                                        issues.
-                                    </span>
-                                </li>
-
-                                <li
-                                    className="
-                                        flex
-                                        gap-4
-                                        text-[15px]
-                                        leading-7
-                                        text-modura-gray-600
-                                    "
-                                >
-                                    <span
-                                        className="
-                                            mt-[10px]
-                                            h-[7px]
-                                            w-[7px]
-                                            shrink-0
-                                            rotate-45
-                                            bg-modura-secondary
-                                        "
-                                    />
-
-                                    <span>
-                                        Improved project visualization and
-                                        communication throughout the
-                                        construction lifecycle.
-                                    </span>
-                                </li>
-
-                                <li
-                                    className="
-                                        flex
-                                        gap-4
-                                        text-[15px]
-                                        leading-7
-                                        text-modura-gray-600
-                                    "
-                                >
-                                    <span
-                                        className="
-                                            mt-[10px]
-                                            h-[7px]
-                                            w-[7px]
-                                            shrink-0
-                                            rotate-45
-                                            bg-modura-secondary
-                                        "
-                                    />
-
-                                    <span>
-                                        More organized project information
-                                        for better decision-making.
-                                    </span>
-                                </li>
-                            </ul>
-
-                            {/* =================================================
-                                H3
-                            ================================================= */}
-
-                            <h3
-                                className="
-                                    mt-12
-                                    text-[27px]
-                                    leading-tight
-                                    font-bold
-                                    text-modura-primary
-
-                                    md:text-[32px]
-                                "
-                            >
-                                Improving Project Delivery
-                            </h3>
-
-                            <p
-                                className="
-                                    mt-5
-                                    text-[15px]
-                                    leading-8
-                                    text-modura-gray-600
-                                "
-                            >
-                                As construction projects become more
-                                complex, coordinated digital workflows are
-                                becoming increasingly valuable. BIM allows
-                                teams to access project information in a more
-                                structured way and supports better
-                                collaboration from early design through
-                                construction.
-                            </p>
-
-                            <p
-                                className="
-                                    mt-5
-                                    text-[15px]
-                                    leading-8
-                                    text-modura-gray-600
-                                "
-                            >
-                                The result is a more informed project
-                                environment where teams can identify
-                                challenges earlier, communicate more clearly
-                                and make decisions using a shared digital
-                                representation of the project.
-                            </p>
-
-                            {/* =================================================
-                                H4
-                            ================================================= */}
-
-                            <h4
-                                className="
-                                    mt-10
-                                    text-[20px]
-                                    font-bold
-                                    text-modura-primary
-                                "
-                            >
-                                The Future Of Digital Construction
-                            </h4>
-
-                            <p
-                                className="
-                                    mt-5
-                                    text-[15px]
-                                    leading-8
-                                    text-modura-gray-600
-                                "
-                            >
-                                BIM continues to evolve alongside new digital
-                                tools, automation and data-driven
-                                construction practices. As these technologies
-                                develop, integrated digital workflows will
-                                play an increasingly important role in
-                                creating efficient, coordinated and
-                                intelligent built environments.
-                            </p>
-
-                            {/* =================================================
-                                HIGHLIGHT
-                            ================================================= */}
-
-                            <div
-                                className="
-                                    mt-12
-                                    border-l-4
-                                    border-modura-secondary
-                                    bg-modura-off-white
-                                    px-6
-                                    py-6
-
-                                    md:px-8
-                                "
-                            >
-                                <p
-                                    className="
-                                        text-[16px]
-                                        leading-8
-                                        font-medium
-                                        text-modura-primary
-                                    "
-                                >
-                                    Better coordination begins with better
-                                    information. BIM provides the foundation
-                                    for bringing people, processes and project
-                                    data together.
-                                </p>
-                            </div>
+                                dangerouslySetInnerHTML={{
+                                    __html: DOMPurify.sanitize(currentBlog.description || '', {
+                                        FORBID_ATTR: ['style'],
+                                    }),
+                                }}
+                            />
                         </article>
 
                         {/* =================================================
@@ -842,7 +620,7 @@ export default function BlogDetail() {
                                     {relatedBlogs.map((blog) => (
                                         <Link
                                             key={blog.slug}
-                                            href={`/blogdetail`}
+                                            href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
                                             className="
                                                 related-card
                                                 group
@@ -863,7 +641,7 @@ export default function BlogDetail() {
                                                 "
                                             >
                                                 <Image
-                                                    src={blog.image}
+                                                    src={blog.imageUrl}
                                                     alt={blog.title}
                                                     fill
                                                     sizes="300px"
@@ -913,7 +691,7 @@ export default function BlogDetail() {
                                                     uppercase
                                                 "
                                             >
-                                                {blog.date}
+                                                {formatBlogDate(blog.publishedAt)}
                                             </p>
 
                                             {/* TITLE */}

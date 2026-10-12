@@ -126,6 +126,7 @@ export interface DashboardData {
     activeJobs: number;
     contactInquiries: number;
     projectInquiries: number;
+    getInTouchInquiries: number;
   };
   recentApplications: Pick<JobApplication, 'id' | 'name' | 'email' | 'status' | 'createdAt' | 'career'>[];
   recentBlogs: { id: number; title: string; status: 'draft' | 'published'; createdAt: string }[];

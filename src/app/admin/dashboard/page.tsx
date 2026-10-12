@@ -49,6 +49,7 @@ export default function DashboardPage() {
     },
     { icon: '☎', label: 'Contact Inquiries', value: counts.contactInquiries, href: '/contact-inquiries' },
     { icon: '◎', label: 'Project Inquiries', value: counts.projectInquiries, href: '/project-inquiries' },
+    { icon: '✋', label: 'Get in Touch', value: counts.getInTouchInquiries, href: '/get-in-touch-inquiries' },
   ];
 
   return (
