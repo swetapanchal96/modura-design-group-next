@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import toast from 'react-hot-toast';
-import api, { errorMessage, fieldErrors } from '@/lib/api';
+import api, { errorMessage, fieldErrors } from '@/lib/admin/api';
 import { formatDate } from '@/lib/admin/utils';
 import { btn, card, cx, err, hint, input, label } from '@/lib/admin/ui';
 import type { ApiResponse, FieldErrors, HomeCounter } from '@/types/admin';
