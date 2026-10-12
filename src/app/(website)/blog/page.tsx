@@ -2,9 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLayoutEffect, useRef, useState } from 'react';
-
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import axios from 'axios';
+import { apiUrl } from '@/app/(website)/config';
 import gsap from 'gsap';
+
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import {
@@ -16,116 +18,31 @@ import {
 import Breadcrumb from '../../../components/Breadcrumb';
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
 
-import blog1 from '@/app/(website)/assets/images/about-1.jpg';
-import blog2 from '@/app/(website)/assets/images/about-2.jpg';
-import blog3 from '@/app/(website)/assets/images/about-3.jpg';
-import blog4 from '@/app/(website)/assets/images/bim-services.jpg';
-import blog5 from '@/app/(website)/assets/images/architectural-engineering.jpg';
-import blog6 from '@/app/(website)/assets/images/about-1.jpg';
-
 gsap.registerPlugin(ScrollTrigger);
 
-/* =========================================================
-   BLOG DATA
-========================================================= */
 
-const blogs = [
-    {
-        title: 'How BIM Is Transforming Modern Construction',
-        slug: 'how-bim-is-transforming-modern-construction',
-        date: 'June 24, 2026',
-        image: blog1.src,
-        desc: 'Building Information Modeling (BIM) is revolutionizing the construction industry by improving project coordination, reducing errors.',
-    },
+interface Blog {
+    id: number;
+    title: string;
+    slug: string;
+    description: string;
+    imageUrl: string;
+    publishedAt: string;
+}
 
-    {
-        title: 'Future Trends In Architectural Design',
-        slug: 'future-trends-in-architectural-design',
-        date: 'May 18, 2026',
-        image: blog3.src,
-        desc: 'Modern architectural design is evolving with sustainable materials, advanced technologies, and innovative planning approaches.',
-    },
+const getShortDescription = (html: string, limit = 130) => {
+    const text = html
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ')
+        .trim();
 
-    {
-        title: 'Key Trends In Structural Engineering',
-        slug: 'key-trends-in-structural-engineering',
-        date: 'April 12, 2026',
-        image: blog2.src,
-        desc: 'Structural engineering is moving towards smarter solutions with advanced analysis tools, sustainable practices, and improved construction techniques.',
-    },
+    return text.length > limit
+        ? text.substring(0, limit).trimEnd() + '...'
+        : text;
+};
 
-    {
-        title: 'The Growing Importance Of BIM Coordination',
-        slug: 'the-growing-importance-of-bim-coordination',
-        date: 'March 28, 2026',
-        image: blog4.src,
-        desc: 'Better coordination between disciplines helps construction teams reduce clashes, improve communication and deliver projects more efficiently.',
-    },
-
-    {
-        title: 'Technology Shaping The Future Of Construction',
-        slug: 'technology-shaping-the-future-of-construction',
-        date: 'March 10, 2026',
-        image: blog5.src,
-        desc: 'Digital technologies are changing the way projects are planned, coordinated and delivered across the modern construction industry.',
-    },
-
-    {
-        title: 'Building Better Through Integrated Design',
-        slug: 'building-better-through-integrated-design',
-        date: 'February 22, 2026',
-        image: blog6.src,
-        desc: 'Integrated design approaches bring architecture and engineering disciplines together for better coordination and project outcomes.',
-    },
-
-    {
-        title: 'Modern Approaches To Architectural Engineering',
-        slug: 'modern-approaches-to-architectural-engineering',
-        date: 'February 08, 2026',
-        image: blog1.src,
-        desc: 'Architectural engineering continues to evolve through innovative design methods, digital workflows and improved technical coordination.',
-    },
-
-    {
-        title: 'Why Detailed Project Documentation Matters',
-        slug: 'why-detailed-project-documentation-matters',
-        date: 'January 24, 2026',
-        image: blog3.src,
-        desc: 'Clear and accurate project documentation plays an important role in maintaining consistency from design development through construction.',
-    },
-
-    {
-        title: 'Smarter Workflows For Complex Projects',
-        slug: 'smarter-workflows-for-complex-projects',
-        date: 'January 12, 2026',
-        image: blog2.src,
-        desc: 'Well-structured workflows help project teams coordinate complex requirements while maintaining accuracy and efficiency.',
-    },
-
-    {
-        title: 'The Role Of Digital Engineering In Construction',
-        slug: 'the-role-of-digital-engineering-in-construction',
-        date: 'December 22, 2025',
-        image: blog4.src,
-        desc: 'Digital engineering is helping construction teams improve collaboration, visualization and technical decision making.',
-    },
-
-    {
-        title: 'Design Coordination For Better Project Delivery',
-        slug: 'design-coordination-for-better-project-delivery',
-        date: 'December 10, 2025',
-        image: blog5.src,
-        desc: 'Effective coordination across project disciplines can reduce conflicts and create a smoother path from design to construction.',
-    },
-
-    {
-        title: 'Creating Efficient Construction Documentation',
-        slug: 'creating-efficient-construction-documentation',
-        date: 'November 26, 2025',
-        image: blog6.src,
-        desc: 'Accurate construction documentation provides teams with the information they need to execute projects with confidence.',
-    },
-];
 
 /* =========================================================
    BLOG PAGE
@@ -133,22 +50,13 @@ const blogs = [
 
 export default function BlogPage() {
     const sectionRef = useRef<HTMLDivElement | null>(null);
-
-    const [currentPage, setCurrentPage] = useState(1);
+    const [blogs, setBlogs] = useState<Blog[]>([]);
+    const [totalPages, setTotalPages] = useState(1);
 
     const blogsPerPage = 6;
+    const [currentPage, setCurrentPage] = useState(1);
 
-    const totalPages = Math.ceil(
-        blogs.length / blogsPerPage,
-    );
 
-    const startIndex =
-        (currentPage - 1) * blogsPerPage;
-
-    const currentBlogs = blogs.slice(
-        startIndex,
-        startIndex + blogsPerPage,
-    );
 
     /* =====================================================
        GSAP ANIMATION
@@ -236,6 +144,41 @@ export default function BlogPage() {
         });
     };
 
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchBlogs = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/blogs`,
+                    {
+                        page: currentPage,
+                        limit: blogsPerPage,
+                    },
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (response.data.success) {
+                    setBlogs(response.data.data.items ?? []);
+                    setTotalPages(
+                        response.data.data.pagination?.totalPages ?? 1
+                    );
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Blog API Error:', error);
+                }
+            }
+        };
+
+        fetchBlogs();
+
+        return () => controller.abort();
+    }, [currentPage]);
+
     return (
         <>
             {/* =================================================
@@ -306,7 +249,7 @@ export default function BlogPage() {
                         <div>
 
                             <div className="mb-2 flex items-center gap-3">
-                                
+
 
                                 <span
                                     className="
@@ -359,7 +302,7 @@ export default function BlogPage() {
                             lg:grid-cols-3
                         "
                     >
-                        {currentBlogs.map((blog, index) => (
+                        {blogs.map((blog, index) => (
                             <article
                                 key={`${currentPage}-${index}`}
                                 className="
@@ -383,7 +326,7 @@ export default function BlogPage() {
                                     "
                                 >
                                     <Link
-                                        href={`/blogdetail`}
+                                        href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
                                         aria-label={`Read ${blog.title}`}
                                         className="
                                             absolute
@@ -392,7 +335,7 @@ export default function BlogPage() {
                                         "
                                     >
                                         <Image
-                                            src={blog.image}
+                                            src={blog.imageUrl}
                                             fill
                                             alt={blog.title}
                                             sizes="
@@ -440,7 +383,13 @@ export default function BlogPage() {
                                             uppercase
                                         "
                                     >
-                                        {blog.date}
+                                        {blog.publishedAt
+                                            ? new Date(blog.publishedAt).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: '2-digit',
+                                            })
+                                            : ''}
                                     </p>
 
                                     {/* =================================================
@@ -457,7 +406,7 @@ export default function BlogPage() {
                                         "
                                     >
                                         <Link
-                                            href={`/blogdetail`}
+                                            href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
                                             className="
                                                 transition-colors
                                                 duration-300
@@ -478,7 +427,7 @@ export default function BlogPage() {
                                             text-modura-secondary
                                         "
                                     >
-                                        {blog.desc}
+                                        {getShortDescription(blog.description, 123)}
                                     </p>
 
                                     {/* =================================================
@@ -486,7 +435,7 @@ export default function BlogPage() {
                                     ================================================= */}
 
                                     <Link
-                                        href={`/blogdetail`}
+                                        href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
                                         className="
                                             group/btn
                                             mt-7

@@ -356,6 +356,7 @@ export const NAV: NavGroup[] = [
   { group: 'Inquiries', items: [
     { label: 'Contact Inquiries', href: adminPath('/contact-inquiries') },
     { label: 'Project Inquiries', href: adminPath('/project-inquiries') },
+    { label: 'Get in Touch Inquiries', href: adminPath('/get-in-touch-inquiries') },
   ] },
   { group: 'Career', items: [
     { label: 'Manage Career', href: adminPath('/careers') },
