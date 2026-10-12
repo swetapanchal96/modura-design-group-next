@@ -4,30 +4,130 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import { FiArrowUpRight, FiX, FiUser, FiMail, FiPhone } from 'react-icons/fi';
 
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { apiUrl } from '@/app/(website)/config';
+import type { FormEvent } from 'react';
+
 import gsap from 'gsap';
 
-const services = [
-    'Architecture Design',
-
-    'Structural Engineering',
-
-    'BIM Services',
-
-    'MEP Services',
-
-    'CAD Drafting',
-
-    'Project Management',
-];
 
 const InquiryDrawer = () => {
     const [open, setOpen] = useState(false);
 
-    // ADDED FOR CUSTOM SERVICE DROPDOWN
+    const router = useRouter();
 
-    const [serviceOpen, setServiceOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        service: '',
+        description: '',
+    });
 
-    const [selectedService, setSelectedService] = useState('Select Service');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+
+        const updatedValue =
+            name === 'phone'
+                ? value.replace(/\D/g, '').slice(0, 10)
+                : name === 'description'
+                    ? value.slice(0, 1000)
+                    : value.slice(0, 50);
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: updatedValue,
+        }));
+
+        setSubmitError('');
+    };
+
+    // api call
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (isSubmitting) return;
+
+        setSubmitError('');
+
+        const payload = {
+            name: formData.name.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone.trim(),
+            service: formData.service.trim(),
+            description: formData.description.trim(),
+        };
+
+        if (Object.values(payload).some((value) => !value)) {
+            setSubmitError('Please fill in all required fields.');
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+            setSubmitError('Please enter a valid email address.');
+            return;
+        }
+
+        if (!/^\d{10}$/.test(payload.phone)) {
+            setSubmitError('Phone number must contain exactly 10 digits.');
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const response = await axios.post(
+                `${apiUrl}/getInTouch`,
+                payload
+            );
+
+            if (response.data?.success === true) {
+                // Clear all form fields after successful submission
+                setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    service: '',
+                    description: '',
+                });
+
+                // Clear previous error messages
+                setSubmitError('');
+
+                // Close the drawer
+                setOpen(false);
+
+                // Redirect to Thank You page
+                router.push('/thankyou/inquiry');
+            } else {
+                setSubmitError(
+                    response.data?.message ||
+                    'Unable to submit your inquiry. Please try again.'
+                );
+            }
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                setSubmitError(
+                    error.response?.data?.message ||
+                    'Unable to submit your inquiry. Please try again.'
+                );
+            } else {
+                setSubmitError(
+                    'Something went wrong. Please try again.'
+                );
+            }
+
+            console.error('Get In Touch API Error:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const drawerRef = useRef<HTMLDivElement | null>(null);
 
@@ -240,7 +340,7 @@ const InquiryDrawer = () => {
 
                 {/* FORM STARTS IN PART 2 */}
 
-                <form ref={formRef} className="space-y-5">
+                <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-5">
                     {/* NAME */}
 
                     <div className="inquiry-field">
@@ -253,7 +353,10 @@ const InquiryDrawer = () => {
 
                             <input
                                 type="text"
-
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                maxLength={50}
                                 placeholder="Your Name"
 
                                 className="focus:border-modura-secondary w-full border-b border-white/20 bg-transparent py-3 pl-7 text-sm text-white transition outline-none"
@@ -273,7 +376,10 @@ const InquiryDrawer = () => {
 
                             <input
                                 type="email"
-
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                maxLength={50}
                                 placeholder="Email Address"
 
                                 className="focus:border-modura-secondary w-full border-b border-white/20 bg-transparent py-3 pl-7 text-sm text-white outline-none"
@@ -293,7 +399,11 @@ const InquiryDrawer = () => {
 
                             <input
                                 type="text"
-
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                maxLength={10}
+                                inputMode="numeric"
                                 placeholder="Phone Number"
 
                                 className="focus:border-modura-secondary w-full border-b border-white/20 bg-transparent py-3 pl-7 text-sm text-white outline-none"
@@ -308,59 +418,15 @@ const InquiryDrawer = () => {
                             Service
                         </label>
 
-                        <button
-                            type="button"
-
-                            onClick={() => setServiceOpen(!serviceOpen)}
-
-                            className="hover:border-modura-secondary flex w-full items-center justify-between border-b border-white/20 bg-transparent py-3 text-sm text-gray-300 transition outline-none"
-                        >
-                            <span className={selectedService === 'Select Service' ? 'text-gray-400' : 'text-white'}>
-                                {selectedService}
-                            </span>
-
-                            <svg
-                                className={`h-4 w-4 transition-transform duration-300 ${serviceOpen ? 'rotate-180' : ''} `}
-
-                                fill="none"
-
-                                stroke="currentColor"
-
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-
-                                    strokeLinejoin="round"
-
-                                    strokeWidth="2"
-
-                                    d="M19 9l-7 7-7-7"
-                                />
-                            </svg>
-                        </button>
-
-                        {serviceOpen && (
-                            <div className="absolute top-full left-0 z-[9999] mt-2 max-h-[220px] w-full overflow-y-auto border border-white/10 bg-[#13263d] shadow-2xl">
-                                {services.map((service) => (
-                                    <button
-                                        key={service}
-
-                                        type="button"
-
-                                        onClick={() => {
-                                            setSelectedService(service);
-
-                                            setServiceOpen(false);
-                                        }}
-
-                                        className="hover:bg-modura-secondary block w-full px-5 py-3 text-left text-sm text-gray-300 transition-all duration-300 hover:text-white"
-                                    >
-                                        {service}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                        <input
+                            type="text"
+                            name="service"
+                            value={formData.service}
+                            onChange={handleInputChange}
+                            maxLength={50}
+                            placeholder="Enter Service"
+                            className="focus:border-modura-secondary w-full border-b border-white/20 bg-transparent py-3 text-sm text-white transition outline-none placeholder:text-gray-400"
+                        />
                     </div>
 
                     {/* DESCRIPTION */}
@@ -372,7 +438,10 @@ const InquiryDrawer = () => {
 
                         <textarea
                             rows={4}
-
+                            name="description"
+                            value={formData.description}
+                            onChange={handleInputChange}
+                            maxLength={1000}
                             placeholder="Tell us about your project"
 
                             className="focus:border-modura-secondary w-full resize-none border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none"
@@ -383,12 +452,20 @@ const InquiryDrawer = () => {
 
                     <button
                         type="submit"
-
+                        disabled={isSubmitting}
                         className="inquiry-button group bg-modura-secondary hover:text-modura-primary mt-5 flex h-[52px] w-full items-center justify-center gap-3 text-[12px] font-bold tracking-[0.15em] text-white uppercase transition-all duration-500 hover:bg-white"
                     >
-                        Send Inquiry
+                        {isSubmitting ? 'Submitting...' : 'Send Inquiry'}
                         <FiArrowUpRight className="transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                     </button>
+                    {submitError && (
+                        <div
+                            role="alert"
+                            className="border border-red-400/30 bg-red-500/10 px-4 py-3 text-[13px] leading-6 text-red-300"
+                        >
+                            {submitError}
+                        </div>
+                    )}
                 </form>
             </aside>
         </>
