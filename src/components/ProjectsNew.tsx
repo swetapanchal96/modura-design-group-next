@@ -15,41 +15,33 @@ import {
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
-
 import 'swiper/css';
-
-import commercial from '@/app/(website)/assets/images/bim-services.jpg';
-import campus from '@/app/(website)/assets/images/architectural-engineering.jpg';
-import airport from '@/app/(website)/assets/images/about-3.jpg';
-import residence from '@/app/(website)/assets/images/about-2.jpg';
-import urban from '@/app/(website)/assets/images/about-1.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const projects = [
-    {
-        name: 'Commercial Tower',
-        image: commercial,
-    },
-    {
-        name: 'Corporate Campus',
-        image: campus,
-    },
-    {
-        name: 'Airport Terminal',
-        image: airport,
-    },
-    {
-        name: 'Luxury Residence',
-        image: residence,
-    },
-    {
-        name: 'Urban Structure',
-        image: urban,
-    },
-];
+interface HomePortfolio {
+    id: number;
+    title: string;
+    slug: string;
+    type: string;
+    imageType: string;
+    clientName: string | null;
+    isFeatured: boolean;
+    coverUrl: string | null;
+}
 
-export default function ProjectsSection() {
+interface ProjectsNewProps {
+    portfolios: HomePortfolio[];
+}
+
+export default function ProjectsSection({
+    portfolios,
+}: ProjectsNewProps) {
+
+    const projects = portfolios.filter(
+        (project) => Boolean(project.coverUrl)
+    );
+
     const sectionRef = useRef<HTMLDivElement>(null);
 
     const popupRef = useRef<HTMLDivElement>(null);
@@ -68,6 +60,9 @@ export default function ProjectsSection() {
     */
 
     useLayoutEffect(() => {
+
+        if (!sectionRef.current || projects.length === 0) return;
+
         const ctx = gsap.context(() => {
             const tl = gsap.timeline({
                 scrollTrigger: {
@@ -108,7 +103,7 @@ export default function ProjectsSection() {
         }, sectionRef);
 
         return () => ctx.revert();
-    }, []);
+    }, [portfolios]);
 
     /*
     |--------------------------------------------------------------------------
@@ -255,7 +250,7 @@ export default function ProjectsSection() {
     */
 
     const changePopupProject = (direction: number) => {
-        if (popupIndex === null) return;
+        if (popupIndex === null || projects.length === 0) return;
 
         const nextIndex =
             (popupIndex + direction + projects.length) %
@@ -319,6 +314,7 @@ export default function ProjectsSection() {
 
     useLayoutEffect(() => {
         if (popupIndex === null) return;
+        
 
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -506,8 +502,9 @@ export default function ProjectsSection() {
                     "
                 >
                     <Swiper
+                        key={projects.map((project) => project.id).join('-')}
                         modules={[Autoplay]}
-                        loop={true}
+                        loop={projects.length > 4}
                         speed={900}
                         slidesPerView={1.1}
                         spaceBetween={16}
@@ -546,7 +543,7 @@ export default function ProjectsSection() {
                         {projects.map(
                             (project, index) => (
                                 <SwiperSlide
-                                    key={index}
+                                    key={project.id}
                                     className="project-card"
                                 >
                                     <button
@@ -570,8 +567,9 @@ export default function ProjectsSection() {
                                         {/* IMAGE */}
 
                                         <Image
-                                            src={project.image}
-                                            alt={project.name}
+                                            src={project.coverUrl!}
+                                            alt={project.title}
+                                            unoptimized
                                             fill
                                             sizes="
                                                 (max-width: 640px) 90vw,
@@ -680,7 +678,7 @@ export default function ProjectsSection() {
                                                     md:text-2xl
                                                 "
                                             >
-                                                {project.name}
+                                                {project.title}
                                             </h3>
                                         </div>
 
@@ -979,20 +977,22 @@ export default function ProjectsSection() {
                             bg-[#eef1f3]
                         "
                     >
-                        <Image
-                            key={
-                                selectedProject.image.src
-                            }
-                            src={selectedProject.image}
-                            alt={selectedProject.name}
-                            fill
-                            sizes="100vw"
-                            className="
+                        {selectedProject?.coverUrl && (
+                            <Image
+                                key={
+                                    selectedProject.coverUrl
+                                }
+                                src={selectedProject.coverUrl}
+                                alt={selectedProject.title}
+                                fill
+                                sizes="100vw"
+                                className="
                                 object-contain
                                 p-3
                                 md:p-6
                             "
-                        />
+                            />
+                        )}
 
                         {/* PREVIOUS */}
 
@@ -1080,7 +1080,7 @@ export default function ProjectsSection() {
                                     md:text-2xl
                                 "
                             >
-                                {selectedProject.name}
+                                {selectedProject?.title ?? ''}
                             </h3>
                         </div>
 

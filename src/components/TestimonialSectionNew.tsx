@@ -15,46 +15,27 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 
 import 'swiper/css';
-
-import test1 from '@/app/(website)/assets/images/client-3.jpg';
-import test2 from '@/app/(website)/assets/images/client-4.jpg';
-import test3 from '@/app/(website)/assets/images/client-5.jpg';
-import test4 from '@/app/(website)/assets/images/client-6.jpg';
-
 gsap.registerPlugin(ScrollTrigger);
 
-const testimonials = [
-    {
-        name: 'David Roberts',
-        role: 'Construction Manager',
-        image: test1.src,
-        review:
-            'A professional and reliable team with strong technical knowledge. Their design support and understanding helped deliver our project successfully.',
-    },
-    {
-        name: 'Michael Anderson',
-        role: 'Project Architect',
-        image: test2.src,
-        review:
-            'Modura provided excellent BIM coordination and engineering solutions with great attention to detail throughout the project.',
-    },
-    {
-        name: 'Sarah Williams',
-        role: 'Project Director',
-        image: test3.src,
-        review:
-            'Their commitment, communication and technical expertise helped us achieve outstanding project results.',
-    },
-    {
-        name: 'James Wilson',
-        role: 'Engineering Consultant',
-        image: test4.src,
-        review:
-            'The team delivered exceptional technical support and maintained excellent coordination from concept to completion.',
-    },
-];
+interface HomeTestimonial {
+    id: number;
+    clientName: string;
+    designation: string | null;
+    company: string | null;
+    rating: number;
+    testimonial: string;
+    photoUrl: string | null;
+    videoUrl: string | null;
+    status: boolean;
+}
 
-export default function TestimonialSection() {
+interface TestimonialSectionProps {
+    testimonials: HomeTestimonial[];
+}
+
+export default function TestimonialSection({
+    testimonials,
+}: TestimonialSectionProps) {
     const sectionRef = useRef<HTMLDivElement>(null);
     const swiperRef = useRef<any>(null);
 
@@ -227,7 +208,7 @@ export default function TestimonialSection() {
                                 gap-3
                             "
                         >
-                           
+
 
                             <span
                                 className="
@@ -264,7 +245,7 @@ export default function TestimonialSection() {
                         </h2>
                     </div>
 
-                    
+
                 </div>
 
                 {/* =====================================================
@@ -283,8 +264,9 @@ export default function TestimonialSection() {
                     "
                 >
                     <Swiper
+                        key={testimonials.map((item) => item.id).join('-')}
                         modules={[Autoplay]}
-                        loop={true}
+                        loop={testimonials.length > 2}
                         slidesPerView={1}
                         spaceBetween={20}
                         speed={1000}
@@ -310,9 +292,9 @@ export default function TestimonialSection() {
                             !overflow-hidden
                         "
                     >
-                        {testimonials.map((item, index) => (
+                        {testimonials.map((item) => (
                             <SwiperSlide
-                                key={index}
+                                key={item.id}
                                 className="
                                     !h-auto
                                 "
@@ -342,7 +324,7 @@ export default function TestimonialSection() {
                                         "
                                     />
 
-                                    
+
 
                                     {/* =================================================
                                         LARGE QUOTE
@@ -426,15 +408,18 @@ export default function TestimonialSection() {
                                                         bg-[#eef1f3]
                                                     "
                                                 >
-                                                    <Image
-                                                        src={item.image}
-                                                        alt={item.name}
-                                                        fill
-                                                        sizes="86px"
-                                                        className="
+                                                    {item.photoUrl && (
+                                                        <Image
+                                                            src={item.photoUrl}
+                                                            alt={item.clientName}
+                                                            fill
+                                                            unoptimized
+                                                            sizes="86px"
+                                                            className="
                                                             object-cover
                                                         "
-                                                    />
+                                                        />
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -450,7 +435,7 @@ export default function TestimonialSection() {
                                                         uppercase
                                                     "
                                                 >
-                                                    {item.name}
+                                                    {item.clientName}
                                                 </h3>
 
                                                 <p
@@ -461,7 +446,7 @@ export default function TestimonialSection() {
                                                         text-[#596a79]
                                                     "
                                                 >
-                                                    {item.role}
+                                                    {item.designation}
                                                 </p>
 
                                                 <div
@@ -472,9 +457,9 @@ export default function TestimonialSection() {
                                                         gap-2
                                                     "
                                                 >
-                                                   
 
-                                                    
+
+
                                                 </div>
                                             </div>
                                         </div>
@@ -532,10 +517,9 @@ export default function TestimonialSection() {
                                                     md:text-[18px]
                                                 "
                                             >
-                                                "{item.review}"
+                                                "{item.testimonial.slice(0,180)}"
                                             </p>
 
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -560,8 +544,8 @@ export default function TestimonialSection() {
                         pt-5
                     "
                 >
-                   
-                    
+
+
 
                     {/* =================================================
                         ARROWS

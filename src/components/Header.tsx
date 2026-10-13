@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { apiUrl } from '@/app/(website)/config';
 
 import { FiArrowRight, FiArrowUpRight, FiBox, FiChevronDown, FiChevronRight, FiFileText, FiGrid, FiHome, FiLayers, FiMenu, FiSettings, FiX } from 'react-icons/fi';
 
@@ -14,16 +16,20 @@ import logo from '@/app/(website)/assets/images/modura-logo-new.jpeg';
    TYPES
 ========================================================= */
 
-type ServiceItem = {
-    title: string;
-    href: string;
+type ServiceCategory = {
+    id: number;
+    name: string;
+    slug: string;
+    imageUrl: string | null;
 };
 
-type ServiceCategory = {
+type ServiceItem = {
+    id: number;
     title: string;
-    href: string;
-    description: string;
-    services: ServiceItem[];
+    slug: string;
+    shortDescription: string | null;
+    categoryId: number;
+    imageUrl: string | null;
 };
 
 /* =========================================================
@@ -61,502 +67,40 @@ const companyLinks = [
     },
 ];
 
-/* =========================================================
-   SERVICES
-========================================================= */
 
-const serviceCategories: ServiceCategory[] = [
-    {
-        title: 'CAD Drafting Services',
-        href: '#',
-        description:
-            'Accurate CAD drafting and technical documentation for architecture, engineering and construction projects.',
-        services: [
-            {
-                title: '2D CAD Drafting',
-                href: '/services',
-            },
-            {
-                title: 'CAD Conversion',
-                href: '#',
-            },
-            {
-                title: 'As-Built Drawings',
-                href: '#',
-            },
-            {
-                title: 'Construction Drawings',
-                href: '#',
-            },
-            {
-                title: 'PDF / Sketch to CAD',
-                href: '#',
-            },
-        ],
-    },
 
-    {
-        title: 'Architectural Engineering',
-        href: '#',
-        description:
-            'Architectural planning, documentation, modelling and visualization for coordinated project delivery.',
-        services: [
-            {
-                title: 'Architectural Drafting',
-                href: '#',
-            },
-            {
-                title: 'Architectural Planning',
-                href: '#',
-            },
-            {
-                title: 'Architectural Modeling',
-                href: '#',
-            },
-            {
-                title: 'Architectural Renderings',
-                href: '#',
-            },
-            {
-                title: 'Architectural Walkthroughs',
-                href: '#',
-            },
-        ],
-    },
+interface SoftwareItem {
+    id: number;
+    name: string;
+    slug: string;
+    shortDescription: string | null;
+    imageUrl: string | null;
+}
 
-    {
-        title: 'Structural Engineering',
-        href: '#',
-        description:
-            'Structural analysis, design and detailing solutions for safe, coordinated and constructible building systems.',
-        services: [
-            {
-                title: 'Residential Structural Design',
-                href: '#',
-            },
-            {
-                title: 'Structural Steel Detailing',
-                href: '#',
-            },
-            {
-                title: 'Reinforcement Detailing',
-                href: '#',
-            },
-            {
-                title: 'Steel / Concrete Structures',
-                href: '#',
-            },
-            {
-                title: 'Structural Steel Frame Analysis',
-                href: '#',
-            },
-            {
-                title: 'Structural Calculations',
-                href: '#',
-            },
-        ],
-    },
+const softwareIcons = {
+    autocad: PiBlueprint,
+    'autodesk-revit': PiCube,
+    'tekla-structures': PiBridge,
+    'staad-pro': PiBuildings,
+    'autodesk-inventor': PiGear,
+};
 
-    {
-        title: 'Building Information Modeling',
-        href: '#',
-        description: 'Integrated BIM workflows connecting design, coordination, construction and project information.',
-        services: [
-            {
-                title: 'Architectural BIM',
-                href: '#',
-            },
-            {
-                title: 'Structural BIM',
-                href: '#',
-            },
-            {
-                title: 'MEP BIM',
-                href: '#',
-            },
-            {
-                title: 'Scan to BIM',
-                href: '#',
-            },
-            {
-                title: 'Clash Detection',
-                href: '#',
-            },
-            {
-                title: 'BIM Coordination',
-                href: '#',
-            },
-        ],
-    },
+const softwareSubtitles: Record<string, string> = {
+    autocad: 'CAD Drafting',
+    'autodesk-revit': 'BIM & Coordination',
+    'tekla-structures': 'Structural Detailing',
+    'staad-pro': 'Structural Analysis',
+    'autodesk-inventor': 'Mechanical Engineering',
+};
 
-    {
-        title: 'MEP Engineering',
-        href: '#',
-        description: 'Integrated mechanical, electrical and plumbing engineering for coordinated building systems.',
-        services: [
-            {
-                title: 'MEP Design',
-                href: '#',
-            },
-            {
-                title: 'MEP Coordination',
-                href: '#',
-            },
-            {
-                title: 'MEP Drafting',
-                href: '#',
-            },
-            {
-                title: 'MEP BIM Modeling',
-                href: '#',
-            },
-            {
-                title: 'MEP Shop Drawings',
-                href: '#',
-            },
-        ],
-    },
+interface PortfolioCategory {
+    id: number;
+    name: string;
+    slug: string;
+    type: '2d' | '3d';
+}
 
-    {
-        title: 'Mechanical Engineering',
-        href: '#',
-        description:
-            'Mechanical design, modelling and technical documentation for multidisciplinary engineering projects.',
-        services: [
-            {
-                title: 'Mechanical Design',
-                href: '#',
-            },
-            {
-                title: 'Mechanical Drafting',
-                href: '#',
-            },
-            {
-                title: '3D Mechanical Modeling',
-                href: '#',
-            },
-            {
-                title: 'Mechanical Detailing',
-                href: '#',
-            },
-        ],
-    },
 
-    {
-        title: 'Shop Drawing Services',
-        href: '#',
-        description: 'Fabrication and installation-ready shop drawings developed for accurate project execution.',
-        services: [
-            {
-                title: 'Architectural Shop Drawings',
-                href: '#',
-            },
-            {
-                title: 'Structural Shop Drawings',
-                href: '#',
-            },
-            {
-                title: 'MEP Shop Drawings',
-                href: '#',
-            },
-            {
-                title: 'Fabrication Drawings',
-                href: '#',
-            },
-            {
-                title: 'Facade Shop Drawings',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'Electrical Services',
-        href: '#',
-        description: 'Electrical layouts, engineering documentation and coordinated building-services design.',
-        services: [
-            {
-                title: 'Electrical Design',
-                href: '#',
-            },
-            {
-                title: 'Electrical Drafting',
-                href: '#',
-            },
-            {
-                title: 'Lighting Layouts',
-                href: '#',
-            },
-            {
-                title: 'Power Distribution',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'Plumbing / Piping',
-        href: '#',
-        description: 'Coordinated plumbing and piping design solutions for building and engineering applications.',
-        services: [
-            {
-                title: 'Plumbing Design',
-                href: '#',
-            },
-            {
-                title: 'Piping Design',
-                href: '#',
-            },
-            {
-                title: 'Plumbing Drafting',
-                href: '#',
-            },
-            {
-                title: 'Piping Layouts',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'HVAC Engineering',
-        href: '#',
-        description: 'HVAC design, calculations, layouts and coordinated documentation for efficient building systems.',
-        services: [
-            {
-                title: 'HVAC System Design',
-                href: '#',
-            },
-            {
-                title: 'HVAC Load Calculations',
-                href: '#',
-            },
-            {
-                title: 'Duct Layouts',
-                href: '#',
-            },
-            {
-                title: 'HVAC Piping Design',
-                href: '#',
-            },
-            {
-                title: 'HVAC Shop Drawings',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'Civil Engineering',
-        href: '#',
-        description: 'Civil engineering and documentation support across planning, design and construction stages.',
-        services: [
-            {
-                title: 'Civil Drafting',
-                href: '#',
-            },
-            {
-                title: 'Civil Engineering Design',
-                href: '#',
-            },
-            {
-                title: 'Site Development',
-                href: '#',
-            },
-            {
-                title: 'Construction Documentation',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'Detailing Services',
-        href: '#',
-        description: 'Detailed fabrication and construction documentation developed for accuracy and coordination.',
-        services: [
-            {
-                title: 'Steel Detailing',
-                href: '#',
-            },
-            {
-                title: 'Rebar Detailing',
-                href: '#',
-            },
-            {
-                title: 'Precast Detailing',
-                href: '#',
-            },
-            {
-                title: 'Structural Detailing',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'Mass Timber Buildings',
-        href: '#',
-        description: 'Engineering and detailing support for modern mass-timber building systems and assemblies.',
-        services: [
-            {
-                title: 'Mass Timber Detailing',
-                href: '#',
-            },
-            {
-                title: 'CLT Detailing',
-                href: '#',
-            },
-            {
-                title: 'Glulam Detailing',
-                href: '#',
-            },
-            {
-                title: 'Timber Shop Drawings',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'Sheet Metal Design',
-        href: '#',
-        description: 'Precision sheet-metal modelling, detailing and fabrication documentation.',
-        services: [
-            {
-                title: 'Sheet Metal Drafting',
-                href: '#',
-            },
-            {
-                title: 'Sheet Metal Detailing',
-                href: '#',
-            },
-            {
-                title: 'Fabrication Drawings',
-                href: '#',
-            },
-            {
-                title: '3D Sheet Metal Modeling',
-                href: '#',
-            },
-        ],
-    },
-
-    {
-        title: 'Cladding Engineering',
-        href: '',
-        description: 'Facade and cladding engineering documentation supporting fabrication and installation.',
-        services: [
-            {
-                title: 'Cladding Design',
-                href: '#',
-            },
-            {
-                title: 'Facade Detailing',
-                href: '#',
-            },
-            {
-                title: 'Cladding Shop Drawings',
-                href: '#',
-            },
-            {
-                title: 'Panel Layouts',
-                href: '#',
-            },
-        ],
-    },
-];
-
-/* =========================================================
-   SOFTWARE
-========================================================= */
-
-const softwareLinks = [
-    {
-        title: 'AutoCAD',
-        subtitle: 'CAD Drafting',
-        icon: PiBlueprint,
-        href: '/expertise',
-    },
-    {
-        title: 'Autodesk Revit',
-        subtitle: 'BIM & Coordination',
-        icon: PiCube,
-        href: '#',
-    },
-    {
-        title: 'Tekla Structures',
-        subtitle: 'Structural Detailing',
-        icon: PiBridge,
-        href: '#',
-    },
-    {
-        title: 'STAAD.Pro',
-        subtitle: 'Structural Analysis',
-        icon: PiBuildings,
-        href: '#',
-    },
-    {
-        title: 'Autodesk Inventor',
-        subtitle: 'Mechanical Engineering',
-        icon: PiGear,
-        href: '#',
-    },
-];
-
-/* =========================================================
-   PORTFOLIO
-========================================================= */
-
-const portfolioLinks = [
-    {
-        title: 'Steel Detailing Samples',
-        href: '/portfolio',
-        icon: FiLayers,
-    },
-    {
-        title: 'Rebar Detailing Samples',
-        href: '/portfolio/rebar-detailing',
-        icon: FiLayers,
-    },
-    {
-        title: 'Architectural Samples',
-        href: '/portfolio/architectural',
-        icon: FiHome,
-    },
-    {
-        title: 'Structural Samples',
-        href: '/portfolio/structural',
-        icon: FiLayers,
-    },
-    {
-        title: 'Facade Shop Drawings',
-        href: '/portfolio/facade',
-        icon: FiBox,
-    },
-    {
-        title: 'Precast Shop Drawings',
-        href: '/portfolio/precast',
-        icon: FiGrid,
-    },
-
-    // More items...
-    {
-        title: 'MEP Coordination',
-        href: '/portfolio/mep',
-        icon: FiSettings,
-    },
-    {
-        title: 'BIM Coordination',
-        href: '/portfolio/bim',
-        icon: FiLayers,
-    },
-    {
-        title: 'Shop Drawing Services',
-        href: '/portfolio/shop-drawings',
-        icon: FiFileText,
-    },
-];
 
 /* =========================================================
    HEADER
@@ -564,17 +108,206 @@ const portfolioLinks = [
 
 export default function Header() {
     const [activeService, setActiveService] = useState(0);
+
+    const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
+    const [categoryLoading, setCategoryLoading] = useState(true);
+
+    const [categoryServices, setCategoryServices] = useState<ServiceItem[]>([]);
+    const [servicesLoading, setServicesLoading] = useState(false);
+
+    const [portfolioLinks, setPortfolioLinks] = useState<PortfolioCategory[]>([]);
+    const [portfolioLoading, setPortfolioLoading] = useState(true);
+
     const [mobileMenu, setMobileMenu] = useState(false);
 
     const [mobileSection, setMobileSection] = useState<string | null>(null);
 
     const [mobileServiceCategory, setMobileServiceCategory] = useState<number | null>(null);
 
-    const selectedService = serviceCategories[activeService];
+    const selectedService = serviceCategories[activeService] ?? null;
 
     const toggleMobileSection = (section: string) => {
         setMobileSection((current) => (current === section ? null : section));
     };
+
+
+    const [softwareLinks, setSoftwareLinks] = useState<SoftwareItem[]>([]);
+    const [softwareLoading, setSoftwareLoading] = useState(true);
+
+    // softare expertise api
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchSoftware = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/softwareExpertise`,
+                    { slug: '' },
+                    { signal: controller.signal }
+                );
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data.data)
+                ) {
+                    setSoftwareLinks(response.data.data);
+                } else {
+                    setSoftwareLinks([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Software Expertise API Error:', error);
+                    setSoftwareLinks([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setSoftwareLoading(false);
+                }
+            }
+        };
+
+        fetchSoftware();
+
+        return () => controller.abort();
+    }, []);
+
+    // category api
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchCategories = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/categories`,
+                    {},
+                    { signal: controller.signal }
+                );
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data.data)
+                ) {
+                    setServiceCategories(response.data.data);
+                    setActiveService(0);
+                } else {
+                    setServiceCategories([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Categories API Error:', error);
+                    setServiceCategories([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setCategoryLoading(false);
+                }
+            }
+        };
+
+        fetchCategories();
+
+        return () => controller.abort();
+    }, []);
+
+    // service api 
+    useEffect(() => {
+        if (!selectedService?.slug) {
+            setCategoryServices([]);
+            setServicesLoading(false);
+            return;
+        }
+
+        const controller = new AbortController();
+
+        const fetchServices = async () => {
+            setServicesLoading(true);
+            setCategoryServices([]);
+
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/services`,
+                    {
+                        category: selectedService.slug,
+                    },
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (controller.signal.aborted) return;
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data.data)
+                ) {
+                    setCategoryServices(response.data.data);
+                } else {
+                    setCategoryServices([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Services API Error:', error);
+
+                    if (!controller.signal.aborted) {
+                        setCategoryServices([]);
+                    }
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setServicesLoading(false);
+                }
+            }
+        };
+
+        fetchServices();
+
+        return () => controller.abort();
+    }, [selectedService?.slug]);
+
+    // portfolio api
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchPortfolioCategories = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/portfoliocategories`,
+                    {
+                        type: '',
+                    },
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (controller.signal.aborted) return;
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data?.data)
+                ) {
+                    setPortfolioLinks(response.data.data);
+                } else {
+                    setPortfolioLinks([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Portfolio Categories API Error:', error);
+                    setPortfolioLinks([]);
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setPortfolioLoading(false);
+                }
+            }
+        };
+
+        fetchPortfolioCategories();
+
+        return () => controller.abort();
+    }, []);
+
 
     return (
         <header className="border-modura-gray-200 bg-modura-white relative z-50 border-b">
@@ -806,7 +539,7 @@ export default function Header() {
 
                                     {/* SERVICE CONTENT */}
 
-                                    <div className="grid min-h-[500px] grid-cols-[330px_1fr_280px]">
+                                    <div className="grid min-h-[450px] grid-cols-[330px_1fr_280px]">
                                         {/* CATEGORY */}
 
                                         <div className="border-modura-gray-200 border-r py-4">
@@ -814,35 +547,43 @@ export default function Header() {
                                                 Service Categories
                                             </div>
 
-                                            {serviceCategories.map((category, index) => {
-                                                const active = activeService === index;
+                                            {categoryLoading ? (
+                                                <p className="px-5 py-4 text-[12px] text-modura-gray-500">
+                                                    Loading categories...
+                                                </p>
+                                            ) : serviceCategories.length === 0 ? (
+                                                <p className="px-5 py-4 text-[12px] text-modura-gray-500">
+                                                    No service categories available.
+                                                </p>
+                                            ) : (
+                                                serviceCategories.map((category, index) => {
+                                                    const active = activeService === index;
 
-                                                return (
-                                                    <button
-                                                        key={category.title}
-                                                        type="button"
-                                                        onMouseEnter={() => setActiveService(index)}
-                                                        onFocus={() => setActiveService(index)}
-                                                        className={`group/category border-modura-gray-100 flex min-h-[30px] w-full items-center justify-between border-b px-5 text-left transition-all duration-200 ${
-                                                            active
+                                                    return (
+                                                        <button
+                                                            key={category.id}
+                                                            type="button"
+                                                            onMouseEnter={() => setActiveService(index)}
+                                                            onFocus={() => setActiveService(index)}
+                                                            className={`group/category border-modura-gray-100 flex min-h-[30px] w-full items-center justify-between border-b px-5 text-left transition-all duration-200 ${active
                                                                 ? 'bg-modura-primary text-modura-white'
                                                                 : 'bg-modura-white text-modura-gray-700 hover:bg-modura-off-white hover:text-modura-primary'
-                                                        } `}
-                                                    >
-                                                        <span className="text-[12px] font-medium">
-                                                            {category.title}
-                                                        </span>
+                                                                } `}
+                                                        >
+                                                            <span className="text-[12px] font-medium">
+                                                                {category.name}
+                                                            </span>
 
-                                                        <FiChevronRight
-                                                            className={`text-[13px] transition-all duration-200 ${
-                                                                active
+                                                            <FiChevronRight
+                                                                className={`text-[13px] transition-all duration-200 ${active
                                                                     ? 'translate-x-0 opacity-100'
                                                                     : '-translate-x-1 opacity-0 group-hover/category:translate-x-0 group-hover/category:opacity-100'
-                                                            } `}
-                                                        />
-                                                    </button>
-                                                );
-                                            })}
+                                                                    } `}
+                                                            />
+                                                        </button>
+                                                    );
+                                                })
+                                            )}
                                         </div>
 
                                         {/* SUB SERVICES */}
@@ -868,16 +609,16 @@ export default function Header() {
                                                         </span>
 
                                                         <h3 className="text-modura-primary mb-2 text-[25px] font-semibold tracking-[-0.02em]">
-                                                            {selectedService.title}
+                                                            {selectedService?.name ?? ''}
                                                         </h3>
 
                                                         <p className="text-modura-gray-500 max-w-[560px] text-[12px] leading-6">
-                                                            {selectedService.description}
+                                                            {categoryServices.find((service) => service.shortDescription)?.shortDescription ?? ''}
                                                         </p>
                                                     </div>
 
                                                     <Link
-                                                        href={selectedService.href}
+                                                        href="/services"
                                                         className="group border-modura-gray-200 text-modura-primary hover:border-modura-primary hover:bg-modura-primary hover:text-modura-white flex h-11 w-11 shrink-0 items-center justify-center border"
                                                     >
                                                         <FiArrowUpRight className="transition-transform duration-300 group-hover:rotate-45" />
@@ -889,19 +630,30 @@ export default function Header() {
                                                 </span>
 
                                                 <div className="grid grid-cols-2 gap-x-8">
-                                                    {selectedService.services.map((service) => (
-                                                        <Link
-                                                            key={service.title}
-                                                            href={service.href}
-                                                            className="group/sub border-modura-gray-200 flex min-h-[56px] items-center justify-between border-b"
-                                                        >
-                                                            <span className="text-modura-gray-700 group-hover/sub:text-modura-primary text-[13px] font-medium">
-                                                                {service.title}
-                                                            </span>
+                                                    {servicesLoading ? (
+                                                        <p className="col-span-2 py-5 text-[13px] text-modura-gray-500">
+                                                            Loading services...
+                                                        </p>
+                                                    ) : categoryServices.length === 0 ? (
+                                                        <p className="col-span-2 py-5 text-[13px] text-modura-gray-500">
+                                                            No services currently available.
+                                                        </p>
+                                                    ) : (
 
-                                                            <FiArrowUpRight className="text-modura-primary -translate-x-1 translate-y-1 text-[15px] opacity-0 transition-all duration-300 group-hover/sub:translate-x-0 group-hover/sub:translate-y-0 group-hover/sub:opacity-100" />
-                                                        </Link>
-                                                    ))}
+                                                        categoryServices.map((service) => (
+                                                            <Link
+                                                                key={service.id}
+                                                                href={`/servicedetail/${encodeURIComponent(service.slug)}`}
+                                                                className="group/sub border-modura-gray-200 flex min-h-[56px] items-center justify-between border-b"
+                                                            >
+                                                                <span className="text-modura-gray-700 group-hover/sub:text-modura-primary text-[13px] font-medium">
+                                                                    {service.title}
+                                                                </span>
+
+                                                                <FiArrowUpRight className="text-modura-primary -translate-x-1 translate-y-1 text-[15px] opacity-0 transition-all duration-300 group-hover/sub:translate-x-0 group-hover/sub:translate-y-0 group-hover/sub:opacity-100" />
+                                                            </Link>
+                                                        ))
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -983,31 +735,45 @@ export default function Header() {
                                 </div>
 
                                 <div className="grid grid-cols-2">
-                                    {softwareLinks.map((software) => {
-                                        const Icon = software.icon;
+                                    {softwareLoading ? (
+                                        <p className="col-span-2 px-4 py-6 text-center text-[12px] text-modura-gray-500">
+                                            Loading software expertise...
+                                        </p>
+                                    ) : softwareLinks.length === 0 ? (
+                                        <p className="col-span-2 px-4 py-6 text-center text-[12px] text-modura-gray-500">
+                                            Software expertise is currently not available.
+                                        </p>
+                                    ) : (
 
-                                        return (
-                                            <Link
-                                                key={software.title}
-                                                href={software.href}
-                                                className="group/software-item border-modura-gray-200 hover:bg-modura-off-white flex items-center gap-3 border-r border-b p-4 even:border-r-0"
-                                            >
-                                                <span className="border-modura-gray-200 text-modura-primary group-hover/software-item:border-modura-primary group-hover/software-item:bg-modura-primary group-hover/software-item:text-modura-white flex h-10 w-10 shrink-0 items-center justify-center border text-[19px]">
-                                                    <Icon />
-                                                </span>
+                                        softwareLinks.map((software) => {
+                                            const Icon =
+                                                softwareIcons[
+                                                software.slug as keyof typeof softwareIcons
+                                                ] || PiCube;
 
-                                                <div>
-                                                    <span className="text-modura-primary block text-[13px] font-semibold">
-                                                        {software.title}
+                                            return (
+                                                <Link
+                                                    key={software.id}
+                                                    href={`/expertise/${encodeURIComponent(software.slug)}`}
+                                                    className="group/software-item border-modura-gray-200 hover:bg-modura-off-white flex items-center gap-3 border-r border-b p-4 even:border-r-0"
+                                                >
+                                                    <span className="border-modura-gray-200 text-modura-primary group-hover/software-item:border-modura-primary group-hover/software-item:bg-modura-primary group-hover/software-item:text-modura-white flex h-10 w-10 shrink-0 items-center justify-center border text-[19px]">
+                                                        <Icon />
                                                     </span>
 
-                                                    <span className="text-modura-gray-500 mt-0.5 block text-[10px]">
-                                                        {software.subtitle}
-                                                    </span>
-                                                </div>
-                                            </Link>
-                                        );
-                                    })}
+                                                    <div>
+                                                        <span className="text-modura-primary block text-[13px] font-semibold">
+                                                            {software.name}
+                                                        </span>
+
+                                                        <span className="text-modura-gray-500 mt-0.5 block text-[10px]">
+                                                            {softwareSubtitles[software.slug] || 'Software Expertise'}
+                                                        </span>
+                                                    </div>
+                                                </Link>
+                                            );
+                                        })
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -1201,12 +967,21 @@ export default function Header() {
                                         "
                                     >
 
-                                        {portfolioLinks.map((item, index) => (
+                                        {portfolioLoading ? (
+                                            <p className="px-5 py-5 text-[12px] text-modura-gray-500">
+                                                Loading portfolio categories...
+                                            </p>
+                                        ) : portfolioLinks.length === 0 ? (
+                                            <p className="px-5 py-5 text-[12px] text-modura-gray-500">
+                                                No portfolio categories available.
+                                            </p>
+                                        ) : (
+                                            portfolioLinks.map((item, index) => (
 
-                                            <Link
-                                                key={item.title}
-                                                href={item.href}
-                                                className="
+                                                <Link
+                                                    key={item.id}
+                                                    href={`/portfolio/${encodeURIComponent(item.slug)}`}
+                                                    className="
                                                     group/portfolio-item
                                                     relative
                                                     flex
@@ -1221,14 +996,14 @@ export default function Header() {
 
                                                     hover:bg-modura-off-white
                                                 "
-                                            >
+                                                >
 
-                                                {/* =================================================
+                                                    {/* =================================================
                                                     LEFT ARCHITECTURAL MARK
                                                 ================================================= */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         relative
                                                         mr-4
                                                         flex
@@ -1247,25 +1022,21 @@ export default function Header() {
                                                         group-hover/portfolio-item:bg-modura-primary
                                                         group-hover/portfolio-item:text-modura-white
                                                     "
-                                                >
+                                                    >
 
-                                                    {/* Use your actual item icon if available */}
+                                                        {/* Use your actual item icon if available */}
 
-                                                    {item.icon ? (
-                                                        <item.icon size={17} />
-                                                    ) : (
                                                         <FiLayers size={17} />
-                                                    )}
 
-                                                </span>
+                                                    </span>
 
 
-                                                {/* =================================================
+                                                    {/* =================================================
                                                     ACTIVE LEFT LINE
                                                 ================================================= */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         absolute
                                                         top-1/2
                                                         left-0
@@ -1278,15 +1049,15 @@ export default function Header() {
 
                                                         group-hover/portfolio-item:h-[32px]
                                                     "
-                                                />
+                                                    />
 
 
-                                                {/* =================================================
+                                                    {/* =================================================
                                                     TITLE
                                                 ================================================= */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         flex-1
                                                         pr-8
                                                         text-[12px]
@@ -1298,17 +1069,17 @@ export default function Header() {
 
                                                         group-hover/portfolio-item:text-modura-primary
                                                     "
-                                                >
-                                                    {item.title}
-                                                </span>
+                                                    >
+                                                        {item.name}
+                                                    </span>
 
 
-                                                {/* =================================================
+                                                    {/* =================================================
                                                     ARROW
                                                 ================================================= */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         absolute
                                                         right-5
                                                         flex
@@ -1327,19 +1098,19 @@ export default function Header() {
                                                         group-hover/portfolio-item:translate-x-0
                                                         group-hover/portfolio-item:opacity-100
                                                     "
-                                                >
-                                                    <FiArrowUpRight
-                                                        size={14}
-                                                    />
-                                                </span>
+                                                    >
+                                                        <FiArrowUpRight
+                                                            size={14}
+                                                        />
+                                                    </span>
 
 
-                                                {/* =================================================
+                                                    {/* =================================================
                                                     BOTTOM HOVER LINE
                                                 ================================================= */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         absolute
                                                         right-0
                                                         bottom-[-1px]
@@ -1353,11 +1124,12 @@ export default function Header() {
 
                                                         group-hover/portfolio-item:w-full
                                                     "
-                                                />
+                                                    />
 
-                                            </Link>
+                                                </Link>
 
-                                        ))}
+                                            ))
+                                        )}
 
                                     </div>
 
@@ -1529,11 +1301,10 @@ export default function Header() {
       ====================================================== */}
 
             <div
-                className={`bg-modura-white overflow-y-auto transition-all duration-500 lg:hidden ${
-                    mobileMenu
-                        ? 'border-modura-gray-200 max-h-[calc(100vh-92px)] border-t opacity-100'
-                        : 'max-h-0 opacity-0'
-                } `}
+                className={`bg-modura-white overflow-y-auto transition-all duration-500 lg:hidden ${mobileMenu
+                    ? 'border-modura-gray-200 max-h-[calc(100vh-92px)] border-t opacity-100'
+                    : 'max-h-0 opacity-0'
+                    } `}
             >
                 <div className="px-5 pb-6 md:px-8">
                     <MobileSimpleLink title="Home" href="/" close={() => setMobileMenu(false)} />
@@ -1576,14 +1347,20 @@ export default function Header() {
                             const open = mobileServiceCategory === index;
 
                             return (
-                                <div key={category.title} className="border-modura-gray-200 border-b">
+                                <div key={category.id} className="border-modura-gray-200 border-b">
                                     <button
                                         type="button"
-                                        onClick={() => setMobileServiceCategory(open ? null : index)}
+                                        onClick={() => {
+                                            setMobileServiceCategory(open ? null : index);
+
+                                            if (!open) {
+                                                setActiveService(index);
+                                            }
+                                        }}
                                         className="flex min-h-[48px] w-full items-center justify-between px-4 text-left"
                                     >
                                         <span className="text-modura-primary text-[13px] font-semibold">
-                                            {category.title}
+                                            {category.name}
                                         </span>
 
                                         <FiChevronDown
@@ -1595,7 +1372,7 @@ export default function Header() {
                                         className={`bg-modura-white overflow-hidden transition-all duration-300 ${open ? 'max-h-[500px]' : 'max-h-0'} `}
                                     >
                                         <Link
-                                            href={category.href}
+                                            href="/services"
                                             onClick={() => setMobileMenu(false)}
                                             className="border-modura-gray-100 text-modura-primary flex min-h-[44px] items-center justify-between border-b px-6 text-[11px] font-bold tracking-[0.06em] uppercase"
                                         >
@@ -1603,18 +1380,31 @@ export default function Header() {
                                             <FiArrowUpRight />
                                         </Link>
 
-                                        {category.services.map((service) => (
-                                            <Link
-                                                key={service.title}
-                                                href={service.href}
-                                                onClick={() => setMobileMenu(false)}
-                                                className="border-modura-gray-100 text-modura-gray-600 flex min-h-[44px] items-center gap-3 border-b px-6 text-[12px]"
-                                            >
-                                                <span className="bg-modura-secondary h-px w-3" />
 
-                                                {service.title}
-                                            </Link>
-                                        ))}
+                                        {open && (
+                                            activeService !== index || servicesLoading ? (
+                                                <p className="px-6 py-4 text-[12px] text-modura-gray-500">
+                                                    Loading services...
+                                                </p>
+                                            ) : categoryServices.length === 0 ? (
+                                                <p className="px-6 py-4 text-[12px] text-modura-gray-500">
+                                                    No services currently available.
+                                                </p>
+                                            ) : (
+                                                categoryServices.map((service) => (
+                                                    <Link
+                                                        key={service.id}
+                                                        href={`/servicedetail/${encodeURIComponent(service.slug)}`}
+                                                        onClick={() => setMobileMenu(false)}
+                                                        className="border-modura-gray-100 text-modura-gray-600 flex min-h-[44px] items-center gap-3 border-b px-6 text-[12px]"
+                                                    >
+                                                        <span className="bg-modura-secondary h-px w-3" />
+
+                                                        {service.title}
+                                                    </Link>
+                                                ))
+                                            )
+                                        )}
                                     </div>
                                 </div>
                             );
@@ -1633,12 +1423,15 @@ export default function Header() {
                         className={`bg-modura-off-white overflow-hidden transition-all duration-300 ${mobileSection === 'software' ? 'max-h-[500px]' : 'max-h-0'} `}
                     >
                         {softwareLinks.map((software) => {
-                            const Icon = software.icon;
+                            const Icon =
+                                softwareIcons[
+                                software.slug as keyof typeof softwareIcons
+                                ] || PiCube;
 
                             return (
                                 <Link
-                                    key={software.title}
-                                    href={software.href}
+                                    key={software.id}
+                                    href={`/expertise/${encodeURIComponent(software.slug)}`}
                                     onClick={() => setMobileMenu(false)}
                                     className="border-modura-gray-200 flex items-center gap-3 border-b px-4 py-3"
                                 >
@@ -1646,11 +1439,11 @@ export default function Header() {
 
                                     <div>
                                         <span className="text-modura-primary block text-[13px] font-semibold">
-                                            {software.title}
+                                            {software.name}
                                         </span>
 
                                         <span className="text-modura-gray-500 block text-[10px]">
-                                            {software.subtitle}
+                                            {softwareSubtitles[software.slug] || 'Software Expertise'}
                                         </span>
                                     </div>
                                 </Link>
@@ -1669,16 +1462,28 @@ export default function Header() {
                     <div
                         className={`bg-modura-off-white overflow-hidden transition-all duration-300 ${mobileSection === 'portfolio' ? 'max-h-[700px]' : 'max-h-0'} `}
                     >
-                        {portfolioLinks.map((item) => (
-                            <Link
-                                key={item.title}
-                                href={item.href}
-                                onClick={() => setMobileMenu(false)}
-                                className="border-modura-gray-200 text-modura-gray-700 flex min-h-[46px] items-center border-b px-4 text-[12px] font-medium"
-                            >
-                                {item.title}
-                            </Link>
-                        ))}
+
+                        {portfolioLoading ? (
+                            <p className="px-4 py-4 text-[12px] text-modura-gray-500">
+                                Loading portfolio categories...
+                            </p>
+                        ) : portfolioLinks.length === 0 ? (
+                            <p className="px-4 py-4 text-[12px] text-modura-gray-500">
+                                No portfolio categories available.
+                            </p>
+                        ) : (
+                            
+                                portfolioLinks.map((item) => (
+                                    <Link
+                                        key={item.id}
+                                        href={`/portfolio/${encodeURIComponent(item.slug)}`}
+                                        onClick={() => setMobileMenu(false)}
+                                        className="border-modura-gray-200 text-modura-gray-700 flex min-h-[46px] items-center border-b px-4 text-[12px] font-medium"
+                                    >
+                                        {item.name}
+                                    </Link>
+                                ))
+                            )}
                     </div>
 
                     <MobileSimpleLink title="Career" href="/career" close={() => setMobileMenu(false)} />

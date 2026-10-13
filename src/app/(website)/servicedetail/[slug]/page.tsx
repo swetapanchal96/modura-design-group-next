@@ -1,7 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
+import axios from 'axios';
+import DOMPurify from 'dompurify';
+import { apiUrl } from '@/app/(website)/config';
 import gsap from 'gsap';
 import {
     FiArrowUpRight,
@@ -11,167 +16,209 @@ import {
     FiFileText,
     FiLayers,
 } from 'react-icons/fi';
-import Breadcrumb from '../../../components/Breadcrumb';
+import Breadcrumb from '@/components/Breadcrumb';
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
-import serviceImage from '@/app/(website)/assets/images/Blueprint.jpg'
-import blog1 from '@/app/(website)/assets/images/about-1.jpg';
-import blog3 from '@/app/(website)/assets/images/about-3.jpg';
 
-const blogs = [
-    {
-        title: 'How BIM Is Transforming Modern Construction',
-        date: 'June 24, 2026',
-        image: blog1.src,
-        desc: 'Building Information Modeling (BIM) is revolutionizing the construction industry by improving project coordination, reducing errors.',
-    },
-    {
-        title: 'Future Trends In Architectural Design',
-        date: 'May 18, 2026',
-        image: blog3.src,
-        desc: 'Modern architectural design is evolving with sustainable materials, advanced technologies, and innovative planning approaches.',
-    },
-    {
-        title: 'Key Trends In Structural Engineering',
-        date: 'April 12, 2026',
-        image: blog1.src,
-        desc: 'Structural engineering is moving towards smarter solutions with advanced analysis tools, sustainable practices, and improved construction techniques.',
-    },
-];
+interface ServiceFAQ {
+    id: number;
+    question: string;
+    answer: string;
+}
+
+interface ServiceBlog {
+    id: number;
+    title: string;
+    slug: string;
+    description: string;
+    imageUrl: string;
+    publishedAt: string;
+}
+
+interface ServiceDetail {
+    id: number;
+    title: string;
+    slug: string;
+    shortDescription: string | null;
+    description: string | null;
+    imageUrl: string | null;
+    faqs: ServiceFAQ[];
+    blogs: ServiceBlog[];
+}
 
 export default function ServicesPage() {
     const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-    /*
-    |--------------------------------------------------------------------------
-    | DYNAMIC SERVICE DATA
-    |--------------------------------------------------------------------------
-    | Replace this object with your API response.
-    */
+    const { slug } = useParams<{ slug: string }>();
 
-    const service = {
-        name: '2D CAD Drafting',
-
-        shortDescription:
-            'Accurate and detailed 2D CAD drafting solutions that support architectural, structural and engineering projects from design development through construction documentation.Our 2D CAD drafting services provide accurate, detailed and well-structured drawings for architects, engineers, contractors and construction teams. We transform concepts, sketches and existing documents into precise digital drawings that support every stage of the project.',
-
-        image: serviceImage,
-
-        description: `
-            <h4>Professional 2D CAD Drafting Services</h4>
-
-            <p>
-                Our 2D CAD drafting services provide accurate, detailed and
-                well-structured drawings for architects, engineers, contractors
-                and construction teams. We transform concepts, sketches and
-                existing documents into precise digital drawings that support
-                every stage of the project.
-            </p>
-
-            <p>
-                With a strong focus on accuracy, consistency and clear
-                documentation, our drafting solutions help teams coordinate
-                efficiently and move projects forward with confidence.
-            </p>
-
-            <h4>Comprehensive Drawing Solutions</h4>
-
-            <p>
-                We create detailed drawings according to project requirements,
-                design standards and client specifications.
-            </p>
-
-            <ul>
-                <li>Architectural floor plans and layouts</li>
-                <li>Elevations and building sections</li>
-                <li>Structural drawings</li>
-                <li>Detailed construction drawings</li>
-                <li>Shop drawings</li>
-                <li>As-built documentation</li>
-            </ul>
-
-            <h5>Accurate Documentation</h5>
-
-            <p>
-                Every drawing is prepared with careful attention to dimensions,
-                annotations, layers and technical information so that the final
-                documentation remains clear and easy to use.
-            </p>
-
-            <h5>Coordinated Workflow</h5>
-
-            <p>
-                Our drafting workflow supports better coordination between
-                architectural, structural and other project disciplines,
-                helping reduce inconsistencies and unnecessary revisions.
-            </p>
-
-            <h4>Built Around Your Project Requirements</h4>
-
-            <p>
-                Whether the requirement is a single drawing, a complete drawing
-                package or ongoing drafting support, our team works according
-                to the required scope, standards and delivery requirements.
-            </p>
-        `,
-
-        faqs: [
-            {
-                question: 'What types of 2D CAD drawings do you provide?',
-                answer:
-                    'We provide architectural, structural, shop, construction, floor plan, elevation, section and as-built drawings according to project requirements.',
-            },
-            {
-                question: 'Can you work from existing drawings or sketches?',
-                answer:
-                    'Yes. Existing drawings, sketches, PDFs and other reference documents can be used as the basis for preparing accurate CAD documentation.',
-            },
-            {
-                question: 'Can the drawings follow specific standards?',
-                answer:
-                    'Yes. Drawings can be prepared according to the required project standards, drafting conventions and client-specific requirements.',
-            },
-            {
-                question: 'Do you provide revisions?',
-                answer:
-                    'Yes. Revisions can be incorporated according to the agreed project scope and coordination requirements.',
-            },
-        ],
-    };
+    const [service, setService] = useState<ServiceDetail | null>(null);
+    const [serviceLoading, setServiceLoading] = useState(true);
+    const [serviceError, setServiceError] = useState('');
 
     const sectionRef = useRef(null);
-    
-        useLayoutEffect(() => {
-            const ctx = gsap.context(() => {
-                gsap.from('.blog-heading', {
-                    y: 50,
-                    opacity: 0,
-                    duration: 1,
-    
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top 80%',
-                    },
-                });
-    
-                gsap.from('.blog-card', {
-                    y: 80,
-                    opacity: 0,
-    
-                    stagger: 0.18,
-    
-                    duration: 0.8,
-    
-                    ease: 'power3.out',
-    
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top 75%',
-                    },
-                });
-            }, sectionRef);
-    
-            return () => ctx.revert();
-        }, []);
+
+    // service detail api
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchServiceDetail = async () => {
+            setServiceLoading(true);
+            setServiceError('');
+            setService(null);
+            setOpenFaq(0);
+
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/serviceDetail`,
+                    { slug },
+                    { signal: controller.signal }
+                );
+
+                if (controller.signal.aborted) return;
+
+                if (
+                    response.data?.success === true &&
+                    response.data?.data &&
+                    !Array.isArray(response.data.data) &&
+                    response.data.data.slug === slug
+                ) {
+                    const data = response.data.data;
+
+                    setService({
+                        id: data.id,
+                        title: data.title,
+                        slug: data.slug,
+                        shortDescription: data.shortDescription ?? null,
+                        description: data.description ?? null,
+                        imageUrl: data.imageUrl ?? null,
+                        faqs: Array.isArray(data.faqs)
+                            ? data.faqs
+                            : [],
+                        blogs: Array.isArray(data.blogs)
+                            ? data.blogs
+                                .filter((blog: ServiceBlog) => blog.slug)
+                                .sort(
+                                    (a: ServiceBlog, b: ServiceBlog) =>
+                                        new Date(b.publishedAt).getTime() -
+                                        new Date(a.publishedAt).getTime()
+                                )
+                                .slice(0, 3)
+                            : [],
+                    });
+                } else {
+                    setServiceError(
+                        'Service details are currently not available.'
+                    );
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Service Detail API Error:', error);
+
+                    setServiceError(
+                        'Unable to load service details. Please try again.'
+                    );
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setServiceLoading(false);
+                }
+            }
+        };
+
+        if (slug) {
+            fetchServiceDetail();
+        } else {
+            setServiceLoading(false);
+            setServiceError('Service not found.');
+        }
+
+        return () => controller.abort();
+    }, [slug]);
+
+    const formatServiceBlogDate = (date: string) => {
+        if (!date) return '';
+
+        const parsed = new Date(date);
+
+        if (Number.isNaN(parsed.getTime())) return '';
+
+        return parsed.toLocaleDateString('en-US', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+            timeZone: 'UTC',
+        });
+    };
+
+    const getServiceBlogExcerpt = (
+        html: string,
+        limit = 130
+    ) => {
+        if (!html) return '';
+
+        const plainText = DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: [],
+            ALLOWED_ATTR: [],
+        })
+            .replace(/\u00a0/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        return plainText.length > limit
+            ? `${plainText.slice(0, limit).trimEnd()}...`
+            : plainText;
+    };
+
+    useLayoutEffect(() => {
+        if (!service?.blogs?.length) return;
+
+        const ctx = gsap.context(() => {
+            gsap.from('.company-blog-heading', {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top 80%',
+                },
+            });
+
+            gsap.from('.blog-card', {
+                y: 80,
+                opacity: 0,
+
+                stagger: 0.18,
+
+                duration: 0.8,
+
+                ease: 'power3.out',
+
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top 75%',
+                },
+            });
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, [service]);
+
+    if (serviceLoading) {
+        return (
+            <div className="flex min-h-[450px] items-center justify-center bg-modura-white text-[15px] text-modura-gray-600">
+                Loading service details...
+            </div>
+        );
+    }
+
+    if (!service) {
+        return (
+            <div className="flex min-h-[450px] items-center justify-center bg-modura-white px-5 text-center text-[16px] text-modura-primary">
+                {serviceError || 'Service not found.'}
+            </div>
+        );
+    }
 
     return (
         <>
@@ -180,7 +227,7 @@ export default function ServicesPage() {
             ================================================= */}
 
             <Breadcrumb
-                title={service.name}
+                title={service.title}
                 image={breadcrumb.src}
             />
 
@@ -310,23 +357,26 @@ export default function ServicesPage() {
                                     bg-modura-light
                                 "
                             >
-                                <Image
-                                    src={service.image}
-                                    alt={service.name}
-                                    fill
-                                    priority
-                                    sizes="
+                                {service.imageUrl && (
+                                    <Image
+                                        src={service.imageUrl}
+                                        alt={service.title}
+                                        fill
+                                        unoptimized
+                                        priority
+                                        sizes="
                                         (max-width: 768px) 100vw,
                                         (max-width: 1280px) 50vw,
                                         600px
                                     "
-                                    className="
+                                        className="
                                         object-cover
                                         transition-transform
                                         duration-700
                                         hover:scale-[1.03]
                                     "
-                                />
+                                    />
+                                )}
 
                                 <div
                                     className="
@@ -390,7 +440,7 @@ export default function ServicesPage() {
                                     
                                 "
                             >
-                                {service.name}
+                                {service.title}
                             </h1>
 
 
@@ -480,7 +530,7 @@ export default function ServicesPage() {
                         "
                     >
 
-                       
+
 
                         <span
                             className="
@@ -565,7 +615,12 @@ export default function ServicesPage() {
                             [&_li]:after:bg-modura-gray-300
                         "
                         dangerouslySetInnerHTML={{
-                            __html: service.description,
+                            __html: DOMPurify.sanitize(
+                                service.description || '',
+                                {
+                                    FORBID_ATTR: ['style'],
+                                }
+                            ),
                         }}
                     />
 
@@ -577,9 +632,10 @@ export default function ServicesPage() {
                 FAQ SECTION
             ================================================= */}
 
-            <section
-                id="faqs"
-                className="
+            {service.faqs.length > 0 && (
+                <section
+                    id="faqs"
+                    className="
                     relative
                     overflow-hidden
                     border-t
@@ -589,12 +645,12 @@ export default function ServicesPage() {
                     md:py-14
                     
                 "
-            >
+                >
 
-                {/* technical background */}
+                    {/* technical background */}
 
-                <div
-                    className="
+                    <div
+                        className="
                         relative
                         z-10
                         mx-auto
@@ -602,64 +658,64 @@ export default function ServicesPage() {
                         px-5
                         md:px-8
                     "
-                >
+                    >
 
-                    {/* =================================================
+                        {/* =================================================
                         FAQ HEADER
                     ================================================= */}
 
-                    <div
-                        className="
+                        <div
+                            className="
                             mx-auto
                             mb-10
                             max-w-[700px]
                             text-center
                         "
-                    >
+                        >
 
-                        <div
-                            className="
+                            <div
+                                className="
                                 mb-4
                                 flex
                                 items-center
                                 justify-center
                                 gap-4
                             "
-                        >
+                            >
 
-                            <span
-                                className="
+                                <span
+                                    className="
                                     h-[2px]
                                     w-10
                                     bg-modura-primary
                                 "
-                            />
+                                />
 
-                            <span
-                                className="
+                                <span
+                                    className="
                                     text-[14px]
                                     font-bold
                                     tracking-[0.35em]
                                     text-modura-secondary
                                     uppercase
                                 "
-                            >
-                                FAQS
-                            </span>
+                                >
+                                    FAQS
+                                </span>
 
-                            <span
-                                className="
+                                <span
+                                    className="
                                     h-[2px]
                                     w-10
                                     bg-modura-primary
                                 "
-                            />
+                                />
 
-                        </div>
+                            </div>
 
 
-                        <h2
-                            className="
+                            <h2
+                                className="
                                 text-[34px]
                                 leading-tight
                                 font-bold
@@ -669,13 +725,13 @@ export default function ServicesPage() {
                                 sm:text-[40px]
                                 md:text-[46px]
                             "
-                        >
-                            Frequently Asked Questions
-                        </h2>
+                            >
+                                Frequently Asked Questions
+                            </h2>
 
 
-                        <p
-                            className="
+                            <p
+                                className="
                                 mx-auto
                                 mt-2
                                 max-w-[620px]
@@ -685,51 +741,51 @@ export default function ServicesPage() {
 
                                 md:text-[16px]
                             "
-                        >
-                            Find answers to common questions about our
-                            {` ${service.name.toLowerCase()}`} services.
-                        </p>
+                            >
+                                Find answers to common questions about our
+                                {` ${service.title.toLowerCase()}`} services.
+                            </p>
 
-                    </div>
+                        </div>
 
 
-                    {/* =================================================
+                        {/* =================================================
                         FAQ LIST
                     ================================================= */}
 
-                    <div
-                        className="
+                        <div
+                            className="
                             overflow-hidden
                             border
                             border-modura-gray-200
                             bg-modura-white
                         "
-                    >
+                        >
 
-                        {service.faqs.map((faq, index) => {
+                            {service.faqs.map((faq, index) => {
 
-                            const isOpen = openFaq === index;
+                                const isOpen = openFaq === index;
 
-                            return (
-                                <div
-                                    key={index}
-                                    className="
+                                return (
+                                    <div
+                                        key={faq.id}
+                                        className="
                                         border-b
                                         border-modura-gray-200
                                         last:border-b-0
                                     "
-                                >
+                                    >
 
-                                    {/* QUESTION */}
+                                        {/* QUESTION */}
 
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setOpenFaq(
-                                                isOpen ? null : index,
-                                            )
-                                        }
-                                        className="
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setOpenFaq(
+                                                    isOpen ? null : index,
+                                                )
+                                            }
+                                            className="
                                             flex
                                             w-full
                                             items-center
@@ -745,18 +801,18 @@ export default function ServicesPage() {
                                             md:px-5
                                             md:py-5
                                         "
-                                    >
+                                        >
 
-                                        <div
-                                            className="
+                                            <div
+                                                className="
                                                 flex
                                                 items-center
                                                 gap-4
                                             "
-                                        >
+                                            >
 
-                                            <span
-                                                className={`
+                                                <span
+                                                    className={`
                                                     flex
                                                     h-10
                                                     w-10
@@ -767,21 +823,20 @@ export default function ServicesPage() {
                                                     font-bold
                                                     transition-all
                                                     duration-300
-                                                    ${
-                                                        isOpen
+                                                    ${isOpen
                                                             ? 'bg-modura-primary text-modura-white'
                                                             : 'bg-modura-light text-modura-primary'
-                                                    }
+                                                        }
                                                 `}
-                                            >
-                                                {String(index + 1).padStart(
-                                                    2,
-                                                    '0',
-                                                )}
-                                            </span>
+                                                >
+                                                    {String(index + 1).padStart(
+                                                        2,
+                                                        '0',
+                                                    )}
+                                                </span>
 
-                                            <span
-                                                className="
+                                                <span
+                                                    className="
                                                     text-[14px]
                                                     font-bold
                                                     leading-6
@@ -789,15 +844,15 @@ export default function ServicesPage() {
 
                                                     md:text-[16px]
                                                 "
-                                            >
-                                                {faq.question}
-                                            </span>
+                                                >
+                                                    {faq.question}
+                                                </span>
 
-                                        </div>
+                                            </div>
 
 
-                                        <span
-                                            className={`
+                                            <span
+                                                className={`
                                                 flex
                                                 h-9
                                                 w-9
@@ -807,38 +862,36 @@ export default function ServicesPage() {
                                                 text-modura-secondary
                                                 transition-transform
                                                 duration-300
-                                                ${
-                                                    isOpen
+                                                ${isOpen
                                                         ? 'rotate-180'
                                                         : ''
-                                                }
+                                                    }
                                             `}
-                                        >
-                                            <FiChevronDown size={19} />
-                                        </span>
+                                            >
+                                                <FiChevronDown size={19} />
+                                            </span>
 
-                                    </button>
+                                        </button>
 
 
-                                    {/* ANSWER */}
+                                        {/* ANSWER */}
 
-                                    <div
-                                        className={`
+                                        <div
+                                            className={`
                                             grid
                                             transition-all
                                             duration-300
-                                            ${
-                                                isOpen
+                                            ${isOpen
                                                     ? 'grid-rows-[1fr]'
                                                     : 'grid-rows-[0fr]'
-                                            }
+                                                }
                                         `}
-                                    >
+                                        >
 
-                                        <div className="overflow-hidden">
+                                            <div className="overflow-hidden">
 
-                                            <div
-                                                className="
+                                                <div
+                                                    className="
                                                     border-t
                                                     border-modura-gray-200
                                                     px-5
@@ -848,55 +901,57 @@ export default function ServicesPage() {
                                                     md:py-6
                                                     md:pl-[84px]
                                                 "
-                                            >
+                                                >
 
-                                                <p
-                                                    className="
+                                                    <p
+                                                        className="
                                                         max-w-[760px]
                                                         text-[16px]
                                                         leading-5.5
                                                         text-modura-gray-600
                                                     "
-                                                >
-                                                    {faq.answer}
-                                                </p>
+                                                    >
+                                                        {faq.answer}
+                                                    </p>
+
+                                                </div>
 
                                             </div>
 
                                         </div>
 
                                     </div>
+                                );
+                            })}
 
-                                </div>
-                            );
-                        })}
+                        </div>
 
                     </div>
 
-                </div>
-
-            </section>
+                </section>
+            )}
 
             {/* =================================================
                 RELATED BLOGS / LATEST INSIGHTS
             ================================================= */}
 
-            <section
-                ref={sectionRef}
-                className="
+            {service.blogs.length > 0 && (
+                <section
+                    ref={sectionRef}
+                    className="
                     relative
                     overflow-hidden
                     bg-modura-white
                     py-12
                     md:py-14
                 "
-            >
-                {/* =================================================
+                >
+                    {/* =================================================
                     BLUEPRINT BACKGROUND
                 ================================================= */}
 
-                <div
-                    className="
+                    <div
+                        className="
                         pointer-events-none
                         absolute
                         inset-0
@@ -905,15 +960,15 @@ export default function ServicesPage() {
                         bg-center
                         opacity-[0.07]
                     "
-                />
+                    />
 
 
-                {/* =================================================
+                    {/* =================================================
                     MAIN CONTAINER
                 ================================================= */}
 
-                <div
-                    className="
+                    <div
+                        className="
                         relative
                         z-10
                         mx-auto
@@ -922,14 +977,14 @@ export default function ServicesPage() {
                         md:px-8
                         xl:px-10
                     "
-                >
+                    >
 
-                    {/* =================================================
+                        {/* =================================================
                         HEADER
                     ================================================= */}
 
-                    <div
-                        className="
+                        <div
+                            className="
                             company-blog-heading
                             mb-10
                             flex
@@ -942,25 +997,25 @@ export default function ServicesPage() {
                             lg:flex-row
                             lg:items-end
                         "
-                    >
+                        >
 
-                        <div>
+                            <div>
 
-                            {/* LABEL */}
+                                {/* LABEL */}
 
-                            <div
-                                className="
+                                <div
+                                    className="
                                     mb-3
                                     flex
                                     items-center
                                     gap-3
                                 "
-                            >
+                                >
 
-                                
 
-                                <span
-                                    className="
+
+                                    <span
+                                        className="
                                         text-[11px]
                                         font-bold
                                         tracking-[0.35em]
@@ -969,17 +1024,17 @@ export default function ServicesPage() {
 
                                         md:text-[14px]
                                     "
-                                >
-                                    Related BLOGS
-                                </span>
+                                    >
+                                        Related BLOGS
+                                    </span>
 
-                            </div>
+                                </div>
 
 
-                            {/* HEADING */}
+                                {/* HEADING */}
 
-                            <h2
-                                className="
+                                <h2
+                                    className="
                                     text-[36px]
                                     leading-[1]
                                     font-bold
@@ -991,29 +1046,29 @@ export default function ServicesPage() {
 
                                     lg:text-[48px]
                                 "
-                            >
-                                Insights That
+                                >
+                                    Insights That
 
-                                <span
-                                    className="
+                                    <span
+                                        className="
                                         ml-2
                                         text-modura-secondary
                                     "
-                                >
-                                    Shape Better Projects
-                                </span>
-                            </h2>
+                                    >
+                                        Shape Better Projects
+                                    </span>
+                                </h2>
 
-                        </div>
+                            </div>
 
 
-                        {/* =================================================
+                            {/* =================================================
                             VIEW MORE
                         ================================================= */}
 
-                        <button
-                            type="button"
-                            className="
+                            <Link
+                                href="/blog"
+                                className="
                                 group
                                 flex
                                 shrink-0
@@ -1031,16 +1086,16 @@ export default function ServicesPage() {
                                 transition-all
                                 duration-500
                                 hover:bg-modura-primary
-                                hover:text-modura-white
+                                hover:text-modura-white!
                             "
-                        >
+                            >
 
-                            <span>
-                                View More
-                            </span>
+                                <span>
+                                    View More
+                                </span>
 
-                            <span
-                                className="
+                                <span
+                                    className="
                                     flex
                                     h-7
                                     w-7
@@ -1052,23 +1107,23 @@ export default function ServicesPage() {
                                     duration-500
                                     group-hover:rotate-45
                                 "
-                            >
-                                <FiArrowUpRight
-                                    size={15}
-                                />
-                            </span>
+                                >
+                                    <FiArrowUpRight
+                                        size={15}
+                                    />
+                                </span>
 
-                        </button>
+                            </Link>
 
-                    </div>
+                        </div>
 
 
-                    {/* =================================================
+                        {/* =================================================
                         BLOG GRID
                     ================================================= */}
 
-                    <div
-                        className="
+                        <div
+                            className="
                             grid
                             gap-6
 
@@ -1077,13 +1132,13 @@ export default function ServicesPage() {
                             lg:grid-cols-3
                             lg:gap-8
                         "
-                    >
+                        >
 
-                        {blogs.map((blog, index) => (
+                            {service.blogs.map((blog) => (
 
-                            <article
-                                key={index}
-                                className="
+                                <article
+                                    key={blog.id}
+                                    className="
                                     blog-card
                                     group
                                     relative
@@ -1091,44 +1146,45 @@ export default function ServicesPage() {
                                     bg-white
                                     shadow-[0_15px_40px_rgba(11,29,51,0.08)]
                                 "
-                            >
-
-                                {/* =================================================
+                                >
+                                    
+                                    {/* =================================================
                                     IMAGE
                                 ================================================= */}
 
-                                <div
-                                    className="
+                                    <div
+                                        className="
                                         relative
                                         h-[220px]
                                         overflow-hidden
 
                                         md:h-[230px]
                                     "
-                                >
+                                    >
 
-                                    <Image
-                                        src={blog.image}
-                                        fill
-                                        alt={blog.title}
-                                        sizes="
+                                        <Image
+                                            src={blog.imageUrl}
+                                            fill
+                                            unoptimized
+                                            alt={blog.title}
+                                            sizes="
                                             (max-width: 768px) 100vw,
                                             (max-width: 1024px) 50vw,
                                             33vw
                                         "
-                                        className="
+                                            className="
                                             object-cover
                                             transition-transform
                                             duration-700
                                             group-hover:scale-110
                                         "
-                                    />
+                                        />
 
 
-                                    {/* IMAGE OVERLAY */}
+                                        {/* IMAGE OVERLAY */}
 
-                                    <div
-                                        className="
+                                        <div
+                                            className="
                                             pointer-events-none
                                             absolute
                                             inset-0
@@ -1140,75 +1196,76 @@ export default function ServicesPage() {
                                             duration-500
                                             group-hover:opacity-100
                                         "
-                                    />
+                                        />
 
-                                </div>
+                                    </div>
+                                        
 
-
-                                {/* =================================================
+                                    {/* =================================================
                                     CONTENT
                                 ================================================= */}
 
-                                <div
-                                    className="
+                                    <div
+                                        className="
                                         p-6
 
                                         md:p-7
                                     "
-                                >
+                                    >
 
-                                    {/* DATE */}
+                                        {/* DATE */}
 
-                                    <p
-                                        className="
+                                        <p
+                                            className="
                                             text-modura-secondary
                                             text-[11px]
                                             font-semibold
                                             tracking-[0.2em]
                                             uppercase
                                         "
-                                    >
-                                        {blog.date}
-                                    </p>
+                                        >
+                                            {formatServiceBlogDate(blog.publishedAt)}
+                                        </p>
 
 
-                                    {/* TITLE */}
+                                        {/* TITLE */}
 
-                                    <h3
-                                        className="
+                                        <Link
+                                            href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
+                                            className="
                                             mt-2
                                             text-[20px]
                                             leading-7
                                             font-bold
                                             tracking-[-0.02em]
-                                            text-modura-primary
+                                            text-modura-primary!
                                         "
-                                    >
-                                        {blog.title}
-                                    </h3>
+                                        >
+                                            {blog.title}
+                                        </Link>
 
 
-                                    {/* DESCRIPTION */}
+                                        {/* DESCRIPTION */}
 
-                                    <p
-                                        className="
+                                        <p
+                                            className="
                                             mt-4
                                             text-[14px]
                                             leading-6
                                             text-modura-secondary
                                         "
-                                    >
-                                        {blog.desc}
-                                    </p>
+                                        >
+                                            {getServiceBlogExcerpt(blog.description, 130)}
+                                        </p>
 
 
-                                    {/* =================================================
+                                        {/* =================================================
                                         READ MORE
                                     ================================================= */}
 
-                                    <button
-                                        type="button"
-                                        className="
+                                        <Link
+                                            href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
+                                            className="
                                             group/btn
                                             mt-7
                                             flex
@@ -1220,10 +1277,10 @@ export default function ServicesPage() {
                                             text-modura-primary
                                             uppercase
                                         "
-                                    >
+                                        >
 
-                                        <span
-                                            className="
+                                            <span
+                                                className="
                                                 relative
                                                 after:absolute
                                                 after:bottom-[-6px]
@@ -1235,13 +1292,13 @@ export default function ServicesPage() {
                                                 after:duration-500
                                                 group-hover/btn:after:w-[40%]
                                             "
-                                        >
-                                            Read More
-                                        </span>
+                                            >
+                                                Read More
+                                            </span>
 
 
-                                        <span
-                                            className="
+                                            <span
+                                                className="
                                                 flex
                                                 h-8
                                                 w-8
@@ -1255,25 +1312,26 @@ export default function ServicesPage() {
                                                 group-hover/btn:bg-modura-secondary
                                                 group-hover/btn:text-white
                                             "
-                                        >
-                                            <FiArrowUpRight
-                                                size={15}
-                                            />
-                                        </span>
+                                            >
+                                                <FiArrowUpRight
+                                                    size={15}
+                                                />
+                                            </span>
 
-                                    </button>
+                                        </Link>
 
-                                </div>
+                                    </div>
 
-                            </article>
+                                </article>
 
-                        ))}
+                            ))}
+
+                        </div>
 
                     </div>
 
-                </div>
-
-            </section>
+                </section>
+            )}
         </>
     );
 }
