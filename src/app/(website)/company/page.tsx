@@ -102,6 +102,8 @@ export default function CompanyPage() {
         return () => controller.abort();
     }, []);
 
+    
+
     // certificate api call
     useEffect(() => {
         const controller = new AbortController();
