@@ -16,52 +16,64 @@ import counterBg from '@/app/(website)/assets/images/counter-bg.jpeg';
 
 gsap.registerPlugin(ScrollTrigger);
 
+
+
+interface HomeCounters {
+    projectCompleted: number;
+    happyClient: number;
+    qualifiedEngineers: number;
+    yearsExperience: number;
+    countriesServed: number;
+}
+
+interface CounterSectionProps {
+    counters: HomeCounters | null;
+}
+
+
+
 // ============================================================
-// COUNTER DATA
+// COMPONENT
 // ============================================================
 
-const counters = [
+const CounterSection = ({ counters: homeCounters }: CounterSectionProps) => {
+    const sectionRef = useRef<HTMLElement | null>(null);
+    const backgroundRef = useRef<HTMLDivElement | null>(null);
+    const accentLineRef = useRef<HTMLDivElement | null>(null);
+
+    const counters = [
     {
-        value: 500,
+        value: homeCounters?.projectCompleted ?? 0,
         suffix: '+',
         label: 'Projects Delivered',
         icon: FaBuilding,
     },
     {
-        value: 250,
+        value: homeCounters?.happyClient ?? 0,
         suffix: '+',
         label: 'Global Clients',
         icon: FaUsers,
     },
     {
-        value: 15,
+        value: homeCounters?.countriesServed ?? 0,
         suffix: '+',
         label: 'Countries Served',
         icon: FaEarthAmericas,
     },
     {
-        value: 10,
+        value: homeCounters?.yearsExperience ?? 0,
         suffix: '+',
         label: 'Years of Experience',
         icon: FaAward,
     },
 ];
 
-// ============================================================
-// COMPONENT
-// ============================================================
-
-const CounterSection = () => {
-    const sectionRef = useRef<HTMLElement | null>(null);
-    const backgroundRef = useRef<HTMLDivElement | null>(null);
-    const accentLineRef = useRef<HTMLDivElement | null>(null);
-
     // ========================================================
     // GSAP
     // ========================================================
 
     useLayoutEffect(() => {
-        if (!sectionRef.current) return;
+        if (!sectionRef.current || !homeCounters) return;
 
         const section = sectionRef.current;
 
@@ -548,7 +560,7 @@ const CounterSection = () => {
         return () => {
             ctx.revert();
         };
-    }, []);
+    }, [homeCounters]);
 
     // ========================================================
     // JSX

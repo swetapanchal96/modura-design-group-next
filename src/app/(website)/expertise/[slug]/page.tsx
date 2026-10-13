@@ -1,7 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useParams } from 'next/navigation';
+import axios from 'axios';
+import DOMPurify from 'dompurify';
+import { apiUrl } from '@/app/(website)/config';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -15,143 +19,174 @@ import {
     FiArrowUpRight,
 } from 'react-icons/fi';
 
-import Breadcrumb from '../../../components/Breadcrumb';
+import Breadcrumb from '@/components/Breadcrumb';
 
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
-import autocadImage from '@/app/(website)/assets/images/autocad.jpg';
-import blog1 from '@/app/(website)/assets/images/about-1.jpg';
-import blog3 from '@/app/(website)/assets/images/about-3.jpg';
+import Link from 'next/link';
 
-const blogs = [
-    {
-        title: 'How BIM Is Transforming Modern Construction',
-        date: 'June 24, 2026',
-        image: blog1.src,
-        desc: 'Building Information Modeling (BIM) is revolutionizing the construction industry by improving project coordination, reducing errors.',
-    },
-    {
-        title: 'Future Trends In Architectural Design',
-        date: 'May 18, 2026',
-        image: blog3.src,
-        desc: 'Modern architectural design is evolving with sustainable materials, advanced technologies, and innovative planning approaches.',
-    },
-    {
-        title: 'Key Trends In Structural Engineering',
-        date: 'April 12, 2026',
-        image: blog1.src,
-        desc: 'Structural engineering is moving towards smarter solutions with advanced analysis tools, sustainable practices, and improved construction techniques.',
-    },
-];
 
 gsap.registerPlugin(ScrollTrigger);
+
+interface SoftwareFAQ {
+    id: number;
+    question: string;
+    answer: string;
+}
+
+interface RelatedBlog {
+    id: number;
+    title: string;
+    slug: string;
+    description: string;
+    imageUrl: string;
+    publishedAt: string;
+}
+
+interface SoftwareDetail {
+    id: number;
+    name: string;
+    slug: string;
+    shortDescription: string | null;
+    longDescription: string | null;
+    imageUrl: string | null;
+    faqs: SoftwareFAQ[];
+    relatedBlogs: RelatedBlog[];
+}
+
+const formatBlogDate = (date: string) => {
+    if (!date) return '';
+
+    const parsed = new Date(date);
+
+    if (Number.isNaN(parsed.getTime())) return '';
+
+    return parsed.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+    });
+};
+
+const getBlogExcerpt = (
+    html: string,
+    limit: number = 130
+) => {
+    if (!html) return '';
+
+    const text = DOMPurify.sanitize(html, {
+        ALLOWED_TAGS: [],
+        ALLOWED_ATTR: [],
+    })
+        .replace(/\u00a0/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    return text.length > limit
+        ? `${text.slice(0, limit).trimEnd()}...`
+        : text;
+};
 
 export default function SoftwareExpertise() {
     const pageRef = useRef<HTMLDivElement | null>(null);
 
     const [openFaq, setOpenFaq] = useState<number | null>(0);
 
-    /*
-    ============================================================
-        SOFTWARE DATA
-        Later this can directly come from your API.
-    ============================================================
-    */
+    const { slug } = useParams<{ slug: string }>();
 
-    const software = {
-        name: 'AutoCAD',
+    const [software, setSoftware] = useState<SoftwareDetail | null>(null);
+    const [softwareLoading, setSoftwareLoading] = useState(true);
+    const [softwareError, setSoftwareError] = useState('');
 
-        shortDescription:
-            'AutoCAD is a powerful CAD software used for creating precise 2D drawings and detailed documentation. It helps architects, engineers and designers develop accurate, industry-standard drawings for a wide range of projects.',
+    useEffect(() => {
+        if (!slug) {
+            setSoftware(null);
+            setSoftwareError('Software expertise not found.');
+            setSoftwareLoading(false);
+            return;
+        }
 
-        image: autocadImage,
+        const controller = new AbortController();
 
-        description: `
-            <h4>Professional AutoCAD Drafting Support</h4>
+        const fetchSoftwareDetail = async () => {
+            setSoftwareLoading(true);
+            setSoftwareError('');
+            setSoftware(null);
+            setOpenFaq(0);
 
-            <p>
-                Our team uses AutoCAD to create accurate, well-structured and
-                industry-compliant drawings for architectural, structural,
-                MEP and construction projects. We work with the latest drafting
-                practices to ensure clear, consistent and coordinated documentation.
-            </p>
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/softwareExpertise`,
+                    { slug },
+                    { signal: controller.signal }
+                );
 
-            <p>
-                From concept design to detailed construction drawings, we provide
-                drafting support tailored to your project needs, helping you achieve
-                better planning, smoother coordination and efficient project execution.
-            </p>
+                if (response.data?.success === true) {
+                    const data = response.data.data;
 
-            <h4>Our AutoCAD Drafting Services</h4>
+                    // Supports an array or a single object response
+                    const selectedSoftware: SoftwareDetail | null =
+                        Array.isArray(data)
+                            ? data.find(
+                                (item: SoftwareDetail) =>
+                                    item.slug === slug
+                            ) || null
+                            : data?.slug === slug
+                                ? data
+                                : null;
 
-            <p>
-                We create a wide range of drawings using AutoCAD, including:
-            </p>
+                    if (selectedSoftware) {
+                        setSoftware({
+                            ...selectedSoftware,
 
-            <ul>
-                <li>Architectural floor plans and layouts</li>
-                <li>Detailed construction drawings</li>
-                <li>Elevations and sections</li>
-                <li>Shop drawings</li>
-                <li>Structural drawings</li>
-                <li>As-built drawings</li>
-                <li>MEP drawings</li>
-                <li>Drawing updates and revisions</li>
-            </ul>
+                            faqs: Array.isArray(selectedSoftware.faqs)
+                                ? selectedSoftware.faqs
+                                : [],
 
-            <h5>Accurate Technical Documentation</h5>
+                            relatedBlogs: Array.isArray(selectedSoftware.relatedBlogs)
+                                ? selectedSoftware.relatedBlogs
+                                    .filter((blog: RelatedBlog) => blog.slug)
+                                    .sort(
+                                        (a: RelatedBlog, b: RelatedBlog) =>
+                                            new Date(b.publishedAt).getTime() -
+                                            new Date(a.publishedAt).getTime()
+                                    )
+                                    .slice(0, 3)
+                                : [],
+                        });
+                    } else {
+                        setSoftwareError(
+                            'Software expertise not found.'
+                        );
+                    }
+                } else {
+                    setSoftwareError(
+                        response.data?.message ||
+                        'Software expertise not found.'
+                    );
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error(
+                        'Software Detail API Error:',
+                        error
+                    );
 
-            <p>
-                Every drawing is prepared with attention to dimensions,
-                annotations, layers and technical information. This helps
-                maintain consistency throughout the complete drawing package.
-            </p>
+                    setSoftwareError(
+                        'Unable to load software expertise. Please try again.'
+                    );
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setSoftwareLoading(false);
+                }
+            }
+        };
 
-            <h5>Coordinated Drawing Workflow</h5>
+        fetchSoftwareDetail();
 
-            <p>
-                Our structured drafting workflow helps coordinate information
-                across project disciplines and reduces inconsistencies during
-                design development and documentation.
-            </p>
-
-            <h4>Reliable, Accurate and Industry-Standard Drawings</h4>
-
-            <p>
-                AutoCAD offers precision, flexibility and wide industry acceptance,
-                making it an essential tool for professional drafting. Our expertise
-                ensures that every drawing is prepared with appropriate layers,
-                annotation, dimensions and standards, supporting seamless
-                collaboration and timely project delivery.
-            </p>
-        `,
-
-        faqs: [
-            {
-                question:
-                    'What types of drawings can be created using AutoCAD?',
-                answer:
-                    'AutoCAD can be used to create architectural floor plans, elevations, sections, structural drawings, MEP drawings, shop drawings, construction drawings and as-built documentation.',
-            },
-            {
-                question:
-                    'Can you work from PDFs, images or hand sketches?',
-                answer:
-                    'Yes. Existing PDFs, images, sketches and other reference documents can be used as the basis for preparing accurate AutoCAD drawings.',
-            },
-            {
-                question:
-                    'Do you follow specific drafting standards?',
-                answer:
-                    'Yes. Drawings can be prepared according to project-specific drafting standards, layer structures, annotation requirements and client specifications.',
-            },
-            {
-                question:
-                    'What file formats will you provide?',
-                answer:
-                    'Depending on the project requirement, drawings can be delivered in commonly required CAD and documentation formats.',
-            },
-        ],
-    };
+        return () => controller.abort();
+    }, [slug]);
 
     /*
     ============================================================
@@ -160,6 +195,8 @@ export default function SoftwareExpertise() {
     */
 
     useLayoutEffect(() => {
+        if (!software) return;
+
         const ctx = gsap.context(() => {
             gsap.from('.software-intro-content', {
                 y: 45,
@@ -220,42 +257,59 @@ export default function SoftwareExpertise() {
         }, pageRef);
 
         return () => ctx.revert();
-    }, []);
+    }, [software]);
 
     const sectionRef = useRef(null);
-    
-        useLayoutEffect(() => {
-            const ctx = gsap.context(() => {
-                gsap.from('.blog-heading', {
-                    y: 50,
-                    opacity: 0,
-                    duration: 1,
-    
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top 80%',
-                    },
-                });
-    
-                gsap.from('.blog-card', {
-                    y: 80,
-                    opacity: 0,
-    
-                    stagger: 0.18,
-    
-                    duration: 0.8,
-    
-                    ease: 'power3.out',
-    
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: 'top 75%',
-                    },
-                });
-            }, sectionRef);
-    
-            return () => ctx.revert();
-        }, []);
+
+    useLayoutEffect(() => {
+        if (!software) return;
+        const ctx = gsap.context(() => {
+            gsap.from('.blog-heading', {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top 80%',
+                },
+            });
+
+            gsap.from('.blog-card', {
+                y: 80,
+                opacity: 0,
+
+                stagger: 0.18,
+
+                duration: 0.8,
+
+                ease: 'power3.out',
+
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top 75%',
+                },
+            });
+        }, sectionRef);
+
+        return () => ctx.revert();
+    }, [software]);
+
+    if (softwareLoading) {
+        return (
+            <div className="flex min-h-[400px] items-center justify-center bg-modura-white text-[15px] text-modura-gray-600">
+                Loading software expertise...
+            </div>
+        );
+    }
+
+    if (!software) {
+        return (
+            <div className="flex min-h-[400px] items-center justify-center bg-modura-white px-5 text-center text-[16px] text-modura-primary">
+                {softwareError || 'Software expertise is currently not available.'}
+            </div>
+        );
+    } ``
 
     return (
         <div ref={pageRef}>
@@ -580,28 +634,31 @@ export default function SoftwareExpertise() {
                                 ACTUAL IMAGE
                             ================================================= */}
 
-                            <Image
-                                src={software.image}
-                                alt={`${software.name} software expertise`}
-                                width={software.image.width}
-                                height={software.image.height}
-                                priority
-                                sizes="
-                                    (max-width: 640px) 92vw,
-                                    (max-width: 1024px) 85vw,
-                                    1200px
-                                "
-                                className="
-                                    block
-                                    h-auto
-                                    w-auto
-                                    max-w-full
-                                    object-contain
-                                    transition-transform
-                                    duration-700
-                                    hover:scale-[1.02]
-                                "
-                            />
+                            {software.imageUrl && (
+                                <Image
+                                    src={software.imageUrl}
+                                    alt={`${software.name} software expertise`}
+                                    width={1200}
+                                    height={700}
+                                    unoptimized
+                                    priority
+                                    sizes="
+                                        (max-width: 640px) 92vw,
+                                        (max-width: 1024px) 85vw,
+                                        1200px
+                                    "
+                                    className="
+                                        block
+                                        h-auto
+                                        w-auto
+                                        max-w-full
+                                        object-contain
+                                        transition-transform
+                                        duration-700
+                                        hover:scale-[1.02]
+                                    "
+                                />
+                            )}
 
                         </div>
 
@@ -741,7 +798,12 @@ export default function SoftwareExpertise() {
                             [&_li]:after:bg-modura-secondary
                         "
                         dangerouslySetInnerHTML={{
-                            __html: software.description,
+                            __html: DOMPurify.sanitize(
+                                software.longDescription || '',
+                                {
+                                    FORBID_ATTR: ['style'],
+                                }
+                            ),
                         }}
                     />
                 </div>
@@ -751,6 +813,7 @@ export default function SoftwareExpertise() {
                 FAQ
             ================================================= */}
 
+            {software.faqs.length > 0 && (
             <section
                 className="
                     software-faq
@@ -965,7 +1028,7 @@ export default function SoftwareExpertise() {
 
                             return (
                                 <div
-                                    key={index}
+                                    key={faq.id}
                                     className="
                                         border-b
                                         border-modura-gray-200
@@ -1136,12 +1199,12 @@ export default function SoftwareExpertise() {
                 </div>
 
             </section>
-
+            )}
 
             {/* =================================================
                 RELATED BLOGS / LATEST INSIGHTS
             ================================================= */}
-
+            {software.relatedBlogs.length > 0 && (
             <section
                 ref={sectionRef}
                 className="
@@ -1272,8 +1335,9 @@ export default function SoftwareExpertise() {
                                         VIEW MORE
                                     ================================================= */}
 
-                        <button
-                            type="button"
+                        <Link
+                            href="/blog"
+                            
                             className="
                                             group
                                             flex
@@ -1292,7 +1356,7 @@ export default function SoftwareExpertise() {
                                             transition-all
                                             duration-500
                                             hover:bg-modura-primary
-                                            hover:text-modura-white
+                                            hover:text-modura-white!
                                         "
                         >
 
@@ -1319,7 +1383,7 @@ export default function SoftwareExpertise() {
                                 />
                             </span>
 
-                        </button>
+                        </Link>
 
                     </div>
 
@@ -1340,10 +1404,10 @@ export default function SoftwareExpertise() {
                                     "
                     >
 
-                        {blogs.map((blog, index) => (
+                        {software.relatedBlogs.map((blog) => (
 
                             <article
-                                key={index}
+                                key={blog.id}
                                 className="
                                                 blog-card
                                                 group
@@ -1369,8 +1433,9 @@ export default function SoftwareExpertise() {
                                 >
 
                                     <Image
-                                        src={blog.image}
+                                        src={blog.imageUrl}
                                         fill
+                                        unoptimized
                                         alt={blog.title}
                                         sizes="
                                                         (max-width: 768px) 100vw,
@@ -1429,7 +1494,7 @@ export default function SoftwareExpertise() {
                                                         uppercase
                                                     "
                                     >
-                                        {blog.date}
+                                        {formatBlogDate(blog.publishedAt)}
                                     </p>
 
 
@@ -1459,7 +1524,7 @@ export default function SoftwareExpertise() {
                                                         text-modura-secondary
                                                     "
                                     >
-                                        {blog.desc}
+                                        {getBlogExcerpt(blog.description, 130)}
                                     </p>
 
 
@@ -1467,8 +1532,9 @@ export default function SoftwareExpertise() {
                                                     READ MORE
                                                 ================================================= */}
 
-                                    <button
-                                        type="button"
+                                    <Link
+                                     href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
+                                        
                                         className="
                                                         group/btn
                                                         mt-7
@@ -1522,7 +1588,7 @@ export default function SoftwareExpertise() {
                                             />
                                         </span>
 
-                                    </button>
+                                    </Link>
 
                                 </div>
 
@@ -1535,6 +1601,7 @@ export default function SoftwareExpertise() {
                 </div>
 
             </section>
+            )}
         </div>
     );
 }

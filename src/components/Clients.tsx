@@ -3,55 +3,27 @@
 import { useEffect, useRef } from 'react';
 
 import gsap from 'gsap';
+import Image from 'next/image';
 
-import skanska from '@/app/(website)/assets/images/skanska.jpg';
-import aecom from '@/app/(website)/assets/images/aecom.jpg';
-import turner from '@/app/(website)/assets/images/turner.jpg';
-import jll from '@/app/(website)/assets/images/JLL_logo.webp';
-import genster from '@/app/(website)/assets/images/Gensler-Logo.jpg';
-import stantec from '@/app/(website)/assets/images/stantec-logo.png';
+interface HomeClient {
+    id: number;
+    name: string;
+    websiteUrl: string | null;
+    imageUrl: string | null;
+}
 
-const clients = [
-    {
-        name: 'Skanska',
-        logo: skanska.src,
-    },
+interface ClientsProps {
+    clients: HomeClient[];
+}
 
-    {
-        name: 'AECOM',
-        logo: aecom.src,
-    },
-
-    {
-        name: 'Turner',
-        logo: turner.src,
-    },
-
-    {
-        name: 'JLL',
-        logo: jll.src,
-    },
-
-    {
-        name: 'Gensler',
-        logo: genster.src,
-    },
-
-    {
-        name: 'Stantec',
-        logo: stantec.src,
-    },
-];
-
-const Clients = () => {
+const Clients = ({ clients }: ClientsProps) => {
     const sliderRef = useRef<HTMLDivElement | null>(null);
-
     const animationRef = useRef<gsap.core.Tween | null>(null);
 
     useEffect(() => {
         const slider = sliderRef.current;
 
-        if (!slider) return;
+        if (!slider || clients.length === 0) return;
 
         const width = slider.scrollWidth / 2;
 
@@ -78,9 +50,12 @@ const Clients = () => {
         slider.addEventListener('mouseleave', play);
 
         return () => {
+            slider.removeEventListener('mouseenter', pause);
+            slider.removeEventListener('mouseleave', play);
             animationRef.current?.kill();
+            gsap.set(slider, { clearProps: 'transform' });
         };
-    }, []);
+    }, [clients]);
 
     return (
         <section className="bg-modura-white relative overflow-hidden py-14 lg:pb-0!">
@@ -126,14 +101,17 @@ const Clients = () => {
                                 key={index}
 
                                 className="client-logo flex h-20 w-40 items-center justify-center"
-                            >
-                                <img
-                                    src={client.logo}
-
+                            >   
+                                {client.imageUrl && (
+                                <Image
+                                    src={client.imageUrl}
                                     alt={client.name}
-
+                                    unoptimized
+                                    width={140}
+                                    height={60}
                                     className="max-h-15 max-w-35 opacity-100 grayscale-0 transition-all duration-500 hover:scale-110 hover:opacity-60 hover:grayscale"
                                 />
+                                )}
                             </div>
                         ))}
                     </div>
@@ -144,20 +122,20 @@ const Clients = () => {
                         CREATIVE NETWORK TRANSITION
                     ================================================= */}
 
-                    <div
-                        className="
+                <div
+                    className="
                             relative
                             h-[105px]
                             w-full
                             overflow-hidden
                         "
-                    >
-                        {/* =================================================
+                >
+                    {/* =================================================
                             LEFT NETWORK
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[38px]
                                 left-0
@@ -165,10 +143,10 @@ const Clients = () => {
                                 w-[calc(50%-90px)]
                                 bg-modura-primary/15
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[50px]
                                 left-[8%]
@@ -176,10 +154,10 @@ const Clients = () => {
                                 w-[calc(42%-90px)]
                                 bg-modura-secondary/25
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[62px]
                                 left-[15%]
@@ -187,15 +165,15 @@ const Clients = () => {
                                 w-[calc(35%-90px)]
                                 bg-modura-primary/10
                             "
-                        />
+                    />
 
 
-                        {/* =================================================
+                    {/* =================================================
                             LEFT CONNECTION POINTS
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[34px]
                                 left-[18%]
@@ -206,10 +184,10 @@ const Clients = () => {
                                 border-modura-primary
                                 bg-modura-white
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[46px]
                                 left-[27%]
@@ -218,10 +196,10 @@ const Clients = () => {
                                 rounded-full
                                 bg-modura-secondary
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[58px]
                                 left-[34%]
@@ -230,15 +208,15 @@ const Clients = () => {
                                 rounded-full
                                 bg-modura-primary/50
                             "
-                        />
+                    />
 
 
-                        {/* =================================================
+                    {/* =================================================
                             LEFT DIAGONAL CONNECTIONS
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[38px]
                                 left-[18%]
@@ -248,10 +226,10 @@ const Clients = () => {
                                 rotate-[58deg]
                                 bg-modura-primary/20
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[50px]
                                 left-[27%]
@@ -261,15 +239,15 @@ const Clients = () => {
                                 rotate-[55deg]
                                 bg-modura-secondary/30
                             "
-                        />
+                    />
 
 
-                        {/* =================================================
+                    {/* =================================================
                             RIGHT NETWORK
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[38px]
                                 right-0
@@ -277,10 +255,10 @@ const Clients = () => {
                                 w-[calc(50%-90px)]
                                 bg-modura-primary/15
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[50px]
                                 right-[8%]
@@ -288,10 +266,10 @@ const Clients = () => {
                                 w-[calc(42%-90px)]
                                 bg-modura-secondary/25
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[62px]
                                 right-[15%]
@@ -299,15 +277,15 @@ const Clients = () => {
                                 w-[calc(35%-90px)]
                                 bg-modura-primary/10
                             "
-                        />
+                    />
 
 
-                        {/* =================================================
+                    {/* =================================================
                             RIGHT CONNECTION POINTS
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[34px]
                                 right-[18%]
@@ -318,10 +296,10 @@ const Clients = () => {
                                 border-modura-primary
                                 bg-modura-white
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[46px]
                                 right-[27%]
@@ -330,10 +308,10 @@ const Clients = () => {
                                 rounded-full
                                 bg-modura-secondary
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[58px]
                                 right-[34%]
@@ -342,15 +320,15 @@ const Clients = () => {
                                 rounded-full
                                 bg-modura-primary/50
                             "
-                        />
+                    />
 
 
-                        {/* =================================================
+                    {/* =================================================
                             RIGHT DIAGONAL CONNECTIONS
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[38px]
                                 right-[18%]
@@ -360,10 +338,10 @@ const Clients = () => {
                                 rotate-[-58deg]
                                 bg-modura-primary/20
                             "
-                        />
+                    />
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[50px]
                                 right-[27%]
@@ -373,15 +351,15 @@ const Clients = () => {
                                 rotate-[-55deg]
                                 bg-modura-secondary/30
                             "
-                        />
+                    />
 
 
-                        {/* =================================================
+                    {/* =================================================
                             CENTER WHITE AREA
                         ================================================= */}
 
-                        <div
-                            className="
+                    <div
+                        className="
                                 absolute
                                 top-1/2
                                 left-1/2
@@ -395,14 +373,14 @@ const Clients = () => {
                                 justify-center
                                 bg-modura-white
                             "
-                        >
+                    >
 
-                            {/* =================================================
+                        {/* =================================================
                                 OUTER DIAMOND
                             ================================================= */}
 
-                            <span
-                                className="
+                        <span
+                            className="
                                     absolute
                                     h-[42px]
                                     w-[42px]
@@ -410,15 +388,15 @@ const Clients = () => {
                                     border
                                     border-modura-primary
                                 "
-                            />
+                        />
 
 
-                            {/* =================================================
+                        {/* =================================================
                                 INNER DIAMOND
                             ================================================= */}
 
-                            <span
-                                className="
+                        <span
+                            className="
                                     absolute
                                     h-[22px]
                                     w-[22px]
@@ -426,57 +404,57 @@ const Clients = () => {
                                     border
                                     border-modura-secondary
                                 "
-                            />
+                        />
 
 
-                            {/* =================================================
+                        {/* =================================================
                                 CENTER NODE
                             ================================================= */}
 
-                            <span
-                                className="
+                        <span
+                            className="
                                     absolute
                                     h-[8px]
                                     w-[8px]
                                     rounded-full
                                     bg-modura-primary
                                 "
-                            />
+                        />
 
 
-                            {/* =================================================
+                        {/* =================================================
                                 CENTER HORIZONTAL AXIS
                             ================================================= */}
 
-                            <span
-                                className="
+                        <span
+                            className="
                                     absolute
                                     left-[20px]
                                     h-px
                                     w-[110px]
                                     bg-modura-primary/25
                                 "
-                            />
+                        />
 
-                            <span
-                                className="
+                        <span
+                            className="
                                     absolute
                                     left-[20px]
                                     h-[2px]
                                     w-[32px]
                                     bg-modura-secondary
                                 "
-                            />
+                        />
 
-                        </div>
+                    </div>
 
 
-                        {/* =================================================
+                    {/* =================================================
                             TOP CENTER NODE
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-[10px]
                                 left-1/2
@@ -487,15 +465,15 @@ const Clients = () => {
                                 rounded-full
                                 bg-modura-secondary
                             "
-                        />
+                    />
 
 
-                        {/* =================================================
+                    {/* =================================================
                             CENTER VERTICAL AXIS
                         ================================================= */}
 
-                        <span
-                            className="
+                    <span
+                        className="
                                 absolute
                                 top-0
                                 left-1/2
@@ -505,9 +483,9 @@ const Clients = () => {
                                 -translate-x-1/2
                                 bg-modura-primary/10
                             "
-                        />
+                    />
 
-                    </div>
+                </div>
 
             </div>
         </section>

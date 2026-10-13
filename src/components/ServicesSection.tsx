@@ -13,40 +13,23 @@ import bimServices from '@/app/(website)/assets/images/bim-services.jpg';
 import mepEngineering from '@/app/(website)/assets/images/mep-engineering.jpg';
 import shopDrawing from '@/app/(website)/assets/images/shop-drawing.jpg';
 
-const services = [
-    {
-        title: 'CAD Drafting',
-        image: cadDrafting,
-        href: '#',
-    },
-    {
-        title: 'Architectural Engineering',
-        image: architecturalEngineering,
-        href: '#',
-    },
-    {
-        title: 'Structural Engineering',
-        image: structuralEngineering,
-        href: '#',
-    },
-    {
-        title: 'BIM Services',
-        image: bimServices,
-        href: '#',
-    },
-    {
-        title: 'MEP Engineering',
-        image: mepEngineering,
-        href: '#',
-    },
-    {
-        title: 'Shop Drawing',
-        image: shopDrawing,
-        href: '#',
-    },
-];
+export interface HomeService {
+    id: number;
+    title: string;
+    slug: string;
+    shortDescription: string | null;
+    imageUrl: string | null;
+}
 
-const ServicesSection = () => {
+interface ServicesSectionProps {
+    services: HomeService[];
+    loading: boolean;
+}
+
+const ServicesSection = ({
+    services,
+    loading,
+}: ServicesSectionProps) => {
     const sectionRef = useRef<HTMLElement | null>(null);
 
     const [isVisible, setIsVisible] = useState(false);
@@ -115,17 +98,15 @@ const ServicesSection = () => {
                     ============================================== */}
 
                     <div
-                        className={`transition-all duration-1000 ease-out ${
-                            isVisible ? 'translate-x-0 opacity-100' : '-translate-x-12 opacity-0'
-                        } `}
+                        className={`transition-all duration-1000 ease-out ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-12 opacity-0'
+                            } `}
                     >
                         {/* EYEBROW */}
 
                         <div className="mb-3 flex items-center gap-3">
                             <span
-                                className={`bg-modura-secondary h-[2px] transition-all delay-300 duration-700 ${
-                                    isVisible ? 'w-8' : 'w-0'
-                                } `}
+                                className={`bg-modura-secondary h-[2px] transition-all delay-300 duration-700 ${isVisible ? 'w-8' : 'w-0'
+                                    } `}
                             />
 
                             <span className="text-modura-secondary text-[10px] font-bold tracking-[0.25em] uppercase sm:text-[11px]">
@@ -148,12 +129,11 @@ const ServicesSection = () => {
                     ============================================== */}
 
                     <div
-                        className={`transition-all delay-200 duration-1000 ease-out ${
-                            isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
-                        } `}
+                        className={`transition-all delay-200 duration-1000 ease-out ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
+                            } `}
                     >
                         <Link
-                            href="#"
+                            href="/services"
                             className="group/services-btn border-modura-primary bg-modura-white text-modura-primary relative inline-flex h-[52px] w-fit items-center overflow-hidden border pr-[62px] pl-5"
                         >
                             {/* NAVY HOVER FILL */}
@@ -192,70 +172,84 @@ const ServicesSection = () => {
                 ====================================================== */}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                    {services.map((service, index) => (
-                        <Link
-                            key={service.title}
-                            href={service.href}
-                            style={{
-                                transitionDelay: isVisible ? `${250 + index * 120}ms` : '0ms',
-                            }}
-                            className={`group/service-card border-modura-gray-200 bg-modura-primary relative block overflow-hidden border transition-all duration-700 ease-out xl:border-r-0 xl:last:border-r ${
-                                isVisible ? 'translate-y-0 opacity-100' : 'translate-y-14 opacity-0'
-                            } `}
-                        >
-                            {/* =========================================
+                    {loading ? (
+                        <div className="col-span-full py-12 text-center text-[14px] text-modura-gray-600">
+                            Loading services...
+                        </div>
+                    ) : services.length === 0 ? (
+                        <div className="col-span-full py-12 text-center">
+                            <p className="text-[16px] font-semibold text-modura-primary">
+                                Services are currently not available.
+                            </p>
+                        </div>
+                    ) : (
+
+                        services.slice(0, 6).map((service, index) => (
+                            <Link
+                                key={service.id}
+                                href={`/servicedetail/${encodeURIComponent(service.slug)}`}
+                                style={{
+                                    transitionDelay: isVisible ? `${250 + index * 120}ms` : '0ms',
+                                }}
+                                className={`group/service-card border-modura-gray-200 bg-modura-primary relative block overflow-hidden border transition-all duration-700 ease-out xl:border-r-0 xl:last:border-r ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-14 opacity-0'
+                                    } `}
+                            >
+                                {/* =========================================
                                 IMAGE
                             ========================================== */}
 
-                            <div className="relative h-[280px] overflow-hidden sm:h-[300px] lg:h-[300px] xl:h-[270px] 2xl:h-[290px]">
-                                <Image
-                                    src={service.image}
-                                    alt={service.title}
-                                    fill
+                                <div className="relative h-[280px] overflow-hidden sm:h-[300px] lg:h-[300px] xl:h-[270px] 2xl:h-[290px]">
+                                    {service.imageUrl && (
+                                        <Image
+                                            src={service.imageUrl}
+                                            alt={service.title}
+                                            fill
+                                            unoptimized
+                                            className="object-cover transition-transform duration-700 ease-out group-hover/service-card:scale-[1.07]"
+                                        />
+                                    )}
 
-                                    className="object-cover transition-transform duration-700 ease-out group-hover/service-card:scale-[1.07]"
-                                />
+                                    {/* IMAGE DARK GRADIENT */}
 
-                                {/* IMAGE DARK GRADIENT */}
+                                    <span className="from-modura-primary/80 via-modura-primary/5 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent" />
 
-                                <span className="from-modura-primary/80 via-modura-primary/5 pointer-events-none absolute inset-0 bg-gradient-to-t to-transparent" />
-
-                                {/* =====================================
+                                    {/* =====================================
                                     HOVER TOP LINE
                                 ====================================== */}
 
-                                <span className="bg-modura-secondary absolute top-0 left-0 z-10 h-[4px] w-0 transition-all duration-500 group-hover/service-card:w-full" />
+                                    <span className="bg-modura-secondary absolute top-0 left-0 z-10 h-[4px] w-0 transition-all duration-500 group-hover/service-card:w-full" />
 
-                                {/* =====================================
+                                    {/* =====================================
                                     IMAGE HOVER SIDE DETAIL
                                 ====================================== */}
 
-                                <span className="bg-modura-white/70 absolute top-4 right-4 z-10 h-0 w-px transition-all delay-100 duration-500 group-hover/service-card:h-12" />
+                                    <span className="bg-modura-white/70 absolute top-4 right-4 z-10 h-0 w-px transition-all delay-100 duration-500 group-hover/service-card:h-12" />
 
-                                <span className="bg-modura-white/70 absolute top-4 right-4 z-10 h-px w-0 transition-all delay-100 duration-500 group-hover/service-card:w-12" />
+                                    <span className="bg-modura-white/70 absolute top-4 right-4 z-10 h-px w-0 transition-all delay-100 duration-500 group-hover/service-card:w-12" />
 
-                                {/* =====================================
+                                    {/* =====================================
                                     BOTTOM PANEL
                                 ====================================== */}
 
-                                <div className="bg-modura-primary text-modura-white absolute bottom-0 left-0 z-20 flex w-full items-stretch">
-                                    {/* TITLE */}
+                                    <div className="bg-modura-primary text-modura-white absolute bottom-0 left-0 z-20 flex w-full items-stretch">
+                                        {/* TITLE */}
 
-                                    <div className="flex min-h-[72px] flex-1 items-center px-4 py-4 xl:px-3 2xl:px-4">
-                                        <h3 className="text-modura-white text-[13px] leading-[1.35] font-semibold transition-transform duration-300 group-hover/service-card:translate-x-1 lg:text-[14px] xl:text-[13px] 2xl:text-[14px]">
-                                            {service.title}
-                                        </h3>
-                                    </div>
+                                        <div className="flex min-h-[72px] flex-1 items-center px-4 py-4 xl:px-3 2xl:px-4">
+                                            <h3 className="text-modura-white text-[13px] leading-[1.35] font-semibold transition-transform duration-300 group-hover/service-card:translate-x-1 lg:text-[14px] xl:text-[13px] 2xl:text-[14px]">
+                                                {service.title}
+                                            </h3>
+                                        </div>
 
-                                    {/* ARROW */}
+                                        {/* ARROW */}
 
-                                    <div className="border-modura-primary-light group-hover/service-card:bg-modura-secondary relative flex w-[48px] shrink-0 items-center justify-center overflow-hidden border-l transition-colors duration-300">
-                                        <FiArrowRight className="text-modura-white relative z-10 text-[17px] transition-transform duration-300 group-hover/service-card:translate-x-1" />
+                                        <div className="border-modura-primary-light group-hover/service-card:bg-modura-secondary relative flex w-[48px] shrink-0 items-center justify-center overflow-hidden border-l transition-colors duration-300">
+                                            <FiArrowRight className="text-modura-white relative z-10 text-[17px] transition-transform duration-300 group-hover/service-card:translate-x-1" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Link>
-                    ))}
+                            </Link>
+                        ))
+                    )}
                 </div>
 
                 {/* =====================================================
@@ -264,15 +258,13 @@ const ServicesSection = () => {
 
                 <div className="mt-5 hidden items-center overflow-hidden lg:flex">
                     <span
-                        className={`bg-modura-secondary h-[3px] transition-all delay-700 duration-700 ${
-                            isVisible ? 'w-[45px]' : 'w-0'
-                        } `}
+                        className={`bg-modura-secondary h-[3px] transition-all delay-700 duration-700 ${isVisible ? 'w-[45px]' : 'w-0'
+                            } `}
                     />
 
                     <span
-                        className={`bg-modura-gray-200 h-px transition-all delay-700 duration-1000 ${
-                            isVisible ? 'flex-1 opacity-100' : 'w-0 opacity-0'
-                        } `}
+                        className={`bg-modura-gray-200 h-px transition-all delay-700 duration-1000 ${isVisible ? 'flex-1 opacity-100' : 'w-0 opacity-0'
+                            } `}
                     />
                 </div>
             </div>
@@ -281,8 +273,8 @@ const ServicesSection = () => {
     SERVICES → PROJECTS
 ================================================= */}
 
-<div
-    className="
+            <div
+                className="
         relative
         flex
         h-[90px]
@@ -292,13 +284,13 @@ const ServicesSection = () => {
         overflow-hidden
         lg:h-[90px]
     "
->
-    {/* =================================================
+            >
+                {/* =================================================
         LEFT SHORT STRUCTURAL LINE
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             left-[8%]
             top-1/2
@@ -306,14 +298,14 @@ const ServicesSection = () => {
             w-[18%]
             bg-modura-primary/20
         "
-    />
+                />
 
-    {/* =================================================
+                {/* =================================================
         LEFT ACCENT LINE
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             left-[22%]
             top-1/2
@@ -322,14 +314,14 @@ const ServicesSection = () => {
             -translate-y-1/2
             bg-modura-primary
         "
-    />
+                />
 
-    {/* =================================================
+                {/* =================================================
         LEFT VERTICAL STRUCTURE
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             left-[30%]
             top-[30px]
@@ -337,14 +329,14 @@ const ServicesSection = () => {
             w-px
             bg-modura-primary/40
         "
-    />
+                />
 
-    {/* =================================================
+                {/* =================================================
         LEFT DIAGONAL
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             left-[30%]
             top-[59px]
@@ -354,15 +346,15 @@ const ServicesSection = () => {
             rotate-[55deg]
             bg-modura-secondary/50
         "
-    />
+                />
 
 
-    {/* =================================================
+                {/* =================================================
         RIGHT SHORT STRUCTURAL LINE
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             right-[8%]
             top-1/2
@@ -370,14 +362,14 @@ const ServicesSection = () => {
             w-[18%]
             bg-modura-primary/20
         "
-    />
+                />
 
-    {/* =================================================
+                {/* =================================================
         RIGHT ACCENT LINE
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             right-[22%]
             top-1/2
@@ -386,14 +378,14 @@ const ServicesSection = () => {
             -translate-y-1/2
             bg-modura-primary
         "
-    />
+                />
 
-    {/* =================================================
+                {/* =================================================
         RIGHT VERTICAL STRUCTURE
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             right-[30%]
             top-[30px]
@@ -401,14 +393,14 @@ const ServicesSection = () => {
             w-px
             bg-modura-primary/40
         "
-    />
+                />
 
-    {/* =================================================
+                {/* =================================================
         RIGHT DIAGONAL
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             right-[30%]
             top-[59px]
@@ -418,15 +410,15 @@ const ServicesSection = () => {
             rotate-[-55deg]
             bg-modura-secondary/50
         "
-    />
+                />
 
 
-    {/* =================================================
+                {/* =================================================
         CENTER ARCHITECTURAL NODE
     ================================================= */}
 
-    <div
-        className="
+                <div
+                    className="
             relative
             z-10
             flex
@@ -436,12 +428,12 @@ const ServicesSection = () => {
             justify-center
             bg-modura-off-white
         "
-    >
+                >
 
-        {/* Outer diamond */}
+                    {/* Outer diamond */}
 
-        <span
-            className="
+                    <span
+                        className="
                 absolute
                 h-[28px]
                 w-[28px]
@@ -449,41 +441,41 @@ const ServicesSection = () => {
                 border
                 border-modura-primary
             "
-        />
+                    />
 
-        {/* Inner diamond */}
+                    {/* Inner diamond */}
 
-        <span
-            className="
+                    <span
+                        className="
                 absolute
                 h-[12px]
                 w-[12px]
                 rotate-45
                 bg-modura-primary
             "
-        />
+                    />
 
-        {/* Accent point */}
+                    {/* Accent point */}
 
-        <span
-            className="
+                    <span
+                        className="
                 absolute
                 h-[4px]
                 w-[4px]
                 rounded-full
                 bg-modura-secondary
             "
-        />
+                    />
 
-    </div>
+                </div>
 
 
-    {/* =================================================
+                {/* =================================================
         CENTER HORIZONTAL AXIS
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             left-1/2
             top-1/2
@@ -497,15 +489,15 @@ const ServicesSection = () => {
 
             lg:w-[180px]
         "
-    />
+                />
 
 
-    {/* =================================================
+                {/* =================================================
         SMALL TECHNICAL NODES
     ================================================= */}
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             left-[calc(50%-100px)]
             top-1/2
@@ -519,10 +511,10 @@ const ServicesSection = () => {
 
             lg:left-[calc(50%-150px)]
         "
-    />
+                />
 
-    <span
-        className="
+                <span
+                    className="
             absolute
             right-[calc(50%-100px)]
             top-1/2
@@ -536,9 +528,9 @@ const ServicesSection = () => {
 
             lg:right-[calc(50%-150px)]
         "
-    />
+                />
 
-</div>
+            </div>
         </section>
     );
 };
