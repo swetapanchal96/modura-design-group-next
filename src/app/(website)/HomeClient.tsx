@@ -66,6 +66,7 @@ interface HomePortfolio {
     coverUrl: string | null;
 }
 
+
 export default function Home() {
 
     const [homeData, setHomeData] = useState<{
@@ -85,6 +86,8 @@ export default function Home() {
     });
 
     const [homeLoading, setHomeLoading] = useState(true);
+
+
 
     useEffect(() => {
         const controller = new AbortController();
@@ -140,10 +143,15 @@ export default function Home() {
             }
         };
 
+        
+
         fetchHomeData();
+        
 
         return () => controller.abort();
     }, []);
+
+
 
     return (
         <>
