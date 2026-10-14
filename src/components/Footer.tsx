@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLayoutEffect, useRef } from 'react';
-
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import axios from 'axios';
+import { apiUrl } from '@/app/(website)/config';
 import { FiPhone, FiMail, FiMapPin, FiArrowUpRight, FiArrowUp } from 'react-icons/fi';
 
 import { FaLinkedinIn, FaInstagram, FaFacebookF } from 'react-icons/fa6';
@@ -15,62 +16,94 @@ import logo from '@/app/(website)/assets/images/modura-logo.jpeg';
 
 gsap.registerPlugin(ScrollTrigger);
 
+interface FooterService {
+    id: number;
+    title: string;
+    slug: string;
+}
+
 const quickLinks = [
     {
-        name: 'About Us',
-        link: '#',
+        name: 'Company',
+        link: '/company',
     },
     {
-        name: 'Portfolio',
-        link: '#',
-    },
-    {
-        name: 'Software expertise',
-        link: '#',
+        name: 'Career',
+        link: '/career',
     },
     {
         name: 'Blog',
-        link: '#',
+        link: '/blog',
     },
     {
         name: 'Contact Us',
-        link: '#',
+        link: '/contact',
     },
     {
         name: 'Inquiry',
-        link: '#',
+        link: '/inquiry',
     },
 ];
 
-const services = [
-    {
-        name: 'Architecture Design',
-        link: '/services/architecture-design',
-    },
-    {
-        name: 'Structural Engineering',
-        link: '/services/structural-engineering',
-    },
-    {
-        name: 'BIM Services',
-        link: '/services/bim-services',
-    },
-    {
-        name: 'MEP Services',
-        link: '/services/mep-services',
-    },
-    {
-        name: 'CAD Drafting',
-        link: '/services/cad-drafting',
-    },
-    {
-        name: 'Project Management',
-        link: '/services/project-management',
-    },
-];
+
 
 const Footer = () => {
     const footerRef = useRef<HTMLDivElement | null>(null);
+
+    // service api
+
+    const [services, setServices] = useState<FooterService[]>([]);
+
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchFooterServices = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/services`,
+                    {
+                        category: '',
+                    },
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (controller.signal.aborted) return;
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data?.data)
+                ) {
+                    const latestServices: FooterService[] = [
+                        ...response.data.data,
+                    ]
+                        .sort(
+                            (a: FooterService, b: FooterService) =>
+                                b.id - a.id
+                        )
+                        .slice(0, 6);
+
+                    setServices(latestServices);
+                } else {
+                    setServices([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Footer Services API Error:', error);
+
+                    if (!controller.signal.aborted) {
+                        setServices([]);
+                    }
+                }
+            }
+        };
+
+        fetchFooterServices();
+
+        return () => controller.abort();
+    }, []);
+
 
     useLayoutEffect(() => {
         if (!footerRef.current) return;
@@ -216,15 +249,15 @@ const Footer = () => {
                         <div className="grid grid-cols-1 gap-3">
                             {services.map((service) => (
                                 <Link
-                                    key={service.name}
+                                    key={service.id}
 
-                                    href={service.link}
+                                    href={`/servicedetail/${encodeURIComponent(service.slug)}`}
 
                                     className="service-link group text-modura-gray-300 flex items-center gap-2 text-[14px] transition-all duration-300 hover:text-white"
                                 >
                                     <FiArrowUpRight className="text-modura-secondary-light text-[12px] opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100" />
 
-                                    {service.name}
+                                    {service.title}
                                 </Link>
                             ))}
                         </div>

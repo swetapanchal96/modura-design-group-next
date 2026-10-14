@@ -2,7 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+import { apiUrl } from '@/app/(website)/config';
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -27,139 +30,22 @@ import careerImage from '@/app/(website)/assets/images/about-1.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* =========================================================
-   OPEN POSITIONS
-========================================================= */
-
-const positions = [
-    {
-        title: 'Senior Architect',
-        department: 'Architecture',
-        location: 'Ahmedabad / Hybrid',
-        type: 'Full Time',
-
-        description:
-            'We are looking for candidates with strong knowledge of architectural design to support international and offshore projects. The ideal candidate should be comfortable working with architectural BIM models, drawings and project documentation.',
-
-        skills: [
-            'Good knowledge of architectural design and BIM workflows.',
-            'Knowledge of AutoCAD will be an added advantage.',
-            'Experience working with architectural BIM projects.',
-            'Understanding of architectural drawings and documentation.',
-            'Ability to coordinate with project teams and other disciplines.',
-        ],
-
-        responsibilities: [
-            'Develop and manage architectural BIM models.',
-            'Create detailed architectural components including walls, floors, doors and families.',
-            'Prepare accurate construction drawings and documentation.',
-            'Coordinate architectural information with engineering disciplines.',
-        ],
-
-        qualification:
-            'B.Arch, Diploma in Architecture or ITI Draftsman with good technical knowledge.',
-
-        experience: '2+ Years',
-
-        vacancy: '02',
-    },
-
-    {
-        title: 'BIM Engineer',
-        department: 'BIM Solutions',
-        location: 'Ahmedabad / Hybrid',
-        type: 'Full Time',
-
-        description:
-            'We are looking for a BIM professional who can contribute to the development and coordination of digital building models for architecture and engineering projects. The candidate should have a strong understanding of BIM workflows and project documentation.',
-
-        skills: [
-            'Good knowledge of BIM modelling and coordination workflows.',
-            'Experience with Revit and BIM-based project delivery.',
-            'Understanding of architectural and engineering drawings.',
-            'Knowledge of BIM standards and documentation.',
-            'Ability to coordinate with multidisciplinary project teams.',
-        ],
-
-        responsibilities: [
-            'Develop and maintain accurate BIM models.',
-            'Coordinate models between architecture and engineering disciplines.',
-            'Prepare BIM documentation and project deliverables.',
-            'Identify and communicate model coordination issues.',
-        ],
-
-        qualification:
-            'Diploma / Degree in Architecture, Civil Engineering or a related technical field.',
-
-        experience: '1–3 Years',
-
-        vacancy: '03',
-    },
-
-    {
-        title: 'Structural Engineer',
-        department: 'Structural Engineering',
-        location: 'Ahmedabad / Hybrid',
-        type: 'Full Time',
-
-        description:
-            'We are looking for a structural engineering professional to support the development and coordination of structural design projects. The ideal candidate should understand structural drawings, engineering documentation and multidisciplinary coordination.',
-
-        skills: [
-            'Strong understanding of structural engineering principles.',
-            'Good knowledge of structural drawings and detailing.',
-            'Experience with structural design and documentation.',
-            'Knowledge of BIM coordination will be an advantage.',
-            'Ability to work with architects and other engineering disciplines.',
-        ],
-
-        responsibilities: [
-            'Prepare and coordinate structural engineering drawings.',
-            'Support structural design and documentation activities.',
-            'Coordinate structural information with architectural and MEP teams.',
-            'Review drawings and identify coordination requirements.',
-        ],
-
-        qualification:
-            'B.E. / B.Tech / Diploma in Civil or Structural Engineering.',
-
-        experience: '2+ Years',
-
-        vacancy: '02',
-    },
-
-    {
-        title: 'Steel Detailer',
-        department: 'Steel Detailing',
-        location: 'Ahmedabad / Hybrid',
-        type: 'Full Time',
-
-        description:
-            'We are looking for a skilled steel detailing professional to work on structural steel projects and produce accurate fabrication and construction documentation. The candidate should have a strong understanding of steel structures and detailing practices.',
-
-        skills: [
-            'Good understanding of structural steel detailing.',
-            'Knowledge of steel fabrication and construction drawings.',
-            'Experience with steel detailing software and workflows.',
-            'Ability to read and understand structural drawings.',
-            'Strong attention to dimensions, connections and detailing accuracy.',
-        ],
-
-        responsibilities: [
-            'Prepare detailed structural steel fabrication drawings.',
-            'Develop accurate steel models and construction documentation.',
-            'Coordinate steel detailing with structural design information.',
-            'Review drawings for accuracy and fabrication requirements.',
-        ],
-
-        qualification:
-            'Diploma / Degree in Civil Engineering or relevant technical qualification.',
-
-        experience: '2+ Years',
-
-        vacancy: '02',
-    },
-];
+interface CareerPosition {
+    id: number;
+    jobTitle: string;
+    slug: string;
+    department: string;
+    experience: string;
+    location: string;
+    jobType: string;
+    openings: number;
+    salaryRange: string | null;
+    lastDate: string | null;
+    description: string | null;
+    requirements: string | null;
+    skills: string | null;
+    status: boolean;
+}
 
 /* =========================================================
    WHY MODURA
@@ -187,9 +73,78 @@ const benefits = [
    CAREER PAGE
 ========================================================= */
 
+function stripHtml(html: string | null): string {
+    if (!html) return '';
+
+    return html
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function splitLines(value: string | null): string[] {
+    if (!value) return [];
+
+    return value
+        .split(/\r?\n/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+}
+
 export default function Career() {
     const [resume, setResume] = useState<File | null>(null);
+    const router = useRouter();
+    const [positions, setPositions] = useState<CareerPosition[]>([]);
+    const [selectedCareerId, setSelectedCareerId] = useState<number | null>(null);
+
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        experience: '',
+        currentCtc: '',
+        expectedCtc: '',
+        noticePeriod: '',
+        portfolioLink: '',
+        coverLetter: '',
+        careerId: '',
+    });
+
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [loadingPositions, setLoadingPositions] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+
     const sectionRef = useRef<HTMLDivElement | null>(null);
+
+    // career api 
+    useEffect(() => {
+        const fetchCareers = async () => {
+            try {
+                setLoadingPositions(true);
+
+                const response = await axios.post(
+                    `${apiUrl}/careers`,
+                    {}
+                );
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data?.data)
+                ) {
+                    setPositions(response.data.data);
+                } else {
+                    setPositions([]);
+                }
+            } catch (error) {
+                console.error('Careers API Error:', error);
+                setPositions([]);
+            } finally {
+                setLoadingPositions(false);
+            }
+        };
+
+        fetchCareers();
+    }, []);
 
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
@@ -283,6 +238,173 @@ export default function Career() {
 
         return () => ctx.revert();
     }, []);
+
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+
+        if (!formData.name.trim()) {
+            newErrors.name = 'Name is required.';
+        } else if (formData.name.trim().length < 2) {
+            newErrors.name = 'Please enter a valid name.';
+        }
+
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required.';
+        } else if (
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+        ) {
+            newErrors.email = 'Please enter a valid email address.';
+        }
+
+        if (!formData.phone.trim()) {
+            newErrors.phone = 'Phone number is required.';
+        } else if (!/^[0-9]{1,15}$/.test(formData.phone)) {
+            newErrors.phone =
+                'Phone number must contain maximum 15 digits.';
+        }
+
+        if (!formData.experience.trim()) {
+            newErrors.experience = 'Experience is required.';
+        }
+
+        if (!formData.currentCtc.trim()) {
+            newErrors.currentCtc = 'Current CTC is required.';
+        } else if (!/^\d+(\.\d+)?$/.test(formData.currentCtc)) {
+            newErrors.currentCtc = 'Enter a valid CTC.';
+        }
+
+        if (!formData.expectedCtc.trim()) {
+            newErrors.expectedCtc = 'Expected CTC is required.';
+        } else if (!/^\d+(\.\d+)?$/.test(formData.expectedCtc)) {
+            newErrors.expectedCtc = 'Enter a valid CTC.';
+        }
+
+        if (!formData.noticePeriod.trim()) {
+            newErrors.noticePeriod =
+                'Notice period is required.';
+        }
+
+        if (
+            formData.portfolioLink.trim() &&
+            !/^https?:\/\/.+/i.test(formData.portfolioLink)
+        ) {
+            newErrors.portfolioLink =
+                'Enter a valid portfolio URL.';
+        }
+
+        if (!formData.coverLetter.trim()) {
+            newErrors.coverLetter =
+                'Cover letter is required.';
+        }
+
+        if (!formData.careerId) {
+            newErrors.careerId =
+                'Please select a position.';
+        }
+
+        if (!resume) {
+            newErrors.resume =
+                'Please upload your resume.';
+        }
+
+        setErrors(newErrors);
+
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        // console.log("SUBMIT BUTTON CLICKED");
+
+        const isValid = validateForm();
+
+        // console.log("FORM VALID:", isValid);/
+        // console.log("FORM DATA:", formData);
+        // console.log("RESUME:", resume);
+
+        if (!isValid) {
+            console.log("FORM VALIDATION FAILED");
+            return;
+        }
+
+        try {
+            setSubmitting(true);
+
+            const data = new FormData();
+
+            data.append('careerId', formData.careerId);
+            data.append('name', formData.name.trim());
+            data.append('email', formData.email.trim());
+            data.append('phone', formData.phone.trim());
+            data.append('experience', formData.experience.trim());
+            data.append('currentCtc', formData.currentCtc.trim());
+            data.append('expectedCtc', formData.expectedCtc.trim());
+            data.append('noticePeriod', formData.noticePeriod.trim());
+            data.append('portfolioLink', formData.portfolioLink.trim());
+            data.append('coverLetter', formData.coverLetter.trim());
+
+            if (resume) {
+                data.append('resume', resume);
+            }
+
+            // console.log("SENDING API REQUEST");
+
+            const response = await axios.post(
+                `${apiUrl}/careers/apply`,
+                data
+            );
+
+            // console.log("API RESPONSE:", response.data);
+
+            if (response.data?.success === true) {
+                router.push('/thankyou/apply');
+
+                setFormData({
+                    name: '',
+                    email: '',
+                    phone: '',
+                    experience: '',
+                    currentCtc: '',
+                    expectedCtc: '',
+                    noticePeriod: '',
+                    portfolioLink: '',
+                    coverLetter: '',
+                    careerId: '',
+                });
+
+                setSelectedCareerId(null);
+                setResume(null);
+                setErrors({});
+            } else {
+                alert(
+                    response.data?.message ||
+                    'Unable to submit application.'
+                );
+            }
+
+        } catch (error) {
+            console.error("APPLICATION API ERROR:", error);
+
+            if (axios.isAxiosError(error)) {
+                console.error(
+                    "API ERROR RESPONSE:",
+                    error.response?.data
+                );
+
+                alert(
+                    error.response?.data?.message ||
+                    'Something went wrong while submitting your application.'
+                );
+            } else {
+                alert(
+                    'Something went wrong while submitting your application.'
+                );
+            }
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
     return (
         <>
@@ -567,7 +689,7 @@ export default function Career() {
                         </div>
 
 
-                        
+
                     </div>
                 </section>
 
@@ -851,7 +973,7 @@ export default function Career() {
                                         gap-3
                                     "
                                 >
-           
+
                                     <span
                                         className="
                                             text-[13px]
@@ -906,10 +1028,13 @@ export default function Career() {
 
                         <div className="space-y-8">
 
-                            {positions.map((position) => (
-                                <article
-                                    key={position.title}
-                                    className="
+                            {positions.map((position) => {
+                                const skills = splitLines(position.requirements);
+                                const responsibilities = splitLines(position.skills);
+                                return (
+                                    <article
+                                        key={position.id}
+                                        className="
                                         career-job
                                         group
                                         overflow-hidden
@@ -921,14 +1046,14 @@ export default function Career() {
                                         hover:border-modura-secondary
                                         hover:shadow-[0_18px_50px_rgba(11,29,51,0.06)]
                                     "
-                                >
+                                    >
 
-                                    {/* =================================================
+                                        {/* =================================================
                                         JOB HEADER
                                     ================================================= */}
 
-                                    <div
-                                        className="
+                                        <div
+                                            className="
                                             relative
                                             border-b
                                             border-modura-gray-200
@@ -938,12 +1063,12 @@ export default function Career() {
                                             md:px-8
                                             md:py-7
                                         "
-                                    >
+                                        >
 
-                                        {/* TOP ACCENT */}
+                                            {/* TOP ACCENT */}
 
-                                        <span
-                                            className="
+                                            <span
+                                                className="
                                                 absolute
                                                 top-0
                                                 left-0
@@ -954,10 +1079,10 @@ export default function Career() {
                                                 duration-500
                                                 group-hover:w-28
                                             "
-                                        />
+                                            />
 
-                                        <div
-                                            className="
+                                            <div
+                                                className="
                                                 flex
                                                 flex-col
                                                 gap-5
@@ -966,13 +1091,13 @@ export default function Career() {
                                                 md:items-center
                                                 md:justify-between
                                             "
-                                        >
+                                            >
 
-                                            {/* TITLE */}
+                                                {/* TITLE */}
 
-                                            <div>
-                                                <h3
-                                                    className="
+                                                <div>
+                                                    <h3
+                                                        className="
                                                         text-[23px]
                                                         leading-tight
                                                         font-bold
@@ -980,12 +1105,12 @@ export default function Career() {
 
                                                         md:text-[26px]
                                                     "
-                                                >
-                                                    {position.title}
-                                                </h3>
+                                                    >
+                                                        {position.jobTitle}
+                                                    </h3>
 
-                                                <p
-                                                    className="
+                                                    <p
+                                                        className="
                                                         mt-2
                                                         text-[13px]
                                                         font-bold
@@ -993,80 +1118,86 @@ export default function Career() {
                                                         text-modura-secondary
                                                         uppercase
                                                     "
-                                                >
-                                                    {position.department}
-                                                </p>
-                                            </div>
+                                                    >
+                                                        {position.department}
+                                                    </p>
+                                                </div>
 
 
-                                            {/* JOB META */}
+                                                {/* JOB META */}
 
-                                            <div
-                                                className="
+                                                <div
+                                                    className="
                                                     flex
                                                     flex-wrap
                                                     items-center
                                                     gap-x-7
                                                     gap-y-3
                                                 "
-                                            >
+                                                >
 
-                                                <div
-                                                    className="
+                                                    <div
+                                                        className="
                                                         flex
                                                         items-center
                                                         gap-2
                                                         text-[14px]
                                                         text-modura-gray-600
                                                     "
-                                                >
-                                                    <FiMapPin
-                                                        size={15}
-                                                        className="text-modura-secondary"
-                                                    />
+                                                    >
+                                                        <FiMapPin
+                                                            size={15}
+                                                            className="text-modura-secondary"
+                                                        />
 
-                                                    {position.location}
-                                                </div>
+                                                        {position.location}
+                                                    </div>
 
-                                                <div
-                                                    className="
+                                                    <div
+                                                        className="
                                                         h-4
                                                         w-px
                                                         bg-modura-gray-300
                                                     "
-                                                />
+                                                    />
 
-                                                <span
-                                                    className="
-                                                        text-[13px]
-                                                        font-bold
-                                                        tracking-[0.15em]
-                                                        text-modura-secondary
-                                                        uppercase
-                                                    "
-                                                >
-                                                    {position.type}
-                                                </span>
+                                                    <span
+                                                        className="
+                                                            text-[13px]
+                                                            font-bold
+                                                            tracking-[0.15em]
+                                                            text-modura-secondary
+                                                            uppercase
+                                                        "
+                                                    >
+                                                        {position.jobType === 'full_time'
+                                                            ? 'Full Time'
+                                                            : position.jobType === 'part_time'
+                                                                ? 'Part Time'
+                                                                : position.jobType === 'internship'
+                                                                    ? 'Internship'
+                                                                    : position.jobType}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
 
-                                    {/* =================================================
+                                        {/* =================================================
                                         DESCRIPTION
                                     ================================================= */}
 
-                                    <div
-                                        className="
+                                        <div
+                                            className="
                                             px-6
                                             py-5
 
                                             md:px-8
                                             md:py-6
                                         "
-                                    >
-                                        <p
-                                            className="
+                                        >
+                                            <p
+                                                className="
                                                 max-w-[1000px]
                                                 text-[14px]
                                                 leading-6
@@ -1074,19 +1205,19 @@ export default function Career() {
 
                                                 md:text-[15px]
                                             "
-                                        >
-                                            {position.description}
-                                        </p>
+                                            >
+                                                {stripHtml(position.description)}
+                                            </p>
 
 
-                                        {/* =================================================
+                                            {/* =================================================
                                                 SKILLS + RESPONSIBILITIES
                                             ================================================= */}
 
-                                            {(position.skills?.length > 0 ||
-                                                position.responsibilities?.length > 0) && (
-                                                <div
-                                                    className="
+                                            {(skills?.length > 0 ||
+                                                responsibilities?.length > 0) && (
+                                                    <div
+                                                        className="
                                                         mt-8
                                                         grid
                                                         gap-8
@@ -1097,52 +1228,51 @@ export default function Career() {
                                                         md:grid-cols-2
                                                         md:gap-10
                                                     "
-                                                >
+                                                    >
 
-                                                    {/* =================================================
+                                                        {/* =================================================
                                                         KEY SKILLS
                                                     ================================================= */}
 
-                                                    {position.skills?.length > 0 && (
-                                                        <div
-                                                            className={`
-                                                                ${
-                                                                    position.responsibilities?.length > 0
+                                                        {skills?.length > 0 && (
+                                                            <div
+                                                                className={`
+                                                                ${responsibilities?.length > 0
                                                                         ? `
                                                                             md:border-r
                                                                             md:border-modura-gray-200
                                                                             md:pr-10
                                                                         `
                                                                         : ''
-                                                                }
+                                                                    }
                                                             `}
-                                                        >
-                                                            <h4
-                                                                className="
+                                                            >
+                                                                <h4
+                                                                    className="
                                                                     text-[16px]
                                                                     font-bold
                                                                     tracking-[0.18em]
                                                                     text-modura-primary
                                                                     uppercase
                                                                 "
-                                                            >
-                                                                Key Skills
-                                                            </h4>
+                                                                >
+                                                                    Key Skills
+                                                                </h4>
 
-                                                            <ul
-                                                                className="
+                                                                <ul
+                                                                    className="
                                                                     mt-2
                                                                     space-y-3
                                                                 "
-                                                            >
-                                                                {position.skills.map(
-                                                                    (
-                                                                        skill: string,
-                                                                        skillIndex: number,
-                                                                    ) => (
-                                                                        <li
-                                                                            key={skillIndex}
-                                                                            className="
+                                                                >
+                                                                    {skills.map(
+                                                                        (
+                                                                            skill: string,
+                                                                            skillIndex: number,
+                                                                        ) => (
+                                                                            <li
+                                                                                key={skillIndex}
+                                                                                className="
                                                                                 flex
                                                                                 items-start
                                                                                 gap-3
@@ -1151,60 +1281,60 @@ export default function Career() {
                                                                                 text-modura-gray-600
                                                                                 mb-0
                                                                             "
-                                                                        >
-                                                                            <span
-                                                                                className="
+                                                                            >
+                                                                                <span
+                                                                                    className="
                                                                                     mt-[9px]
                                                                                     h-[5px]
                                                                                     w-[5px]
                                                                                     shrink-0
                                                                                     bg-modura-secondary
                                                                                 "
-                                                                            />
+                                                                                />
 
-                                                                            <span>
-                                                                                {skill}
-                                                                            </span>
-                                                                        </li>
-                                                                    ),
-                                                                )}
-                                                            </ul>
-                                                        </div>
-                                                    )}
+                                                                                <span>
+                                                                                    {skill}
+                                                                                </span>
+                                                                            </li>
+                                                                        ),
+                                                                    )}
+                                                                </ul>
+                                                            </div>
+                                                        )}
 
 
-                                                    {/* =================================================
+                                                        {/* =================================================
                                                         RESPONSIBILITIES
                                                     ================================================= */}
 
-                                                    {position.responsibilities?.length > 0 && (
-                                                        <div>
-                                                            <h4
-                                                                className="
+                                                        {responsibilities?.length > 0 && (
+                                                            <div>
+                                                                <h4
+                                                                    className="
                                                                     text-[16px]
                                                                     font-bold
                                                                     tracking-[0.18em]
                                                                     text-modura-primary
                                                                     uppercase
                                                                 "
-                                                            >
-                                                                Responsibilities
-                                                            </h4>
+                                                                >
+                                                                    Responsibilities
+                                                                </h4>
 
-                                                            <ul
-                                                                className="
+                                                                <ul
+                                                                    className="
                                                                     mt-2
                                                                     space-y-3
                                                                 "
-                                                            >
-                                                                {position.responsibilities.map(
-                                                                    (
-                                                                        responsibility: string,
-                                                                        responsibilityIndex: number,
-                                                                    ) => (
-                                                                        <li
-                                                                            key={responsibilityIndex}
-                                                                            className="
+                                                                >
+                                                                    {responsibilities.map(
+                                                                        (
+                                                                            responsibility: string,
+                                                                            responsibilityIndex: number,
+                                                                        ) => (
+                                                                            <li
+                                                                                key={responsibilityIndex}
+                                                                                className="
                                                                                 flex
                                                                                 items-start
                                                                                 gap-3
@@ -1213,35 +1343,35 @@ export default function Career() {
                                                                                 text-modura-gray-600
                                                                                 mb-0
                                                                             "
-                                                                        >
-                                                                            <span
-                                                                                className="
+                                                                            >
+                                                                                <span
+                                                                                    className="
                                                                                     mt-[9px]
                                                                                     h-[5px]
                                                                                     w-[5px]
                                                                                     shrink-0
                                                                                     bg-modura-secondary
                                                                                 "
-                                                                            />
+                                                                                />
 
-                                                                            <span>
-                                                                                {responsibility}
-                                                                            </span>
-                                                                        </li>
-                                                                    ),
-                                                                )}
-                                                            </ul>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
+                                                                                <span>
+                                                                                    {responsibility}
+                                                                                </span>
+                                                                            </li>
+                                                                        ),
+                                                                    )}
+                                                                </ul>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
 
-                                        {/* =================================================
+                                            {/* =================================================
                                             BOTTOM INFORMATION
                                         ================================================= */}
 
-                                        <div
-                                            className="
+                                            <div
+                                                className="
                                                 mt-8
                                                 flex
                                                 flex-col
@@ -1254,113 +1384,169 @@ export default function Career() {
                                                 md:items-end
                                                 md:justify-between
                                             "
-                                        >
-
-                                            {/* INFORMATION */}
-
-                                            <div
-                                                className="
-                                                    grid
-                                                    gap-6
-
-                                                    sm:grid-cols-3
-                                                    sm:gap-10
-                                                "
                                             >
 
-                                                {/* QUALIFICATION */}
+                                                {/* INFORMATION */}
 
-                                                <div>
-                                                    <p
-                                                        className="
+                                                <div
+                                                    className="
+                                                        grid
+                                                        flex-1
+                                                        grid-cols-2
+                                                        gap-6
+                                                        sm:grid-cols-4
+                                                        sm:gap-8
+                                                    "
+                                                >
+                                                    {/* EXPERIENCE */}
+
+                                                    <div>
+                                                        <p
+                                                            className="
                                                             text-[15px]
                                                             font-bold
                                                             tracking-[0.2em]
                                                             text-modura-secondary
                                                             uppercase
                                                         "
-                                                    >
-                                                        Qualification
-                                                    </p>
+                                                        >
+                                                            Experience
+                                                        </p>
 
-                                                    <p
-                                                        className="
-                                                            mt-2
-                                                            max-w-[190px]
-                                                            text-[13px]
-                                                            leading-4
-                                                            text-modura-gray-600
-                                                        "
-                                                    >
-                                                        {position.qualification}
-                                                    </p>
-                                                </div>
-
-
-                                                {/* EXPERIENCE */}
-
-                                                <div>
-                                                    <p
-                                                        className="
-                                                            text-[15px]
-                                                            font-bold
-                                                            tracking-[0.2em]
-                                                            text-modura-secondary
-                                                            uppercase
-                                                        "
-                                                    >
-                                                        Experience
-                                                    </p>
-
-                                                    <p
-                                                        className="
+                                                        <p
+                                                            className="
                                                             mt-2
                                                             text-[13px]
                                                             leading-5
                                                             text-modura-gray-600
                                                         "
-                                                    >
-                                                        {position.experience}
-                                                    </p>
-                                                </div>
+                                                        >
+                                                            {position.experience}
+                                                        </p>
+                                                    </div>
 
 
-                                                {/* VACANCY */}
+                                                    {/* VACANCY */}
 
-                                                <div>
-                                                    <p
-                                                        className="
+                                                    <div>
+                                                        <p
+                                                            className="
                                                             text-[15px]
                                                             font-bold
                                                             tracking-[0.2em]
                                                             text-modura-secondary
                                                             uppercase
                                                         "
-                                                    >
-                                                        No. Of Vacancy
-                                                    </p>
+                                                        >
+                                                            No. Of Vacancy
+                                                        </p>
 
-                                                    <p
-                                                        className="
+                                                        <p
+                                                            className="
                                                             mt-2
                                                             text-[13px]
                                                             leading-5
                                                             text-modura-gray-600
                                                         "
-                                                    >
-                                                        {position.vacancy}
-                                                    </p>
+                                                        >
+                                                            {position.openings}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* SALARY */}
+
+                                                    <div>
+                                                        <p
+                                                            className="
+                                                                text-[15px]
+                                                                font-bold
+                                                                tracking-[0.2em]
+                                                                text-modura-secondary
+                                                                uppercase
+                                                            "
+                                                        >
+                                                            Salary Range
+                                                        </p>
+
+                                                        <p
+                                                            className="
+                                                                    mt-2
+                                                                    text-[13px]
+                                                                    leading-5
+                                                                    text-modura-gray-600
+                                                                "
+                                                        >
+                                                            {position.salaryRange
+                                                                ? `₹${position.salaryRange.replace('-', ' - ₹')}`
+                                                                : 'Not Disclosed'}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* LAST DATE */}
+
+                                                    <div>
+                                                        <p
+                                                            className="
+                                                                text-[15px]
+                                                                font-bold
+                                                                tracking-[0.2em]
+                                                                text-modura-secondary
+                                                                uppercase
+                                                            "
+                                                        >
+                                                            Last Date
+                                                        </p>
+
+                                                        <p
+                                                            className="
+                                                                mt-2
+                                                                text-[13px]
+                                                                leading-5
+                                                                text-modura-gray-600
+                                                            "
+                                                        >
+                                                            {position.lastDate
+                                                                ? new Date(position.lastDate).toLocaleDateString(
+                                                                    'en-IN',
+                                                                    {
+                                                                        day: '2-digit',
+                                                                        month: 'short',
+                                                                        year: 'numeric',
+                                                                    }
+                                                                )
+                                                                : 'Not Specified'}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                            </div>
 
 
-                                            {/* =================================================
+                                                {/* =================================================
                                                 APPLY BUTTON
                                             ================================================= */}
 
-                                            <Link
-                                                href="#application"
-                                                className="
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setSelectedCareerId(position.id);
+
+                                                        setFormData((prev) => ({
+                                                            ...prev,
+                                                            careerId: String(position.id),
+                                                        }));
+
+                                                        setErrors((prev) => ({
+                                                            ...prev,
+                                                            careerId: '',
+                                                        }));
+
+                                                        document
+                                                            .getElementById('application')
+                                                            ?.scrollIntoView({
+                                                                behavior: 'smooth',
+                                                                block: 'start',
+                                                            });
+                                                    }}
+                                                    className="
                                                     group/apply
                                                     border-modura-primary
                                                     bg-modura-white
@@ -1376,12 +1562,12 @@ export default function Career() {
                                                     pr-[62px]
                                                     pl-5
                                                 "
-                                            >
+                                                >
 
-                                                {/* PRIMARY FILL */}
+                                                    {/* PRIMARY FILL */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         bg-modura-primary
                                                         absolute
                                                         inset-y-0
@@ -1391,12 +1577,12 @@ export default function Career() {
                                                         duration-500
                                                         group-hover/apply:w-full
                                                     "
-                                                />
+                                                    />
 
-                                                {/* TOP LINE */}
+                                                    {/* TOP LINE */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         bg-modura-secondary
                                                         absolute
                                                         top-0
@@ -1408,21 +1594,21 @@ export default function Career() {
                                                         duration-500
                                                         group-hover/apply:w-full
                                                     "
-                                                />
+                                                    />
 
-                                                {/* TECHNICAL MARK */}
+                                                    {/* TECHNICAL MARK */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         relative
                                                         z-10
                                                         mr-3
                                                         flex
                                                         items-center
                                                     "
-                                                >
-                                                    <span
-                                                        className="
+                                                    >
+                                                        <span
+                                                            className="
                                                             bg-modura-secondary
                                                             group-hover/apply:bg-modura-white
                                                             h-[5px]
@@ -1431,13 +1617,13 @@ export default function Career() {
                                                             transition-colors
                                                             duration-300
                                                         "
-                                                    />
-                                                </span>
+                                                        />
+                                                    </span>
 
-                                                {/* TEXT */}
+                                                    {/* TEXT */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         group-hover/apply:text-modura-white
                                                         relative
                                                         z-10
@@ -1449,14 +1635,14 @@ export default function Career() {
                                                         transition-colors
                                                         duration-300
                                                     "
-                                                >
-                                                    Apply Now
-                                                </span>
+                                                    >
+                                                        Apply Now
+                                                    </span>
 
-                                                {/* ARROW */}
+                                                    {/* ARROW */}
 
-                                                <span
-                                                    className="
+                                                    <span
+                                                        className="
                                                         bg-modura-primary
                                                         text-modura-white
                                                         group-hover/apply:bg-modura-secondary
@@ -1472,21 +1658,22 @@ export default function Career() {
                                                         transition-colors
                                                         duration-300
                                                     "
-                                                >
-                                                    <FiArrowUpRight
-                                                        className="
+                                                    >
+                                                        <FiArrowUpRight
+                                                            className="
                                                             text-[18px]
                                                             transition-transform
                                                             duration-300
                                                             group-hover/apply:rotate-45
                                                         "
-                                                    />
-                                                </span>
-                                            </Link>
+                                                        />
+                                                    </span>
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
-                                </article>
-                            ))}
+                                    </article>
+                                )
+                            })}
                         </div>
                     </div>
                 </section>
@@ -1533,7 +1720,7 @@ export default function Career() {
                                         gap-3
                                     "
                                 >
-                                    
+
                                     <span
                                         className="
                                             text-[13px]
@@ -1625,7 +1812,11 @@ export default function Career() {
                                 APPLICATION FORM
                             ================================================= */}
 
-                            <form className="grid gap-6">
+                            <form
+                                noValidate
+                                className="grid gap-6"
+                                onSubmit={handleSubmit}
+                            >
 
                                 {/* =================================================
                                     NAME + EMAIL
@@ -1656,6 +1847,18 @@ export default function Career() {
                                         <input
                                             type="text"
                                             placeholder="Your full name"
+                                            value={formData.name}
+                                            onChange={(e) => {
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    name: e.target.value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    name: '',
+                                                }));
+                                            }}
                                             className="
                                                 h-14
                                                 w-full
@@ -1674,6 +1877,11 @@ export default function Career() {
                                                 focus:ring-modura-secondary/20
                                             "
                                         />
+                                        {errors.name && (
+                                            <p className="mt-1 text-xs text-red-600">
+                                                {errors.name}
+                                            </p>
+                                        )}
                                     </div>
 
 
@@ -1695,6 +1903,18 @@ export default function Career() {
                                         <input
                                             type="email"
                                             placeholder="Your email address"
+                                            value={formData.email}
+                                            onChange={(e) => {
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    email: e.target.value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    email: '',
+                                                }));
+                                            }}
                                             className="
                                                 h-14
                                                 w-full
@@ -1713,6 +1933,11 @@ export default function Career() {
                                                 focus:ring-modura-secondary/20
                                             "
                                         />
+                                        {errors.email && (
+                                            <p className="mt-1 text-xs text-red-600">
+                                                {errors.email}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -1745,6 +1970,23 @@ export default function Career() {
 
                                         <input
                                             type="tel"
+                                            value={formData.phone}
+                                            maxLength={15}
+                                            onChange={(e) => {
+                                                const value = e.target.value
+                                                    .replace(/\D/g, '')
+                                                    .slice(0, 15);
+
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    phone: value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    phone: '',
+                                                }));
+                                            }}
                                             placeholder="Your phone number"
                                             className="
                                                 h-14
@@ -1764,6 +2006,11 @@ export default function Career() {
                                                 focus:ring-modura-secondary/20
                                             "
                                         />
+                                        {errors.phone && (
+                                            <p className="mt-1 text-xs text-red-600">
+                                                {errors.phone}
+                                            </p>
+                                        )}
                                     </div>
 
 
@@ -1785,6 +2032,18 @@ export default function Career() {
                                         <input
                                             type="text"
                                             placeholder="e.g. 3 years"
+                                            value={formData.experience}
+                                            onChange={(e) => {
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    experience: e.target.value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    experience: '',
+                                                }));
+                                            }}
                                             className="
                                                 h-14
                                                 w-full
@@ -1839,7 +2098,18 @@ export default function Career() {
                                         />
 
                                         <select
-                                            defaultValue=""
+                                            value={formData.careerId}
+                                            onChange={(e) => {
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    careerId: e.target.value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    careerId: '',
+                                                }));
+                                            }}
                                             className="
                                                 h-14
                                                 w-full
@@ -1868,13 +2138,19 @@ export default function Career() {
 
                                             {positions.map((position) => (
                                                 <option
-                                                    key={position.title}
-                                                    value={position.title}
+                                                    key={position.id}
+                                                    value={position.id}
                                                 >
-                                                    {position.title}
+                                                    {position.jobTitle}
                                                 </option>
                                             ))}
                                         </select>
+
+                                        {errors.careerId && (
+                                            <p className="mt-1 text-xs text-red-600">
+                                                {errors.careerId}
+                                            </p>
+                                        )}
 
                                         <span
                                             className="
@@ -1933,7 +2209,24 @@ export default function Career() {
 
                                         <input
                                             type="text"
+                                            inputMode="numeric"
+                                            maxLength={6}
                                             placeholder="Enter current CTC"
+                                            value={formData.currentCtc}
+                                            onChange={(e) => {
+                                                const value = e.target.value
+                                                    .replace(/\D/g, '');
+
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    currentCtc: value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    currentCtc: '',
+                                                }));
+                                            }}
                                             className="
                                                 h-14
                                                 w-full
@@ -1972,7 +2265,24 @@ export default function Career() {
 
                                         <input
                                             type="text"
+                                            maxLength={6}
+                                            inputMode="numeric"
                                             placeholder="Enter expected CTC"
+                                            value={formData.expectedCtc}
+                                            onChange={(e) => {
+                                                const value = e.target.value
+                                                    .replace(/\D/g, '');
+
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    expectedCtc: value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    expectedCtc: '',
+                                                }));
+                                            }}
                                             className="
                                                 h-14
                                                 w-full
@@ -2026,6 +2336,18 @@ export default function Career() {
                                                 type="number"
                                                 min="0"
                                                 placeholder="Enter notice period in months"
+                                                value={formData.noticePeriod}
+                                                onChange={(e) => {
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        noticePeriod: e.target.value,
+                                                    }));
+
+                                                    setErrors((prev) => ({
+                                                        ...prev,
+                                                        noticePeriod: '',
+                                                    }));
+                                                }}
                                                 className="
                                                     h-14
                                                     w-full
@@ -2045,7 +2367,7 @@ export default function Career() {
                                                 "
                                             />
 
-                                            
+
                                         </div>
                                     </div>
 
@@ -2068,6 +2390,18 @@ export default function Career() {
                                         <input
                                             type="url"
                                             placeholder="https://yourportfolio.com"
+                                            value={formData.portfolioLink}
+                                            onChange={(e) => {
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    portfolioLink: e.target.value,
+                                                }));
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    portfolioLink: '',
+                                                }));
+                                            }}
                                             className="
                                                 h-14
                                                 w-full
@@ -2110,6 +2444,18 @@ export default function Career() {
                                     <textarea
                                         rows={7}
                                         placeholder="Tell us about yourself, your experience, expertise and why you would be a good fit for this position..."
+                                        value={formData.coverLetter}
+                                        onChange={(e) => {
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                coverLetter: e.target.value,
+                                            }));
+
+                                            setErrors((prev) => ({
+                                                ...prev,
+                                                coverLetter: '',
+                                            }));
+                                        }}
                                         className="
                                             w-full
                                             resize-none
@@ -2230,10 +2576,9 @@ export default function Career() {
                                                     transition-all
                                                     duration-300
 
-                                                    ${
-                                                        resume
-                                                            ? 'border-modura-primary bg-modura-primary text-modura-white'
-                                                            : 'border-modura-secondary text-modura-secondary group-hover:bg-modura-primary group-hover:text-modura-white'
+                                                    ${resume
+                                                        ? 'border-modura-primary bg-modura-primary text-modura-white'
+                                                        : 'border-modura-secondary text-modura-secondary group-hover:bg-modura-primary group-hover:text-modura-white'
                                                     }
                                                 `}
                                             >
@@ -2323,19 +2668,49 @@ export default function Career() {
 
                                                 if (!file) return;
 
-                                                const maxSize = 2 * 1024 * 1024; // 2 MB
+                                                const allowedTypes = [
+                                                    'application/pdf',
+                                                    'application/msword',
+                                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                                ];
+
+                                                const maxSize = 2 * 1024 * 1024;
+
+                                                if (!allowedTypes.includes(file.type)) {
+                                                    alert(
+                                                        'Only PDF, DOC or DOCX files are allowed.'
+                                                    );
+
+                                                    e.target.value = '';
+                                                    setResume(null);
+                                                    return;
+                                                }
 
                                                 if (file.size > maxSize) {
-                                                    alert('File size must be less than 2 MB.');
+                                                    alert(
+                                                        'File size must be less than 2 MB.'
+                                                    );
+
                                                     e.target.value = '';
                                                     setResume(null);
                                                     return;
                                                 }
 
                                                 setResume(file);
+
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    resume: '',
+                                                }));
                                             }}
                                         />
                                     </label>
+
+                                    {errors.resume && (
+                                        <p className="mt-1 text-xs text-red-600">
+                                            {errors.resume}
+                                        </p>
+                                    )}
                                 </div>
 
 
@@ -2346,6 +2721,7 @@ export default function Career() {
                                 <div className="pt-2">
                                     <button
                                         type="submit"
+                                        disabled={submitting}
                                         className="
                                             group
                                             border-modura-primary
@@ -2433,7 +2809,9 @@ export default function Career() {
                                                 duration-300
                                             "
                                         >
-                                            Submit Application
+                                            {submitting
+                                                ? 'Submitting...'
+                                                : 'Submit Application'}
                                         </span>
 
                                         {/* ARROW */}
