@@ -248,3 +248,51 @@ export async function generateSeoMetadata(
     },
   };
 }
+
+
+export interface BlogDetailSeo {
+  id: number;
+  title: string;
+  slug: string;
+  description: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  headScript: string | null;
+  bodyScript: string | null;
+  imageUrl: string | null;
+  publishedAt: string | null;
+}
+
+export async function getBlogDetailSeo(
+  slug: string
+): Promise<BlogDetailSeo | null> {
+  if (!slug) return null;
+
+  try {
+    const response = await fetch(`${API_BASE}/blogDetail`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ slug }),
+
+      next: {
+        revalidate: 60,
+        tags: [`blog-seo-${slug}`],
+      },
+    });
+
+    if (!response.ok) return null;
+
+    const result = await response.json();
+
+    if (!result.success || !result.data) {
+      return null;
+    }
+
+    return result.data as BlogDetailSeo;
+  } catch (error) {
+    console.error("Blog Detail SEO API Error:", error);
+    return null;
+  }
+}

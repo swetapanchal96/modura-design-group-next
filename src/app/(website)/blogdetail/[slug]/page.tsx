@@ -1,723 +1,264 @@
-'use client';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import DOMPurify from 'dompurify';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useParams } from 'next/navigation';
-import axios from 'axios';
-import { apiUrl } from '@/app/(website)/config';
+import type { Metadata } from "next";
+
+import BlogDetailClient from "./BlogDetailClient";
+
 import {
-    FiArrowUpRight,
-    FiCalendar,
-} from 'react-icons/fi';
+  getBlogDetailSeo,
+} from "@/lib/seo";
+import BlogDetailJsonLd from "@/components/BlogDetailJsonLd";
 
-import Breadcrumb from '../../../../components/Breadcrumb';
-import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
-
-
-gsap.registerPlugin(ScrollTrigger);
-
-interface RelatedBlog {
-    id: number;
-    title: string;
+type PageProps = {
+  params: Promise<{
     slug: string;
-    imageUrl: string;
-    publishedAt: string;
-}
-
-interface BlogDetailData {
-    id: number;
-    title: string;
-    slug: string;
-    description: string;
-    imageUrl: string;
-    publishedAt: string;
-    recent: RelatedBlog[];
-}
-
-const formatBlogDate = (date: string) => {
-    if (!date) return '';
-
-    return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: '2-digit',
-    });
+  }>;
 };
 
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://modura-design-group-next.vercel.app"
+).replace(/\/+$/, "");
 
+// Convert HTML description into plain text
+function stripHtml(value?: string | null): string {
+  if (!value) return "";
 
-/* =========================================================
-   BLOG DETAIL
-========================================================= */
+  return value
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-export default function BlogDetail() {
-    const sectionRef = useRef<HTMLDivElement | null>(null);
+// Extract HTML attribute safely
+function getAttribute(
+  tag: string,
+  attribute: string
+): string | undefined {
+  const match = tag.match(
+    new RegExp(
+      `\\b${attribute}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`,
+      "i"
+    )
+  );
 
-    const params = useParams<{ slug: string }>();
+  return match?.[1] ?? match?.[2];
+}
 
-    const slug = params.slug;
+// Extract meta tag content from headScript
+function getMetaContent(
+  html: string,
+  key: string,
+  value: string
+): string | undefined {
+  const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
 
-    const [currentBlog, setCurrentBlog] = useState<BlogDetailData | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+  for (const tag of tags) {
+    if (
+      getAttribute(tag, key)?.toLowerCase() ===
+      value.toLowerCase()
+    ) {
+      return getAttribute(tag, "content");
+    }
+  }
 
-    const relatedBlogs = currentBlog?.recent ?? [];
+  return undefined;
+}
 
-    useLayoutEffect(() => {
+// Extract canonical URL
+function getCanonical(
+  html: string
+): string | undefined {
+  const links = html.match(/<link\b[^>]*>/gi) ?? [];
 
-        if (!currentBlog) return;
+  for (const link of links) {
+    if (
+      getAttribute(link, "rel")?.toLowerCase() ===
+      "canonical"
+    ) {
+      return getAttribute(link, "href");
+    }
+  }
 
-        const ctx = gsap.context(() => {
-            /* =============================================
-               HEADER
-            ============================================= */
+  return undefined;
+}
 
-            gsap.fromTo(
-                '.detail-heading',
-                {
-                    y: 45,
-                    opacity: 0,
-                },
-                {
-                    y: 0,
-                    opacity: 1,
-                    duration: 0.9,
-                    ease: 'power3.out',
-                },
-            );
+// Validate absolute or relative URL
+function validUrl(
+  value?: string | null
+): string | undefined {
+  if (!value) return undefined;
 
-            /* =============================================
-               HERO IMAGE
-            ============================================= */
+  try {
+    const url = new URL(value, SITE_URL);
 
-            gsap.fromTo(
-                '.detail-hero-image',
-                {
-                    y: 50,
-                    opacity: 0,
-                },
-                {
-                    y: 0,
-                    opacity: 1,
-                    duration: 1,
-                    delay: 0.15,
-                    ease: 'power3.out',
-                },
-            );
-
-            /* =============================================
-               LEFT CONTENT
-            ============================================= */
-
-            gsap.fromTo(
-                '.detail-content',
-                {
-                    y: 50,
-                    opacity: 0,
-                },
-                {
-                    y: 0,
-                    opacity: 1,
-                    duration: 0.9,
-                    delay: 0.25,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: '.detail-content',
-                        start: 'top 85%',
-                        once: true,
-                    },
-                },
-            );
-
-            /* =============================================
-               RIGHT SIDEBAR
-            ============================================= */
-
-            gsap.fromTo(
-                '.related-sidebar',
-                {
-                    x: 40,
-                    opacity: 0,
-                },
-                {
-                    x: 0,
-                    opacity: 1,
-                    duration: 0.9,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: '.related-sidebar',
-                        start: 'top 85%',
-                        once: true,
-                    },
-                },
-            );
-
-            /* =============================================
-               RELATED CARDS
-            ============================================= */
-
-            gsap.fromTo(
-                '.related-card',
-                {
-                    y: 25,
-                    opacity: 0,
-                },
-                {
-                    y: 0,
-                    opacity: 1,
-                    duration: 0.7,
-                    stagger: 0.12,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: '.related-sidebar',
-                        start: 'top 80%',
-                        once: true,
-                    },
-                },
-            );
-        }, sectionRef);
-
-        return () => ctx.revert();
-    }, [currentBlog]);
-
-    useEffect(() => {
-        if (!slug) return;
-
-        const controller = new AbortController();
-
-        const fetchBlogDetail = async () => {
-            setLoading(true);
-            setError('');
-            setCurrentBlog(null);
-
-            try {
-                const response = await axios.post(
-                    `${apiUrl}/blogDetail`,
-                    {
-                        slug: slug,
-                    },
-                    {
-                        signal: controller.signal,
-                    }
-                );
-
-                if (response.data.success && response.data.data) {
-                    setCurrentBlog(response.data.data);
-                } else {
-                    setError('Blog not found.');
-                }
-            } catch (error) {
-                if (!axios.isCancel(error)) {
-                    console.error('Blog Detail API Error:', error);
-                    setError('Unable to load blog details.');
-                }
-            } finally {
-                if (!controller.signal.aborted) {
-                    setLoading(false);
-                }
-            }
-        };
-
-        fetchBlogDetail();
-
-        return () => controller.abort();
-    }, [slug]);
-
-    if (loading) {
-        return <div className="min-h-screen bg-modura-white" />;
+    if (
+      !["https:", "http:"].includes(url.protocol)
+    ) {
+      return undefined;
     }
 
-    if (error || !currentBlog) {
-        return (
-            <div className="min-h-screen py-20 text-center">
-                {error || 'Blog not found.'}
-            </div>
-        );
-    }
+    return url.href;
+  } catch {
+    return undefined;
+  }
+}
 
-    return (
-        <>
-            {/* =================================================
-                BREADCRUMB
-            ================================================= */}
+// Refresh data every 60 seconds
+export const revalidate = 60;
 
-            <Breadcrumb
-                title="Blog"
-                image={breadcrumb.src}
-                breadcrumbs={[
-                    {
-                        label: 'Home',
-                        href: '/',
-                    },
-                    {
-                        label: 'Blog',
-                        href: '/blog',
-                    },
-                    {
-                        label: currentBlog.title,
-                    },
-                ]}
-            />
+// Dynamic metadata for each blog
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
 
-            {/* =================================================
-                BLOG DETAIL SECTION
-            ================================================= */}
+  const blog = await getBlogDetailSeo(slug);
 
-            <section
-                ref={sectionRef}
-                className="
-                    relative
-                    overflow-hidden
-                    bg-modura-white
-                    py-16
-                    md:py-20
-                    lg:py-14
-                "
-            >
-                {/* =================================================
-                    SUBTLE BACKGROUND
-                ================================================= */}
+  if (!blog) {
+    return {
+      title: "Blog Not Found | Modura Design Group",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
 
-                <div
-                    className="
-                        pointer-events-none
-                        absolute
-                        inset-0
-                        bg-[url('/images/blueprint-bg.png')]
-                        bg-cover
-                        opacity-[0.035]
-                    "
-                />
+  const head = blog.headScript || "";
 
-                {/* =================================================
-                    MAIN CONTAINER
-                ================================================= */}
+  const title =
+    stripHtml(blog.metaTitle) ||
+    blog.title ||
+    "Modura Design Group";
 
-                <div
-                    className="
-                        relative
-                        mx-auto
-                        max-w-[1300px]
-                        px-5
-                        md:px-8
-                    "
-                >
-                    {/* =================================================
-                        BLOG HEADER
-                    ================================================= */}
+  const description =
+    stripHtml(blog.metaDescription) ||
+    stripHtml(blog.description).slice(0, 160);
 
-                    <div
-                        className="
-                            detail-heading
-                            max-w-[1050px]
-                        "
-                    >
-                        {/* JOURNAL */}
+  const fallbackUrl = new URL(
+    `/blogdetail/${encodeURIComponent(slug)}`,
+    SITE_URL
+  ).href;
 
-                        <div
-                            className="
-                                mb-2
-                                flex
-                                items-center
-                                gap-3
-                            "
-                        >
+  const canonical =
+    validUrl(getCanonical(head)) ||
+    fallbackUrl;
 
+  const ogTitle =
+    getMetaContent(head, "property", "og:title") ||
+    title;
 
-                            <span
-                                className="
-                                    text-[12px]
-                                    font-bold
-                                    tracking-[0.34em]
-                                    text-modura-secondary
-                                    uppercase
-                                "
-                            >
-                                MODURA JOURNAL
-                            </span>
-                        </div>
+  const ogDescription =
+    getMetaContent(
+      head,
+      "property",
+      "og:description"
+    ) || description;
 
-                        {/* TITLE */}
+  const ogImage =
+    validUrl(
+      getMetaContent(
+        head,
+        "property",
+        "og:image"
+      )
+    ) || validUrl(blog.imageUrl);
 
-                        <h1
-                            className="
-                                max-w-[1050px]
-                                text-[40px]
-                                leading-[1.02]
-                                font-bold
-                                tracking-[-0.035em]
-                                text-modura-primary
+  const twitterImage =
+    validUrl(
+      getMetaContent(
+        head,
+        "name",
+        "twitter:image"
+      )
+    ) || ogImage;
 
-                                md:text-[54px]
+  return {
+    metadataBase: new URL(SITE_URL),
 
-                                lg:text-[60px]
-                            "
-                        >
-                            {currentBlog.title}
-                        </h1>
+    title,
+    description,
 
-                        {/* DATE */}
+    alternates: {
+      canonical,
+    },
 
-                        <div
-                            className="
-                                mt-3
-                                flex
-                                items-center
-                                gap-3
-                            "
-                        >
-                            <FiCalendar
-                                size={15}
-                                className="text-modura-secondary"
-                            />
+    openGraph: {
+      type: "article",
+      title: ogTitle,
+      description: ogDescription,
+      url:
+        validUrl(
+          getMetaContent(
+            head,
+            "property",
+            "og:url"
+          )
+        ) || canonical,
 
-                            <span
-                                className="
-                                    text-[11px]
-                                    font-semibold
-                                    tracking-[0.18em]
-                                    text-modura-secondary
-                                    uppercase
-                                "
-                            >
-                                {formatBlogDate(currentBlog.publishedAt)}
-                            </span>
-                        </div>
-                    </div>
+      ...(blog.publishedAt
+        ? {
+            publishedTime: blog.publishedAt,
+          }
+        : {}),
 
-                    {/* =================================================
-                        MAIN IMAGE
-                    ================================================= */}
+      ...(ogImage
+        ? {
+            images: [
+              {
+                url: ogImage,
+                alt:
+                  getMetaContent(
+                    head,
+                    "property",
+                    "og:image:alt"
+                  ) || blog.title,
+              },
+            ],
+          }
+        : {}),
+    },
 
-                    <div
-                        className="
-                            detail-hero-image
-                            relative
-                            mx-auto
-                            mt-12
-                            h-[360px]
-                            max-w-[1250px]
-                            overflow-hidden
+    twitter: {
+      card: "summary_large_image",
 
-                            md:h-[500px]
+      title:
+        getMetaContent(
+          head,
+          "name",
+          "twitter:title"
+        ) || title,
 
-                            lg:h-[600px]
-                        "
-                    >
-                        <Image
-                            src={currentBlog.imageUrl}
-                            alt={currentBlog.title}
-                            fill
-                            priority
-                            sizes="100vw"
-                            className="object-cover"
-                        />
+      description:
+        getMetaContent(
+          head,
+          "name",
+          "twitter:description"
+        ) || description,
 
-                        {/* BOTTOM DETAIL */}
+      ...(twitterImage
+        ? {
+            images: [twitterImage],
+          }
+        : {}),
+    },
+  };
+}
 
-                        <div
-                            className="
-                                absolute
-                                bottom-0
-                                left-0
-                                h-[5px]
-                                w-full
-                                bg-modura-secondary
-                            "
-                        />
+// Blog detail server page
+export default async function BlogDetailPage({
+  params,
+}: PageProps) {
+  const { slug } = await params;
 
-                        <div
-                            className="
-                                absolute
-                                bottom-0
-                                left-0
-                                h-[5px]
-                                w-[120px]
-                                bg-modura-primary
-                            "
-                        />
-                    </div>
-
-                    {/* =================================================
-                        70 / 30 LAYOUT
-                    ================================================= */}
-
-                    <div
-                        className="
-                            mt-16
-                            grid
-                            grid-cols-1
-                            items-start
-                            gap-12
-
-                            lg:grid-cols-[minmax(0,7fr)_minmax(280px,3fr)]
-                            lg:gap-16
-                        "
-                    >
-                        {/* =================================================
-                            LEFT — 70%
-                            ONLY THIS AREA SCROLLS
-                        ================================================= */}
-
-                        <article
-                            className="
-                                detail-content
-                                min-w-0
-
-                                lg:max-h-[750px]
-                                lg:overflow-y-auto
-                                lg:pr-6
-
-                                [&::-webkit-scrollbar]:w-[0px]
-                                [&::-webkit-scrollbar-track]:bg-modura-gray-100
-                                [&::-webkit-scrollbar-thumb]:rounded-full
-                                [&::-webkit-scrollbar-thumb]:bg-modura-secondary
-                                [&::-webkit-scrollbar-thumb]:hover:bg-modura-primary
-                            "
-                        >
-                            <div
-                                className="
-                                    max-w-full
-                                    text-modura-gray-600
-
-                                    [&_p]:mt-5
-                                    [&_p]:text-[15px]
-                                    [&_p]:leading-6
-                                    [&_p]:text-modura-gray-600
-
-                                    [&_p:first-child]:mt-0
-
-                                    [&_h3]:mt-12
-                                    [&_h3]:text-[27px]
-                                    [&_h3]:leading-tight
-                                    [&_h3]:font-bold
-                                    [&_h3]:text-modura-primary
-                                    md:[&_h3]:text-[32px]
-
-                                    [&_h4]:mt-10
-                                    [&_h4]:text-[20px]
-                                    [&_h4]:font-bold
-                                    [&_h4]:text-modura-primary
-
-                                    [&_ul]:mt-5
-                                    [&_ul]:list-none
-                                    [&_ul]:space-y-4
-                                    [&_ul]:pl-0
-
-                                    [&_li]:relative
-                                    [&_li]:pl-5
-                                    [&_li]:text-[15px]
-                                    [&_li]:leading-7
-                                    [&_li]:mb-0
-                                    [&_li]:text-modura-gray-600
-
-                                    [&_li]:before:absolute
-                                    [&_li]:before:top-[10px]
-                                    [&_li]:before:left-1
-                                    [&_li]:before:h-[7px]
-                                    [&_li]:before:w-[7px]
-                                    [&_li]:before:rotate-45
-                                    [&_li]:before:bg-modura-secondary
-                                    [&_li]:before:content-['']
-
-                                    [&_ol]:mt-5
-                                    [&_ol]:list-decimal
-                                    [&_ol]:pl-6
-
-                                    [&_ol_li]:pl-2
-                                    [&_ol_li]:before:hidden
-
-                                    [&_strong]:font-bold
-                                "
-                                dangerouslySetInnerHTML={{
-                                    __html: DOMPurify.sanitize(currentBlog.description || '', {
-                                        FORBID_ATTR: ['style'],
-                                    }),
-                                }}
-                            />
-                        </article>
-
-                        {/* =================================================
-                            RIGHT — 30%
-                            STAYS FIXED / STICKY
-                        ================================================= */}
-
-                        <aside
-                            className="
-                                related-sidebar
-                                min-w-0
-                            "
-                        >
-                            <div
-                                className="
-                                    lg:sticky
-                                    lg:top-28
-                                "
-                            >
-                                {/* =================================================
-                                    SIDEBAR HEADER
-                                ================================================= */}
-
-                                <div className="mb-7">
-                                    <div
-                                        className="
-                                            mb-2
-                                            flex
-                                            items-center
-                                            gap-3
-                                        "
-                                    >
-
-
-                                        <span
-                                            className="
-                                                text-[12px]
-                                                font-bold
-                                                tracking-[0.3em]
-                                                text-modura-secondary
-                                                uppercase
-                                            "
-                                        >
-                                            EXPLORE MORE
-                                        </span>
-                                    </div>
-
-                                    <h2
-                                        className="
-                                            text-[28px]
-                                            leading-tight
-                                            font-bold
-                                            uppercase
-                                            text-modura-primary
-                                        "
-                                    >
-                                        Related
-                                        <span
-                                            className="
-                                                ml-2
-                                                text-modura-secondary
-                                            "
-                                        >
-                                            Blogs
-                                        </span>
-                                    </h2>
-                                </div>
-
-                                {/* =================================================
-                                    RELATED BLOGS
-                                ================================================= */}
-
-                                <div
-                                    className="
-                                        border-t
-                                        border-modura-gray-200
-                                    "
-                                >
-                                    {relatedBlogs.map((blog) => (
-                                        <Link
-                                            key={blog.slug}
-                                            href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
-                                            className="
-                                                related-card
-                                                group
-                                                block
-                                                border-b
-                                                border-modura-gray-200
-                                                py-6
-                                            "
-                                        >
-                                            {/* IMAGE */}
-
-                                            <div
-                                                className="
-                                                    relative
-                                                    h-[170px]
-                                                    overflow-hidden
-                                                    bg-modura-light
-                                                "
-                                            >
-                                                <Image
-                                                    src={blog.imageUrl}
-                                                    alt={blog.title}
-                                                    fill
-                                                    sizes="300px"
-                                                    className="
-                                                        object-cover
-                                                        transition-transform
-                                                        duration-700
-                                                        group-hover:scale-105
-                                                    "
-                                                />
-
-                                                {/* CORNER ARROW */}
-
-                                                <span
-                                                    className="
-                                                        absolute
-                                                        right-3
-                                                        top-3
-                                                        flex
-                                                        h-8
-                                                        w-8
-                                                        items-center
-                                                        justify-center
-                                                        bg-modura-white
-                                                        text-modura-primary
-                                                        transition-all
-                                                        duration-300
-                                                        group-hover:bg-modura-secondary
-                                                        group-hover:text-modura-white
-                                                    "
-                                                >
-                                                    <FiArrowUpRight
-                                                        size={14}
-                                                    />
-                                                </span>
-                                            </div>
-
-                                            {/* DATE */}
-
-                                            <p
-                                                className="
-                                                    mt-4
-                                                    text-[9px]
-                                                    font-bold
-                                                    tracking-[0.2em]
-                                                    text-modura-secondary
-                                                    uppercase
-                                                "
-                                            >
-                                                {formatBlogDate(blog.publishedAt)}
-                                            </p>
-
-                                            {/* TITLE */}
-
-                                            <h3
-                                                className="
-                                                    mt-2
-                                                    text-[17px]
-                                                    leading-6
-                                                    font-bold
-                                                    text-modura-primary
-                                                    transition-colors
-                                                    duration-300
-                                                    group-hover:text-modura-secondary
-                                                "
-                                            >
-                                                {blog.title}
-                                            </h3>
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        </aside>
-                    </div>
-                </div>
-            </section>
-        </>
-    );
+  return (
+    <>
+    <BlogDetailJsonLd slug={slug} />
+      <BlogDetailClient key={slug} />
+    </>
+  );
 }
