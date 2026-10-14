@@ -34,6 +34,8 @@ interface ServiceBlog {
     publishedAt: string;
 }
 
+
+
 interface ServiceDetail {
     id: number;
     title: string;
@@ -41,6 +43,11 @@ interface ServiceDetail {
     shortDescription: string | null;
     description: string | null;
     imageUrl: string | null;
+    category: {
+        id: number;
+        name: string;
+        slug: string;
+    } | null;
     faqs: ServiceFAQ[];
     blogs: ServiceBlog[];
 }
@@ -91,6 +98,7 @@ export default function ServicesPage() {
                         shortDescription: data.shortDescription ?? null,
                         description: data.description ?? null,
                         imageUrl: data.imageUrl ?? null,
+                        category: data.category ?? null,
                         faqs: Array.isArray(data.faqs)
                             ? data.faqs
                             : [],
@@ -229,6 +237,22 @@ export default function ServicesPage() {
             <Breadcrumb
                 title={service.title}
                 image={breadcrumb.src}
+                breadcrumbs={[
+                    {
+                        label: 'Home',
+                        href: '/',
+                    },
+                    ...(service.category
+                        ? [
+                            {
+                                label: service.category.name,
+                            },
+                        ]
+                        : []),
+                    {
+                        label: service.title,
+                    },
+                ]}
             />
 
             {/* =================================================
@@ -1147,7 +1171,7 @@ export default function ServicesPage() {
                                     shadow-[0_15px_40px_rgba(11,29,51,0.08)]
                                 "
                                 >
-                                    
+
                                     {/* =================================================
                                     IMAGE
                                 ================================================= */}
@@ -1199,7 +1223,7 @@ export default function ServicesPage() {
                                         />
 
                                     </div>
-                                        
+
 
                                     {/* =================================================
                                     CONTENT

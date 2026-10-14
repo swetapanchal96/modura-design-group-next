@@ -213,7 +213,7 @@ export default function ThankYouPage() {
                                 font-bold
                                 uppercase
                                 tracking-[0.18em]
-                                text-modura-white
+                                text-modura-white!
                                 transition-colors
                                 duration-300
                                 hover:bg-modura-primary-light

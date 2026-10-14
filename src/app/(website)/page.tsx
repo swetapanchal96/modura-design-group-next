@@ -1,175 +1,194 @@
-'use client';
-
-import { useEffect, useState } from 'react';
+import type { Metadata } from 'next';
 import axios from 'axios';
-import { apiUrl } from '@/app/(website)/config';
 
-import Image from 'next/image';
-import HeroSection from '../../components/HeroSection';
-import AboutSection from '../../components/AboutSection';
-import ServicesSection from '../../components/ServicesSection';
-import type { HomeService } from '../../components/ServicesSection';
-import ProjectsSection from '../../components/ProjectsSection';
-import CounterSection from '../../components/CounterSection';
-import Clients from '../../components/Clients';
-import GlobalPresence from '../../components/GlobalPresence';
-import TestimonialSection from '../../components/TestimonialSection';
-import RelatedBlogs from '../../components/RelatedBlogs';
-import ProjectsNew from '../../components/ProjectsNew';
-import IndustriesServe from '../../components/IndustriesServe';
-import TestimonialSectionNew from '../../components/TestimonialSectionNew';
+import HomeClient from './HomeClient';
+import { apiUrl } from './config';
+import SeoJsonLd from '@/components/SeoJsonLd';
 
-interface HomeCounters {
-    projectCompleted: number;
-    happyClient: number;
-    qualifiedEngineers: number;
-    yearsExperience: number;
-    countriesServed: number;
-}
-
-interface HomeClient {
+interface SeoData {
     id: number;
-    name: string;
-    websiteUrl: string | null;
-    imageUrl: string | null;
+    pageKey: string;
+    pageName: string;
+    metaTitle: string | null;
+    metaKeyword: string | null;
+    metaDescription: string | null;
+    headScript: string | null;
+    bodyScript: string | null;
 }
 
-interface HomeTestimonial {
-    id: number;
-    clientName: string;
-    designation: string | null;
-    company: string | null;
-    rating: number;
-    testimonial: string;
-    photoUrl: string | null;
-    videoUrl: string | null;
-    status: boolean;
+interface SeoResponse {
+    success: boolean;
+    message: string;
+    data: SeoData | null;
 }
 
-interface HomeBlog {
-    id: number;
-    title: string;
-    slug: string;
-    description: string | null;
-    imageUrl: string | null;
-    publishedAt: string;
-}
-
-interface HomePortfolio {
-    id: number;
-    title: string;
-    slug: string;
-    type: string;
-    imageType: string;
-    clientName: string | null;
-    isFeatured: boolean;
-    coverUrl: string | null;
-}
-
-export default function Home() {
-
-    const [homeData, setHomeData] = useState<{
-        services: HomeService[];
-        counters: HomeCounters | null;
-        clients: HomeClient[];
-        testimonials: HomeTestimonial[];
-        blogs: HomeBlog[];
-        portfolios: HomePortfolio[];
-    }>({
-        services: [],
-        counters: null,
-        clients: [],
-        testimonials: [],
-        blogs: [],
-        portfolios: [],
-    });
-
-    const [homeLoading, setHomeLoading] = useState(true);
-
-    useEffect(() => {
-        const controller = new AbortController();
-
-        const fetchHomeData = async () => {
-            try {
-                const response = await axios.post(
-                    `${apiUrl}/home`,
-                    {},
-                    {
-                        signal: controller.signal,
-                    }
-                );
-
-                if (controller.signal.aborted) return;
-
-                if (
-                    response.data?.success === true &&
-                    response.data?.data
-                ) {
-                    setHomeData({
-                        services: Array.isArray(response.data.data.services)
-                            ? response.data.data.services
-                            : [],
-
-                        counters: response.data.data.counters ?? null,
-
-                        clients: Array.isArray(response.data.data.clients)
-                            ? response.data.data.clients
-                            : [],
-
-                        testimonials: Array.isArray(response.data.data.testimonials)
-                            ? response.data.data.testimonials
-                            : [],
-
-                        blogs: Array.isArray(response.data.data.blogs)
-                            ? response.data.data.blogs
-                            : [],
-
-                        portfolios: Array.isArray(response.data.data.portfolios)
-                            ? response.data.data.portfolios
-                            : [],
-                    });
-                }
-            } catch (error) {
-                if (!axios.isCancel(error)) {
-                    console.error('Home API Error:', error);
-                }
-            } finally {
-                if (!controller.signal.aborted) {
-                    setHomeLoading(false);
-                }
+/**
+ * Get SEO data from API
+ */
+async function getHomeSeo(): Promise<SeoData | null> {
+    try {
+        const response = await axios.post<SeoResponse>(
+            `${apiUrl}/seopageKey`,
+            {
+                pageKey: 'home',
+            },
+            {
+                timeout: 10000,
             }
-        };
+        );
 
-        fetchHomeData();
+        if (
+            response.data?.success === true &&
+            response.data?.data
+        ) {
+            return response.data.data;
+        }
 
-        return () => controller.abort();
-    }, []);
+        return null;
+    } catch (error) {
+        console.error('Home SEO API Error:', error);
+        return null;
+    }
+}
 
-    return (
-        <>
-            <HeroSection />
-            <ServicesSection
-                services={homeData.services}
-                loading={homeLoading}
-            />
-            <AboutSection />
-            {/* <ProjectsSection /> */}
-            <ProjectsNew portfolios={homeData.portfolios} />
-            <CounterSection counters={homeData.counters} />
-            <Clients clients={homeData.clients} />
-            {/* <GlobalPresence /> */}
-            <IndustriesServe />
-            {/* <TestimonialSection /> */}
-            <TestimonialSectionNew testimonials={homeData.testimonials} />
-            <RelatedBlogs
-                blogs={[...homeData.blogs]
-                    .sort(
-                        (a, b) =>
-                            new Date(b.publishedAt).getTime() -
-                            new Date(a.publishedAt).getTime()
-                    )
-                    .slice(0, 3)}
-            />
-        </>
+/**
+ * Extract a meta attribute from headScript
+ */
+function getMetaContent(
+    html: string | null,
+    attribute: string,
+    value: string
+): string | undefined {
+    if (!html) return undefined;
+
+    const regex = new RegExp(
+        `<meta[^>]+${attribute}=["']${value}["'][^>]+content=["']([^"']*)["'][^>]*>`,
+        'i'
     );
+
+    const match = html.match(regex);
+
+    return match?.[1];
+}
+
+/**
+ * Extract canonical URL
+ */
+function getCanonicalUrl(
+    html: string | null
+): string | undefined {
+    if (!html) return undefined;
+
+    const match = html.match(
+        /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i
+    );
+
+    return match?.[1];
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+    const seo = await getHomeSeo();
+
+    if (!seo) {
+        return {
+            title: 'Modura Design Group',
+        };
+    }
+
+    const canonical = getCanonicalUrl(seo.headScript);
+
+    const ogTitle =
+        getMetaContent(
+            seo.headScript,
+            'property',
+            'og:title'
+        ) || seo.metaTitle || undefined;
+
+    const ogDescription =
+        getMetaContent(
+            seo.headScript,
+            'property',
+            'og:description'
+        ) || seo.metaDescription || undefined;
+
+    const ogImage =
+        getMetaContent(
+            seo.headScript,
+            'property',
+            'og:image'
+        );
+
+    const twitterTitle =
+        getMetaContent(
+            seo.headScript,
+            'name',
+            'twitter:title'
+        ) || seo.metaTitle || undefined;
+
+    const twitterDescription =
+        getMetaContent(
+            seo.headScript,
+            'name',
+            'twitter:description'
+        ) || seo.metaDescription || undefined;
+
+    const twitterImage =
+        getMetaContent(
+            seo.headScript,
+            'name',
+            'twitter:image'
+        );
+
+    return {
+        title: seo.metaTitle || seo.pageName,
+
+        description:
+            seo.metaDescription
+                ?.replace(/<[^>]*>/g, '')
+                .trim() || undefined,
+
+        keywords: seo.metaKeyword || undefined,
+
+        alternates: canonical
+            ? {
+                  canonical,
+              }
+            : undefined,
+
+        openGraph: {
+            type: 'website',
+            title: ogTitle,
+            description: ogDescription,
+            url: canonical,
+            images:
+                ogImage &&
+                !ogImage.includes('REPLACE_WITH')
+                    ? [
+                          {
+                              url: ogImage,
+                          },
+                      ]
+                    : undefined,
+        },
+
+        twitter: {
+            card: 'summary_large_image',
+            title: twitterTitle,
+            description: twitterDescription,
+            images:
+                twitterImage &&
+                !twitterImage.includes('REPLACE_WITH')
+                    ? [twitterImage]
+                    : undefined,
+        },
+    };
+}
+
+export default async function HomePage() {
+    const seo = await getHomeSeo();
+    return <>
+            <SeoJsonLd json={seo?.headScript} />
+
+            <HomeClient />
+        </>
 }

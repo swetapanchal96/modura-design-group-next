@@ -8,6 +8,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import InquiryDrawer from '../../components/InquiryDrawer';
 import ModuraPageLoader from '../../components/ModuraPageLoader';
+import WhatsAppFloat from '@/components/WhatsAppFloat';
 
 
 const geistSans = Geist({
@@ -52,6 +53,8 @@ export default function RootLayout({
                     <InquiryDrawer />
 
                     <Footer />
+
+                    <WhatsAppFloat />
 
                 </ModuraPageLoader>
 

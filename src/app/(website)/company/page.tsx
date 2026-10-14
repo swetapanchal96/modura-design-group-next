@@ -10,8 +10,6 @@ import about2 from '@/app/(website)/assets/images/about-2.jpg';
 import about3 from '@/app/(website)/assets/images/about-3.jpg';
 import Breadcrumb from '../../../components/Breadcrumb';
 import breadcrumb from '@/app/(website)/assets/images/breadcrumb.jpg';
-import raviPatel from '@/app/(website)/assets/images/client-4.jpg';
-import pankajbhai from '@/app/(website)/assets/images/client-3.jpg';
 import bimImage from '@/app/(website)/assets/images/client-5.jpg';
 import architectImage from '@/app/(website)/assets/images/client-6.jpg';
 import qualityImage from '@/app/(website)/assets/images/qualityImage.jpg'
@@ -50,7 +48,16 @@ interface CompanyBlog {
     publishedAt: string;
 }
 
-
+interface TeamMember {
+    id: number;
+    name: string;
+    designation: string;
+    bio: string | null;
+    photo: string | null;
+    photoUrl: string | null;
+    linkedinUrl: string | null;
+    socialUrl: string | null;
+}
 
 export default function CompanyPage() {
     const [activeFaq, setActiveFaq] = useState(0);
@@ -60,7 +67,10 @@ export default function CompanyPage() {
     const [certificationLoading, setCertificationLoading] = useState(true);
     const [companyBlogs, setCompanyBlogs] = useState<CompanyBlog[]>([]);
     const [blogLoading, setBlogLoading] = useState(true);
-    const [selectedMember, setSelectedMember] = useState<any>(null);
+    const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+    const [teamLoading, setTeamLoading] = useState(true);
+
+    const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
     const blogSectionRef = useRef<HTMLElement | null>(null);
 
     // faq api call
@@ -102,7 +112,7 @@ export default function CompanyPage() {
         return () => controller.abort();
     }, []);
 
-    
+
 
     // certificate api call
     useEffect(() => {
@@ -289,6 +299,51 @@ export default function CompanyPage() {
             document.body.style.overflow = '';
         };
     }, [selectedMember]);
+
+    // team api
+    useEffect(() => {
+        const controller = new AbortController();
+
+        const fetchTeamMembers = async () => {
+            try {
+                const response = await axios.post(
+                    `${apiUrl}/team`,
+                    {},
+                    {
+                        signal: controller.signal,
+                    }
+                );
+
+                if (controller.signal.aborted) return;
+
+                if (
+                    response.data?.success === true &&
+                    Array.isArray(response.data?.data)
+                ) {
+                    setTeamMembers(response.data.data);
+                } else {
+                    setTeamMembers([]);
+                }
+            } catch (error) {
+                if (!axios.isCancel(error)) {
+                    console.error('Team API Error:', error);
+
+                    if (!controller.signal.aborted) {
+                        setTeamMembers([]);
+                    }
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setTeamLoading(false);
+                }
+            }
+        };
+
+        fetchTeamMembers();
+
+        return () => controller.abort();
+    }, []);
+
 
     return (
         <>
@@ -2217,84 +2272,52 @@ export default function CompanyPage() {
                 "
             >
                 {/* =================================================
-                    TEAM DATA
-                    Keep this inside your Company page
-                ================================================= */}
-
-                {(() => {
-                    const teamMembers = [
-                        {
-                            id: 1,
-                            name: 'Pankajbhai',
-                            designation: 'Founder & CEO',
-                            group: 'leadership',
-                            groupTitle: 'Leadership',
-                            image: pankajbhai,
-                            description:
-                                'Pankajbhai leads Modura Design Group with a focus on technical excellence, innovation and delivering reliable solutions across architecture, engineering and digital construction.',
-                        },
-
-                        {
-                            id: 2,
-                            name: 'Ravi Patel',
-                            designation: 'PHP Laravel Developer',
-                            group: 'hr',
-                            groupTitle: 'Human Resources',
-                            image: raviPatel,
-                            description:
-                                'Ravi contributes to Modura’s digital development initiatives and supports the organisation through reliable technology solutions and efficient digital workflows.',
-                        },
-                    ];
-
-                    return (
-                        <>
-                            {/* =================================================
                                 HEADER
                             ================================================= */}
 
-                            <div
-                                className="
+                <div
+                    className="
                                     mx-auto
                                     max-w-[1300px]
                                     px-5
                                     md:px-8
                                 "
-                            >
-                                <div
-                                    className="
+                >
+                    <div
+                        className="
                                         grid
                                         gap-8
                                         lg:grid-cols-[1fr_0.7fr]
                                         lg:items-end
                                     "
-                                >
-                                    {/* LEFT */}
+                    >
+                        {/* LEFT */}
 
-                                    <div>
-                                        <div
-                                            className="
+                        <div>
+                            <div
+                                className="
                                                 mb-3
                                                 flex
                                                 items-center
                                                 gap-3
                                             "
-                                        >
+                            >
 
-                                            <span
-                                                className="
+                                <span
+                                    className="
                                                     text-[13px]
                                                     font-bold
                                                     tracking-[0.32em]
                                                     text-modura-secondary
                                                     uppercase
                                                 "
-                                            >
-                                                The Modura Team
-                                            </span>
-                                        </div>
+                                >
+                                    The Modura Team
+                                </span>
+                            </div>
 
-                                        <h2
-                                            className="
+                            <h2
+                                className="
                                                 max-w-[650px]
                                                 text-[42px]
                                                 leading-[0.95]
@@ -2305,49 +2328,49 @@ export default function CompanyPage() {
                                                 md:text-[47px]
                                                
                                             "
-                                        >
-                                            Expertise That
-                                            <span
-                                                className="
+                            >
+                                Expertise That
+                                <span
+                                    className="
                                         block
                                         text-modura-secondary
                                     "
-                                            >
-                                                Moves Projects Forward
-                                            </span>
-                                        </h2>
-                                    </div>
+                                >
+                                    Moves Projects Forward
+                                </span>
+                            </h2>
+                        </div>
 
-                                    {/* RIGHT */}
+                        {/* RIGHT */}
 
-                                    <div
-                                        className="
+                        <div
+                            className="
                                             border-l
                                             border-modura-secondary
                                             pl-6
                                             lg:pl-7
                                         "
-                                    >
-                                        <p
-                                            className="
+                        >
+                            <p
+                                className="
                                                 max-w-[500px]
                                                 text-[14px]
                                                 leading-7
                                                 text-modura-gray-600
                                                 md:text-[15px]
                                             "
-                                        >
-                                            Our multidisciplinary team brings together architectural,engineering, BIM and project expertise to deliver coordinatedsolutions for complex built environments.
-                                        </p>
-                                    </div>
-                                </div>
+                            >
+                                Our multidisciplinary team brings together architectural,engineering, BIM and project expertise to deliver coordinatedsolutions for complex built environments.
+                            </p>
+                        </div>
+                    </div>
 
-                                {/* =================================================
+                    {/* =================================================
                                     TEAM TITLE
                                 ================================================= */}
 
-                                <div
-                                    className="
+                    <div
+                        className="
                                         mt-7
                                         
                                         flex
@@ -2357,110 +2380,39 @@ export default function CompanyPage() {
                                         
                                         md:mt-7
                                     "
-                                >
+                    >
 
 
 
-                                </div>
+                    </div>
 
-                                {/* =================================================
+                    {/* =================================================
                                         TEAM GROUPS
                                 ================================================= */}
 
-                                <div className="space-y-14 md:space-y-10">
+                    <div className="space-y-14 md:space-y-10">
+                        <div
+                            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 
-                                    {Array.from(
-                                        new Map(
-                                            teamMembers.map((member) => [
-                                                member.group,
-                                                {
-                                                    group: member.group,
-                                                    title: member.groupTitle,
-                                                },
-                                            ]),
-                                        ).values(),
-                                    ).map((group) => {
+                            {teamLoading ? (
+                                <div className="col-span-full py-12 text-center">
+                                    <p className="text-[14px] text-modura-gray-600">
+                                        Loading team members...
+                                    </p>
+                                </div>
+                            ) : teamMembers.length === 0 ? (
+                                <div className="col-span-full py-12 text-center">
+                                    <p className="text-[16px] font-semibold text-modura-primary">
+                                        Team members are currently not available.
+                                    </p>
+                                </div>
+                            ) : (
+                                
+                                    teamMembers.map((member) => (
 
-                                        const members = teamMembers.filter(
-                                            (member) => member.group === group.group,
-                                        );
-
-                                        return (
-                                            <div
-                                                key={group.group}
-                                                className="team-group"
-                                            >
-
-                                                {/* =================================================
-                                                        GROUP HEADER
-                                                ================================================= */}
-
-                                                <div
-                                                    className="
-                                                        mb-6
-                                                        flex
-                                                        items-center
-                                                        justify-between
-                                                        border-b
-                                                        border-modura-gray-300
-                                                        pb-3
-                                                    "
-                                                >
-
-                                                    <div className="flex items-center gap-4">
-
-
-
-                                                        <h4
-                                                            className="
-                                                                text-[20px]
-                                                                font-bold
-                                                                tracking-[-0.02em]
-                                                                text-modura-primary
-                                                                uppercase
-                                                                md:text-[24px]
-                                                            "
-                                                        >
-                                                            {group.title}
-                                                        </h4>
-
-                                                    </div>
-
-                                                    {/* <span
-                                                        className="
-                                                            text-[10px]
-                                                            font-bold
-                                                            tracking-[0.25em]
-                                                            text-modura-gray-500
-                                                            uppercase
-                                                        "
-                                                    >
-                                                        {String(members.length).padStart(2, '0')} Members
-                                                    </span> */}
-
-                                                </div>
-
-
-                                                {/* =================================================
-                                                        SAME GRID FOR EVERY GROUP
-                                                ================================================= */}
-
-                                                <div
-                                                    className="
-                                                        grid
-                                                        grid-cols-1
-                                                        gap-5
-                                                        sm:grid-cols-2
-                                                        lg:grid-cols-3
-                                                        xl:grid-cols-4
-                                                    "
-                                                >
-
-                                                    {members.map((member) => (
-
-                                                        <article
-                                                            key={member.id}
-                                                            className="
+                                        <article
+                                            key={member.id}
+                                            className="
                                                                 team-card
                                                                 group
                                                                 relative
@@ -2468,64 +2420,64 @@ export default function CompanyPage() {
                                                                 overflow-hidden
                                                                 bg-modura-white
                                                             "
-                                                            onClick={() =>
-                                                                setSelectedMember(member)
-                                                            }
-                                                            onKeyDown={(event) => {
+                                            onClick={() =>
+                                                setSelectedMember(member)
+                                            }
+                                            onKeyDown={(event) => {
 
-                                                                if (
-                                                                    event.key === 'Enter' ||
-                                                                    event.key === ' '
-                                                                ) {
-                                                                    event.preventDefault();
+                                                if (
+                                                    event.key === 'Enter' ||
+                                                    event.key === ' '
+                                                ) {
+                                                    event.preventDefault();
 
-                                                                    setSelectedMember(member);
-                                                                }
+                                                    setSelectedMember(member);
+                                                }
 
-                                                            }}
-                                                            role="button"
-                                                            tabIndex={0}
-                                                            aria-label={`View profile of ${member.name}`}
-                                                        >
+                                            }}
+                                            role="button"
+                                            tabIndex={0}
+                                            aria-label={`View profile of ${member.name}`}
+                                        >
 
-                                                            {/* =================================================
+                                            {/* =================================================
                                                                     IMAGE
                                                             ================================================= */}
 
-                                                            <div
-                                                                className="
+                                            <div
+                                                className="
                                                                     relative
                                                                     aspect-[0.78]
                                                                     overflow-hidden
                                                                     bg-modura-gray-200
                                                                 "
-                                                            >
+                                            >
+                                                {member.photoUrl && (
+                                                <Image
+                                                    src={member.photoUrl}
+                                                    alt={`${member.name} - ${member.designation}`}
+                                                    fill
+                                                    sizes="
+                                                        (max-width: 640px) 100vw,
+                                                        (max-width: 1024px) 50vw,
+                                                        25vw
+                                                        "
+                                                    className="
+                                                        object-cover
+                                                        transition-transform
+                                                        duration-700
+                                                        ease-out
+                                                        group-hover:scale-[1.04]
+                                                    "
+                                                />
+                                            )}
 
-                                                                <Image
-                                                                    src={member.image}
-                                                                    alt={`${member.name} - ${member.designation}`}
-                                                                    fill
-                                                                    sizes="
-                                                                        (max-width: 640px) 100vw,
-                                                                        (max-width: 1024px) 50vw,
-                                                                        25vw
-                                                                    "
-                                                                    className="
-                                                                        object-cover
-                                                                        transition-transform
-                                                                        duration-700
-                                                                        ease-out
-                                                                        group-hover:scale-[1.04]
-                                                                    "
-                                                                />
-
-
-                                                                {/* =================================================
+                                                {/* =================================================
                                                                         IMAGE OVERLAY
                                                                 ================================================= */}
 
-                                                                <div
-                                                                    className="
+                                                <div
+                                                    className="
                                                                         pointer-events-none
                                                                         absolute
                                                                         inset-x-0
@@ -2536,15 +2488,15 @@ export default function CompanyPage() {
                                                                         via-modura-primary/50
                                                                         to-transparent
                                                                     "
-                                                                />
+                                                />
 
 
-                                                                {/* =================================================
+                                                {/* =================================================
                                                                         TOP CORNER
                                                                 ================================================= */}
 
-                                                                <span
-                                                                    className="
+                                                <span
+                                                    className="
                                                                         absolute
                                                                         top-0
                                                                         right-0
@@ -2556,19 +2508,19 @@ export default function CompanyPage() {
                                                                         group-hover:h-20
                                                                         group-hover:w-20
                                                                     "
-                                                                    style={{
-                                                                        clipPath:
-                                                                            'polygon(100% 0, 100% 100%, 0 0)',
-                                                                    }}
-                                                                />
+                                                    style={{
+                                                        clipPath:
+                                                            'polygon(100% 0, 100% 100%, 0 0)',
+                                                    }}
+                                                />
 
 
-                                                                {/* =================================================
+                                                {/* =================================================
                                                                         MEMBER INFORMATION
                                                                 ================================================= */}
 
-                                                                <div
-                                                                    className="
+                                                <div
+                                                    className="
                                                                         absolute
                                                                         right-0
                                                                         bottom-0
@@ -2576,35 +2528,35 @@ export default function CompanyPage() {
                                                                         z-10
                                                                         p-5
                                                                     "
-                                                                >
+                                                >
 
-                                                                    <div
-                                                                        className="
+                                                    <div
+                                                        className="
                                                                             flex
                                                                             items-end
                                                                             justify-between
                                                                             gap-4
                                                                         "
-                                                                    >
+                                                    >
 
-                                                                        {/* NAME + DESIGNATION */}
+                                                        {/* NAME + DESIGNATION */}
 
-                                                                        <div>
+                                                        <div>
 
-                                                                            <h5
-                                                                                className="
+                                                            <h5
+                                                                className="
                                                                                     text-[19px]
                                                                                     font-bold
                                                                                     tracking-[-0.02em]
                                                                                     text-modura-white
                                                                                     uppercase
                                                                                 "
-                                                                            >
-                                                                                {member.name}
-                                                                            </h5>
+                                                            >
+                                                                {member.name}
+                                                            </h5>
 
-                                                                            <p
-                                                                                className="
+                                                            <p
+                                                                className="
                                                                                     mt-1
                                                                                     text-[10px]
                                                                                     font-bold
@@ -2612,19 +2564,19 @@ export default function CompanyPage() {
                                                                                     text-modura-secondary
                                                                                     uppercase
                                                                                 "
-                                                                            >
-                                                                                {member.designation}
-                                                                            </p>
+                                                            >
+                                                                {member.designation}
+                                                            </p>
 
-                                                                        </div>
+                                                        </div>
 
 
-                                                                        {/* =================================================
+                                                        {/* =================================================
                                                                                 OPEN BUTTON
                                                                         ================================================= */}
 
-                                                                        <span
-                                                                            className="
+                                                        <span
+                                                            className="
                                                                                 flex
                                                                                 h-11
                                                                                 w-11
@@ -2638,45 +2590,43 @@ export default function CompanyPage() {
                                                                                 group-hover:bg-modura-secondary
                                                                                 group-hover:text-modura-white
                                                                             "
-                                                                        >
+                                                        >
 
-                                                                            <FiArrowUpRight
-                                                                                size={18}
-                                                                                className="
+                                                            <FiArrowUpRight
+                                                                size={18}
+                                                                className="
                                                                                     transition-transform
                                                                                     duration-300
                                                                                     group-hover:rotate-45
                                                                                 "
-                                                                            />
+                                                            />
 
-                                                                        </span>
+                                                        </span>
 
-                                                                    </div>
-
-                                                                </div>
-
-                                                            </div>
-
-                                                        </article>
-
-                                                    ))}
+                                                    </div>
 
                                                 </div>
 
                                             </div>
-                                        );
-                                    })}
 
-                                </div>
-                            </div>
+                                        </article>
 
-                            {/* =================================================
+                                    ))
+                                )}
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                {/* =================================================
                     TEAM MEMBER POPUP
                 ================================================= */}
 
-                            {selectedMember && (
-                                <div
-                                    className="
+                {selectedMember && (
+                    <div
+                        className="
                             fixed
                             inset-0
                             z-[9999]
@@ -2688,10 +2638,10 @@ export default function CompanyPage() {
                             backdrop-blur-[3px]
                             md:p-8
                         "
-                                    onClick={() => setSelectedMember(null)}
-                                >
-                                    <div
-                                        className="
+                        onClick={() => setSelectedMember(null)}
+                    >
+                        <div
+                            className="
                                 relative
                                 flex
                                 min-h-[90vh]
@@ -2703,19 +2653,19 @@ export default function CompanyPage() {
                                 shadow-2xl
                                 md:flex-row
                             "
-                                        onClick={(event) =>
-                                            event.stopPropagation()
-                                        }
-                                    >
-                                        {/* CLOSE */}
+                            onClick={(event) =>
+                                event.stopPropagation()
+                            }
+                        >
+                            {/* CLOSE */}
 
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setSelectedMember(null)
-                                            }
-                                            aria-label="Close team member profile"
-                                            className="
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setSelectedMember(null)
+                                }
+                                aria-label="Close team member profile"
+                                className="
                                     group
                                     absolute
                                     top-4
@@ -2732,21 +2682,21 @@ export default function CompanyPage() {
                                     duration-300
                                     hover:bg-modura-secondary
                                 "
-                                        >
-                                            <FiX
-                                                size={20}
-                                                className="
+                            >
+                                <FiX
+                                    size={20}
+                                    className="
                                         transition-transform
                                         duration-300
                                         group-hover:rotate-90
                                     "
-                                            />
-                                        </button>
+                                />
+                            </button>
 
-                                        {/* POPUP IMAGE */}
+                            {/* POPUP IMAGE */}
 
-                                        <div
-                                            className="
+                            <div
+                                className="
                                     relative
                                     h-[320px]
                                     shrink-0
@@ -2754,23 +2704,25 @@ export default function CompanyPage() {
                                     md:h-auto
                                     md:w-[42%]
                                 "
-                                        >
-                                            <Image
-                                                src={selectedMember.image}
-                                                alt={`${selectedMember.name} - ${selectedMember.designation}`}
-                                                fill
-                                                sizes="
+                            >
+                                {selectedMember.photoUrl && (
+                                <Image
+                                    src={selectedMember.photoUrl}
+                                    alt={`${selectedMember.name} - ${selectedMember.designation}`}
+                                    fill
+                                    sizes="
                                         (max-width: 768px) 100vw,
                                         42vw
                                     "
-                                                className="object-cover"
-                                            />
-                                        </div>
+                                    className="object-cover"
+                                />
+                                )}
+                            </div>
 
-                                        {/* POPUP CONTENT */}
+                            {/* POPUP CONTENT */}
 
-                                        <div
-                                            className="
+                            <div
+                                className="
                                     flex
                                     min-h-0
                                     flex-1
@@ -2780,36 +2732,36 @@ export default function CompanyPage() {
                                     md:p-10
                                     lg:p-12
                                 "
-                                        >
-                                            {/* LABEL */}
+                            >
+                                {/* LABEL */}
 
-                                            <div
-                                                className="
+                                <div
+                                    className="
                                         mb-3
                                         flex
                                         items-center
                                         gap-3
                                     "
-                                            >
+                                >
 
 
-                                                <span
-                                                    className="
+                                    <span
+                                        className="
                                             text-[13px]
                                             font-bold
                                             tracking-[0.3em]
                                             text-modura-secondary
                                             uppercase
                                         "
-                                                >
-                                                    Our People
-                                                </span>
-                                            </div>
+                                    >
+                                        Our People
+                                    </span>
+                                </div>
 
-                                            {/* NAME */}
+                                {/* NAME */}
 
-                                            <h2
-                                                className="
+                                <h2
+                                    className="
                                         text-[34px]
                                         leading-[1]
                                         font-bold
@@ -2818,14 +2770,14 @@ export default function CompanyPage() {
                                         uppercase
                                         md:text-[44px]
                                     "
-                                            >
-                                                {selectedMember.name}
-                                            </h2>
+                                >
+                                    {selectedMember.name}
+                                </h2>
 
-                                            {/* DESIGNATION */}
+                                {/* DESIGNATION */}
 
-                                            <p
-                                                className="
+                                <p
+                                    className="
                                         mt-3
                                         text-[12px]
                                         font-bold
@@ -2833,49 +2785,49 @@ export default function CompanyPage() {
                                         text-modura-secondary
                                         uppercase
                                     "
-                                            >
-                                                {selectedMember.designation}
-                                            </p>
+                                >
+                                    {selectedMember.designation}
+                                </p>
 
-                                            {/* DIVIDER */}
+                                {/* DIVIDER */}
 
-                                            <div className="my-4 flex items-center">
-                                                <span
-                                                    className="
+                                <div className="my-4 flex items-center">
+                                    <span
+                                        className="
                                             h-[3px]
                                             w-12
                                             bg-modura-primary
                                         "
-                                                />
+                                    />
 
-                                                <span
-                                                    className="
+                                    <span
+                                        className="
                                             h-px
                                             w-20
                                             bg-modura-gray-300
                                         "
-                                                />
-                                            </div>
+                                    />
+                                </div>
 
-                                            {/* DESCRIPTION */}
+                                {/* DESCRIPTION */}
 
-                                            <p
-                                                className="
+                                <p
+                                    className="
                                         max-w-[650px]
                                         text-[14px]
                                         leading-7
                                         text-modura-gray-600
                                         md:text-[16px]
                                     "
-                                            >
-                                                {selectedMember.description}
-                                            </p>
+                                >
+                                    {selectedMember.bio}
+                                </p>
 
-                                            {/* BOTTOM */}
+                                {/* BOTTOM */}
 
-                                            <div className="mt-auto pt-10">
-                                                <div
-                                                    className="
+                                <div className="mt-auto pt-10">
+                                    <div
+                                        className="
                                             flex
                                             items-center
                                             justify-between
@@ -2883,36 +2835,35 @@ export default function CompanyPage() {
                                             border-modura-gray-200
                                             pt-4
                                         "
-                                                >
-                                                    <span
-                                                        className="
+                                    >
+                                        <span
+                                            className="
                                                 text-[12px]
                                                 font-bold
                                                 tracking-[0.3em]
                                                 text-modura-gray-400
                                                 uppercase
                                             "
-                                                    >
-                                                        Modura Design Group
-                                                    </span>
+                                        >
+                                            Modura Design Group
+                                        </span>
 
-                                                    <span
-                                                        className="
+                                        <span
+                                            className="
                                                 h-[7px]
                                                 w-[7px]
                                                 rotate-45
                                                 bg-modura-secondary
                                             "
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
+                                        />
                                     </div>
                                 </div>
-                            )}
-                        </>
-                    );
-                })()}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+
             </section>
 
             {/* =================================================
@@ -5226,11 +5177,11 @@ export default function CompanyPage() {
                                 </p>
                             </div>
                         ) : (
-                        companyBlogs.map((blog, index) => (
+                            companyBlogs.map((blog, index) => (
 
-                            <article
-                                key={blog.slug}
-                                className="
+                                <article
+                                    key={blog.slug}
+                                    className="
                                     company-blog-card
                                     group
                                     relative
@@ -5238,44 +5189,44 @@ export default function CompanyPage() {
                                     bg-modura-white
                                     shadow-[0_15px_40px_rgba(11,29,51,0.08)]
                                 "
-                            >
+                                >
 
-                                {/* =================================================
+                                    {/* =================================================
                                 CLICKABLE IMAGE
                     ================================================= */}
 
-                                <Link
-                                    href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
-                                    className="
+                                    <Link
+                                        href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
+                                        className="
                             relative
                             block
                             h-[220px]
                             overflow-hidden
                             md:h-[230px]
                         "
-                                >
+                                    >
 
-                                    <Image
-                                        src={blog.imageUrl}
-                                        alt={blog.title}
-                                        fill
-                                        sizes="
+                                        <Image
+                                            src={blog.imageUrl}
+                                            alt={blog.title}
+                                            fill
+                                            sizes="
                                 (max-width: 768px) 100vw,
                                 (max-width: 1024px) 50vw,
                                 33vw
                             "
-                                        className="
+                                            className="
                                 object-cover
                                 transition-transform
                                 duration-700
                                 group-hover:scale-110
                             "
-                                    />
+                                        />
 
-                                    {/* IMAGE OVERLAY */}
+                                        {/* IMAGE OVERLAY */}
 
-                                    <span
-                                        className="
+                                        <span
+                                            className="
                                 pointer-events-none
                                 absolute
                                 inset-0
@@ -5288,80 +5239,80 @@ export default function CompanyPage() {
                                 duration-500
                                 group-hover:opacity-100
                             "
-                                    />
+                                        />
 
-                                </Link>
+                                    </Link>
 
 
-                                {/* =================================================
+                                    {/* =================================================
                                 CONTENT
                     ================================================= */}
 
-                                <div className="p-6 md:p-7">
+                                    <div className="p-6 md:p-7">
 
-                                    {/* DATE */}
+                                        {/* DATE */}
 
-                                    <p
-                                        className="
+                                        <p
+                                            className="
                                 text-[11px]
                                 font-semibold
                                 tracking-[0.2em]
                                 text-modura-secondary
                                 uppercase
                             "
-                                    >
-                                        {formatCompanyBlogDate(blog.publishedAt)}
-                                    </p>
+                                        >
+                                            {formatCompanyBlogDate(blog.publishedAt)}
+                                        </p>
 
 
-                                    {/* =================================================
+                                        {/* =================================================
                                     CLICKABLE TITLE
                         ================================================= */}
 
-                                    <Link
-                                        href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
-                                        className="
+                                        <Link
+                                            href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
+                                            className="
                                 block
                                 transition-colors
                                 duration-300
                                 hover:text-modura-secondary
                             "
-                                    >
-                                        <h3
-                                            className="
+                                        >
+                                            <h3
+                                                className="
                                     mt-2
                                     text-[20px]
                                     leading-7
                                     font-bold
                                     text-modura-primary
                                 "
-                                        >
-                                            {blog.title}
-                                        </h3>
-                                    </Link>
+                                            >
+                                                {blog.title}
+                                            </h3>
+                                        </Link>
 
 
-                                    {/* DESCRIPTION */}
+                                        {/* DESCRIPTION */}
 
-                                    <p
-                                        className="
+                                        <p
+                                            className="
                                 mt-4
                                 text-[14px]
                                 leading-6
                                 text-modura-gray-600
                             "
-                                    >
-                                        {getCompanyBlogExcerpt(blog.description, 130)}
-                                    </p>
+                                        >
+                                            {getCompanyBlogExcerpt(blog.description, 130)}
+                                        </p>
 
 
-                                    {/* =================================================
+                                        {/* =================================================
                                     READ MORE
                         ================================================= */}
 
-                                    <Link
-                                        href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
-                                        className="
+                                        <Link
+                                            href={`/blogdetail/${encodeURIComponent(blog.slug)}`}
+                                            className="
                                 group/blog-btn
                                 mt-7
                                 inline-flex
@@ -5373,10 +5324,10 @@ export default function CompanyPage() {
                                 text-modura-primary
                                 uppercase
                             "
-                                    >
+                                        >
 
-                                        <span
-                                            className="
+                                            <span
+                                                className="
                                     relative
                                     after:absolute
                                     after:bottom-[-6px]
@@ -5388,12 +5339,12 @@ export default function CompanyPage() {
                                     after:duration-500
                                     group-hover/blog-btn:after:w-[40%]
                                 "
-                                        >
-                                            Read More
-                                        </span>
+                                            >
+                                                Read More
+                                            </span>
 
-                                        <span
-                                            className="
+                                            <span
+                                                className="
                                     flex
                                     h-8
                                     w-8
@@ -5407,17 +5358,17 @@ export default function CompanyPage() {
                                     group-hover/blog-btn:bg-modura-secondary
                                     group-hover/blog-btn:text-modura-white
                                 "
-                                        >
-                                            <FiArrowUpRight size={16} />
-                                        </span>
+                                            >
+                                                <FiArrowUpRight size={16} />
+                                            </span>
 
-                                    </Link>
+                                        </Link>
 
-                                </div>
+                                    </div>
 
-                            </article>
+                                </article>
 
-                        ))
+                            ))
                         )}
 
                     </div>
