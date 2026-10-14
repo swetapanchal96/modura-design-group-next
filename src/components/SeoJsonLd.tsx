@@ -1,30 +1,50 @@
-export default function SeoJsonLd({
-    json,
+import { getSeoData } from "@/lib/seo";
+
+export default async function SeoJsonLd({
+  pageKey,
 }: {
-    json: string | null | undefined;
+  pageKey: string;
 }) {
-    if (!json) return null;
+  const seo = await getSeoData(pageKey);
 
-    const match = json.match(
-        /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i
-    );
+  if (!seo?.headScript) return null;
 
-    if (!match?.[1]) return null;
+  const matches = [
+    ...seo.headScript.matchAll(
+      /<script\b([^>]*)>([\s\S]*?)<\/script>/gi
+    ),
+  ];
 
-    const content = match[1].trim();
-
-    try {
-        JSON.parse(content);
-    } catch {
-        return null;
+  const schemas = matches.flatMap((match) => {
+    if (
+      !/\btype\s*=\s*["']application\/ld\+json["']/i.test(
+        match[1]
+      )
+    ) {
+      return [];
     }
 
-    return (
+    try {
+      return [JSON.parse(match[2])];
+    } catch {
+      return [];
+    }
+  });
+
+  return (
+    <>
+      {schemas.map((schema, index) => (
         <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-                __html: content,
-            }}
+          key={`${pageKey}-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schema).replace(
+              /</g,
+              "\\u003c"
+            ),
+          }}
         />
-    );
+      ))}
+    </>
+  );
 }
