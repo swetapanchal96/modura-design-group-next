@@ -252,7 +252,7 @@ const Footer = () => {
                                     key={service.id}
 
                                     href={`/servicedetail/${encodeURIComponent(service.slug)}`}
-
+                                    scroll={true}
                                     className="service-link group text-modura-gray-300 flex items-center gap-2 text-[14px] transition-all duration-300 hover:text-white"
                                 >
                                     <FiArrowUpRight className="text-modura-secondary-light text-[12px] opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100" />

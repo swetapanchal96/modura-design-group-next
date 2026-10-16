@@ -130,6 +130,11 @@ export default function Header() {
         setMobileSection((current) => (current === section ? null : section));
     };
 
+    const closeMobileMenu = () => {
+        setMobileMenu(false);
+        setMobileSection(null);
+        setMobileServiceCategory(null);
+    };
 
     const [softwareLinks, setSoftwareLinks] = useState<SoftwareItem[]>([]);
     const [softwareLoading, setSoftwareLoading] = useState(true);
@@ -612,9 +617,9 @@ export default function Header() {
                                                             {selectedService?.name ?? ''}
                                                         </h3>
 
-                                                        <p className="text-modura-gray-500 max-w-[560px] text-[12px] leading-6">
+                                                        {/* <p className="text-modura-gray-500 max-w-[560px] text-[12px] leading-6">
                                                             {categoryServices.find((service) => service.shortDescription)?.shortDescription ?? ''}
-                                                        </p>
+                                                        </p> */}
                                                     </div>
 
                                                     <Link
@@ -1287,7 +1292,13 @@ export default function Header() {
                             type="button"
                             aria-label="Toggle navigation"
                             aria-expanded={mobileMenu}
-                            onClick={() => setMobileMenu(!mobileMenu)}
+                            onClick={() => {
+                                if (mobileMenu) {
+                                    closeMobileMenu();
+                                } else {
+                                    setMobileMenu(true);
+                                }
+                            }}
                             className="border-modura-gray-200 bg-modura-white text-modura-primary hover:bg-modura-light flex h-11 w-11 items-center justify-center border text-[21px] lg:hidden"
                         >
                             {mobileMenu ? <FiX /> : <FiMenu />}
@@ -1324,7 +1335,7 @@ export default function Header() {
                             <Link
                                 key={item.title}
                                 href={item.href}
-                                onClick={() => setMobileMenu(false)}
+                                onClick={closeMobileMenu}
                                 className="border-modura-gray-200 text-modura-gray-700 flex min-h-[46px] items-center border-b px-4 text-[13px] font-medium"
                             >
                                 {item.title}
@@ -1373,7 +1384,7 @@ export default function Header() {
                                     >
                                         <Link
                                             href="/services"
-                                            onClick={() => setMobileMenu(false)}
+                                            onClick={closeMobileMenu}
                                             className="border-modura-gray-100 text-modura-primary flex min-h-[44px] items-center justify-between border-b px-6 text-[11px] font-bold tracking-[0.06em] uppercase"
                                         >
                                             View Category
@@ -1395,7 +1406,7 @@ export default function Header() {
                                                     <Link
                                                         key={service.id}
                                                         href={`/servicedetail/${encodeURIComponent(service.slug)}`}
-                                                        onClick={() => setMobileMenu(false)}
+                                                        onClick={closeMobileMenu}
                                                         className="border-modura-gray-100 text-modura-gray-600 flex min-h-[44px] items-center gap-3 border-b px-6 text-[12px]"
                                                     >
                                                         <span className="bg-modura-secondary h-px w-3" />
@@ -1432,7 +1443,7 @@ export default function Header() {
                                 <Link
                                     key={software.id}
                                     href={`/expertise/${encodeURIComponent(software.slug)}`}
-                                    onClick={() => setMobileMenu(false)}
+                                    onClick={closeMobileMenu}
                                     className="border-modura-gray-200 flex items-center gap-3 border-b px-4 py-3"
                                 >
                                     <Icon className="text-modura-primary text-[19px]" />
@@ -1472,23 +1483,23 @@ export default function Header() {
                                 No portfolio categories available.
                             </p>
                         ) : (
-                            
-                                portfolioLinks.map((item) => (
-                                    <Link
-                                        key={item.id}
-                                        href={`/portfolio/${encodeURIComponent(item.slug)}`}
-                                        onClick={() => setMobileMenu(false)}
-                                        className="border-modura-gray-200 text-modura-gray-700 flex min-h-[46px] items-center border-b px-4 text-[12px] font-medium"
-                                    >
-                                        {item.name}
-                                    </Link>
-                                ))
-                            )}
+
+                            portfolioLinks.map((item) => (
+                                <Link
+                                    key={item.id}
+                                    href={`/portfolio/${encodeURIComponent(item.slug)}`}
+                                    onClick={closeMobileMenu}
+                                    className="border-modura-gray-200 text-modura-gray-700 flex min-h-[46px] items-center border-b px-4 text-[12px] font-medium"
+                                >
+                                    {item.name}
+                                </Link>
+                            ))
+                        )}
                     </div>
 
-                    <MobileSimpleLink title="Career" href="/career" close={() => setMobileMenu(false)} />
+                    <MobileSimpleLink title="Career" href="/career" close={closeMobileMenu} />
 
-                    <MobileSimpleLink title="Inquiry" href="/inquiry" close={() => setMobileMenu(false)} />
+                    <MobileSimpleLink title="Inquiry" href="/inquiry" close={closeMobileMenu} />
 
                     {/* MOBILE CTA */}
 
