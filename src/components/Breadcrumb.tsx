@@ -486,7 +486,7 @@ export default function Breadcrumb({
                     lg:px-12
                 "
             >
-                <div className="w-full max-w-[650px]">
+                <div className="w-full max-w-[550px]">
                     {/* ====================================================
                         EYEBROW
                     ==================================================== */}
@@ -532,7 +532,7 @@ export default function Breadcrumb({
 
                     <h1
                         className="
-                            text-[38px]
+                            text-[30px]
                             font-bold
                             capitalize
                             leading-[0.92]
@@ -541,9 +541,9 @@ export default function Breadcrumb({
 
                             sm:text-[56px]
 
-                            md:text-[64px]
+                            md:text-[52px]
 
-                            lg:text-[72px]
+                            lg:text-[52px]
                         "
                     >
                         {title}
@@ -558,7 +558,8 @@ export default function Breadcrumb({
                         className="
                             relative
                             mt-6
-                            inline-flex
+                            hidden
+                            sm:inline-flex
                             items-center
                             overflow-hidden
                             bg-modura-white
@@ -723,6 +724,165 @@ export default function Breadcrumb({
                                     sm:block
                                 "
                             />
+                    </div>
+
+                    {/* ====================================================
+                        MOBILE BREADCRUMB
+                    ===================================================== */}
+
+                    <div className="mt-5 w-full sm:hidden">
+                        <div
+                            className="
+                                flex
+                                w-full
+                                items-stretch
+                                overflow-hidden
+                                bg-modura-white
+                                shadow-[0_10px_30px_rgba(11,29,51,0.08)]
+                            "
+                        >
+                            {/* =================================================
+                                MOBILE LEFT ICON
+                            ================================================= */}
+
+                            <div
+                                className="
+                                    flex
+                                    w-[46px]
+                                    shrink-0
+                                    items-center
+                                    justify-center
+                                    bg-modura-primary
+                                "
+                            >
+                                <FaDraftingCompass
+                                    size={17}
+                                    strokeWidth={1.4}
+                                    className="text-modura-white"
+                                />
+                            </div>
+
+                            {/* =================================================
+                                MOBILE BREADCRUMB CONTENT
+                            ================================================= */}
+
+                            <div
+                                className="
+                                    min-w-0
+                                    flex-1
+                                    px-3.5
+                                    py-3
+                                "
+                            >
+                                <div className="flex min-w-0 flex-wrap items-center">
+                                    {items.map((item, index) => {
+                                        const isLast = index === items.length - 1;
+
+                                        return (
+                                            <div
+                                                key={`mobile-${item.label}-${index}`}
+                                                className="
+                                                    flex
+                                                    min-w-0
+                                                    max-w-full
+                                                    items-center
+                                                "
+                                            >
+                                                {/* ---------------------------------
+                                                    LABEL
+                                                --------------------------------- */}
+
+                                                {item.href && !isLast ? (
+                                                    <div
+                                                        
+                                                        className="
+                                                            max-w-full
+                                                            break-words
+                                                            text-[11px]
+                                                            leading-[1.5]
+                                                            font-medium
+                                                            text-modura-secondary
+                                                            hover:text-modura-primary
+                                                        "
+                                                    >
+                                                        {item.label}
+                                                    </div>
+                                                ) : (
+                                                    <span
+                                                        className={`
+                                                            max-w-full
+                                                            break-words
+                                                            text-[11px]
+                                                            leading-[1.5]
+                                                            ${
+                                                                isLast
+                                                                    ? 'font-semibold text-modura-primary'
+                                                                    : 'font-medium text-modura-secondary'
+                                                            }
+                                                        `}
+                                                    >
+                                                        {item.label}
+                                                    </span>
+                                                )}
+
+                                                {/* ---------------------------------
+                                                    SEPARATOR
+                                                --------------------------------- */}
+
+                                                {!isLast && (
+                                                    <div
+                                                        className="
+                                                            mx-2
+                                                            flex
+                                                            shrink-0
+                                                            items-center
+                                                        "
+                                                    >
+                                                        <span
+                                                            className="
+                                                                h-px
+                                                                w-4
+                                                                bg-modura-gray-300
+                                                            "
+                                                        />
+
+                                                        <span
+                                                            className="
+                                                                mx-1.5
+                                                                h-1.5
+                                                                w-1.5
+                                                                rotate-45
+                                                                bg-modura-secondary
+                                                            "
+                                                        />
+
+                                                        <span
+                                                            className="
+                                                                h-px
+                                                                w-4
+                                                                bg-modura-gray-300
+                                                            "
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* =================================================
+                                MOBILE RIGHT ACCENT
+                            ================================================= */}
+
+                            <div
+                                className="
+                                    w-[4px]
+                                    shrink-0
+                                    bg-modura-secondary
+                                "
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

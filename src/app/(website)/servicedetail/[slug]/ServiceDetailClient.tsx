@@ -264,7 +264,7 @@ export default function ServiceDetailClient() {
                     relative
                     overflow-hidden
                     bg-modura-white
-                    py-12
+                    pt-12
                     md:py-14
                 "
             >
@@ -453,14 +453,14 @@ export default function ServiceDetailClient() {
 
                             <h1
                                 className="
-                                    text-[38px]
+                                    text-[35px]
                                     leading-[1.02]
                                     font-bold
                                     tracking-[-0.045em]
                                     text-modura-primary
 
                                     sm:text-[44px]
-                                    md:text-[50px]
+                                    md:text-[45px]
                                     
                                 "
                             >
@@ -524,7 +524,8 @@ export default function ServiceDetailClient() {
                 className="
                     relative
                     overflow-hidden
-                    border-t
+                    border-none
+                    md-border-t
                     border-modura-gray-200
                     bg-modura-white
                     py-12

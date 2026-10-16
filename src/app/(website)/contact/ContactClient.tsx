@@ -1321,7 +1321,7 @@ export default function ContactClient() {
             >
                 {/* MAP */}
 
-                <div className="relative h-[480px] md:h-[560px]">
+                <div className="relative h-[380px] md:h-[560px]">
                     <iframe
                         title="Modura Design Group Location"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3443.3271756873573!2d-97.75741282539943!3d30.341650274775223!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8644cae2f96fffff%3A0x893fa7795b7d5f91!2sGenesis%20Business%20Solutions%20LLC%2C%205900%20Balcones%20Dr%20Suit%20100%2C%20Austin%2C%20TX%2078731%2C%20USA!5e0!3m2!1sen!2sin!4v1792126155403!5m2!1sen!2sin"
