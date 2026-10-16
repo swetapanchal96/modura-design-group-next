@@ -156,7 +156,7 @@ export default function Breadcrumb({
             className="
                 relative
                 isolate
-                h-90
+                h-70
                 w-full
                 overflow-hidden
                 bg-modura-off-white
@@ -293,7 +293,8 @@ export default function Breadcrumb({
                     z-0
                     h-full
                     w-[250px]
-
+                    hidden
+                    md:block
                     md:right-[29%]
                     md:w-[300px]
 
@@ -493,16 +494,16 @@ export default function Breadcrumb({
                     <div className="mb-5 flex items-center gap-3">
                         <div
                             className="
-            flex
-            h-7
-            w-7
-            shrink-0
-            items-center
-            justify-center
-            border
-            border-modura-secondary/30
-            bg-modura-white
-        "
+                                flex
+                                h-7
+                                w-7
+                                shrink-0
+                                items-center
+                                justify-center
+                                border
+                                border-modura-secondary/30
+                                bg-modura-white
+                            "
                         >
                             <FaDraftingCompass
                                 size={15}
@@ -531,7 +532,7 @@ export default function Breadcrumb({
 
                     <h1
                         className="
-                            text-[48px]
+                            text-[38px]
                             font-bold
                             capitalize
                             leading-[0.92]
@@ -553,176 +554,176 @@ export default function Breadcrumb({
                     ==================================================== */}
 
                     <div
-    ref={breadcrumbRef}
-    className="
-        relative
-        mt-6
-        inline-flex
-        items-center
-        overflow-hidden
-        bg-modura-white
-        shadow-[0_10px_30px_rgba(11,29,51,0.08)]
-    "
->
-    {/* LEFT ACCENT */}
+                        ref={breadcrumbRef}
+                        className="
+                            relative
+                            mt-6
+                            inline-flex
+                            items-center
+                            overflow-hidden
+                            bg-modura-white
+                            shadow-[0_10px_30px_rgba(11,29,51,0.08)]
+                        "
+                    >
+                    {/* LEFT ACCENT */}
 
-    <div
-        className="
-            relative
-            flex
-            h-[52px]
-            w-[52px]
-            shrink-0
-            items-center
-            justify-center
-            bg-modura-primary
-        "
-    >
-        <span
-            className="
-                absolute
-                left-3
-                top-3
-                h-3
-                w-3
-                border-l
-                border-t
-                border-modura-secondary-light/60
-            "
-        />
-
-        <span
-            className="
-                absolute
-                bottom-3
-                right-3
-                h-3
-                w-3
-                border-b
-                border-r
-                border-modura-secondary-light/60
-            "
-        />
-
-        <FaDraftingCompass
-            size={19}
-            strokeWidth={1.4}
-            className="text-modura-white"
-        />
-    </div>
-
-    {/* BREADCRUMB */}
-
-    <div
-        className="
-            flex
-            h-[52px]
-            items-center
-            px-4
-
-            md:px-5
-        "
-    >
-        {items.map((item, index) => {
-            const isLast = index === items.length - 1;
-
-            return (
-                <div
-                    key={`${item.label}-${index}`}
-                    className="
-                        flex
-                        items-center
-                    "
-                >
-                    {/* LABEL */}
-
-                    {item.href && !isLast ? (
-                        <Link
-                            href={item.href}
-                            className="
-                                text-[12px]
-                                font-medium
-                                text-modura-secondary
-                                transition-colors
-                                duration-300
-                                hover:text-modura-primary
-                            "
-                        >
-                            {item.label}
-                        </Link>
-                    ) : (
+                    <div
+                        className="
+                            relative
+                            flex
+                            h-[52px]
+                            w-[52px]
+                            shrink-0
+                            items-center
+                            justify-center
+                            bg-modura-primary
+                        "
+                    >
                         <span
-                            className={`
-                                max-w-[260px]
-                                truncate
-                                text-[12px]
-
-                                ${
-                                    isLast
-                                        ? 'font-semibold text-modura-primary'
-                                        : 'font-medium text-modura-secondary'
-                                }
-                            `}
-                        >
-                            {item.label}
-                        </span>
-                    )}
-
-                    {/* SEPARATOR */}
-
-                    {!isLast && (
-                        <div
                             className="
-                                mx-3
-                                flex
-                                items-center
+                                absolute
+                                left-3
+                                top-3
+                                h-3
+                                w-3
+                                border-l
+                                border-t
+                                border-modura-secondary-light/60
                             "
-                        >
-                            <span
-                                className="
-                                    h-px
-                                    w-5
-                                    bg-modura-gray-300
-                                "
-                            />
+                        />
 
-                            <span
+                        <span
+                            className="
+                                absolute
+                                bottom-3
+                                right-3
+                                h-3
+                                w-3
+                                border-b
+                                border-r
+                                border-modura-secondary-light/60
+                            "
+                        />
+
+                        <FaDraftingCompass
+                            size={19}
+                            strokeWidth={1.4}
+                            className="text-modura-white"
+                        />
+                    </div>
+
+                    {/* BREADCRUMB */}
+
+                    <div
+                        className="
+                            flex
+                            h-[52px]
+                            items-center
+                            px-4
+
+                            md:px-5
+                        "
+                    >
+                        {items.map((item, index) => {
+                            const isLast = index === items.length - 1;
+
+                            return (
+                                <div
+                                    key={`${item.label}-${index}`}
+                                    className="
+                                        flex
+                                        items-center
+                                    "
+                                >
+                                    {/* LABEL */}
+
+                                    {item.href && !isLast ? (
+                                        <Link
+                                            href={item.href}
+                                            className="
+                                                text-[12px]
+                                                font-medium
+                                                text-modura-secondary
+                                                transition-colors
+                                                duration-300
+                                                hover:text-modura-primary
+                                            "
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    ) : (
+                                        <span
+                                            className={`
+                                                max-w-[260px]
+                                                truncate
+                                                text-[12px]
+
+                                                ${
+                                                    isLast
+                                                        ? 'font-semibold text-modura-primary'
+                                                        : 'font-medium text-modura-secondary'
+                                                }
+                                            `}
+                                        >
+                                            {item.label}
+                                        </span>
+                                    )}
+
+                                    {/* SEPARATOR */}
+
+                                    {!isLast && (
+                                        <div
+                                            className="
+                                                mx-3
+                                                flex
+                                                items-center
+                                            "
+                                        >
+                                            <span
+                                                className="
+                                                    h-px
+                                                    w-5
+                                                    bg-modura-gray-300
+                                                "
+                                            />
+
+                                            <span
+                                                className="
+                                                    mx-1.5
+                                                    h-1.5
+                                                    w-1.5
+                                                    rotate-45
+                                                    bg-modura-secondary
+                                                "
+                                            />
+
+                                            <span
+                                                className="
+                                                    h-px
+                                                    w-5
+                                                    bg-modura-gray-300
+                                                "
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                            {/* RIGHT ACCENT */}
+
+                            <div
                                 className="
-                                    mx-1.5
-                                    h-1.5
-                                    w-1.5
-                                    rotate-45
+                                    hidden
+                                    h-[52px]
+                                    w-3
                                     bg-modura-secondary
+
+                                    sm:block
                                 "
                             />
-
-                            <span
-                                className="
-                                    h-px
-                                    w-5
-                                    bg-modura-gray-300
-                                "
-                            />
-                        </div>
-                    )}
-                </div>
-            );
-        })}
-    </div>
-
-    {/* RIGHT ACCENT */}
-
-    <div
-        className="
-            hidden
-            h-[52px]
-            w-3
-            bg-modura-secondary
-
-            sm:block
-        "
-    />
-</div>
+                    </div>
                 </div>
             </div>
 

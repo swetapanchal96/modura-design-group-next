@@ -120,6 +120,12 @@ export const MODULES: Record<string, ModuleConfig> = {
       { name: 'type', label: 'Type', type: 'select', options: PORTFOLIO_TYPES, placeholder: 'Select type' },
       { name: 'displayOrder', label: 'Display Order', type: 'number', default: 0 },
       { name: 'status', label: 'Status', type: 'toggle', default: true },
+      SEO_SECTION,
+      { name: 'metaTitle', label: 'Meta Title', type: 'text', optional: true, maxLength: 255 },
+      { name: 'metaKeyword', label: 'Meta Keyword', type: 'text', optional: true, maxLength: 500 },
+      { name: 'metaDescription', label: 'Meta Description', type: 'textarea', optional: true, full: true },
+      { name: 'headScript', label: 'Head', type: 'code', optional: true, hint: 'Scripts / tags injected inside <head> of this software expertise page' },
+      { name: 'bodyScript', label: 'Body', type: 'code', optional: true, hint: 'Scripts injected at start of <body> of this software expertise page' },
     ],
   },
 
@@ -150,6 +156,7 @@ export const MODULES: Record<string, ModuleConfig> = {
       { name: 'albums', label: 'Albums', type: 'albums', required: true, full: true, hint: 'Each album needs a title and at least one image. The first image of the first album is the cover.', showWhen: { field: 'imageType', value: 'album' } },
       { name: 'isFeatured', label: 'Mark as Featured', type: 'toggle', default: false, onLabel: 'Featured', offLabel: 'Not featured' },
       { name: 'status', label: 'Status', type: 'toggle', default: true },
+      
     ],
   },
 
@@ -171,6 +178,12 @@ export const MODULES: Record<string, ModuleConfig> = {
       { name: 'image', label: 'Image', type: 'image', required: true },
       { name: 'status', label: 'Status', type: 'toggle', default: true },
       { name: 'faqs', label: 'Software FAQs (shown on Software Expertise page)', type: 'faqs', full: true },
+      SEO_SECTION,
+      { name: 'metaTitle', label: 'Meta Title', type: 'text', optional: true, maxLength: 255 },
+      { name: 'metaKeyword', label: 'Meta Keyword', type: 'text', optional: true, maxLength: 500 },
+      { name: 'metaDescription', label: 'Meta Description', type: 'textarea', optional: true, full: true },
+      { name: 'headScript', label: 'Head', type: 'code', optional: true, hint: 'Scripts / tags injected inside <head> of this software expertise page' },
+      { name: 'bodyScript', label: 'Body', type: 'code', optional: true, hint: 'Scripts injected at start of <body> of this software expertise page' },
     ],
   },
 

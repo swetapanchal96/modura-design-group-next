@@ -58,7 +58,7 @@ const Clients = ({ clients }: ClientsProps) => {
     }, [clients]);
 
     return (
-        <section className="bg-modura-white relative overflow-hidden py-14 lg:pb-0!">
+        <section className="bg-modura-white relative overflow-hidden pt-14 pb-7 lg:pb-0!">
             {/* TOP TECH LINE */}
 
             <div className="bg-modura-primary/10 absolute top-0 left-0 h-px w-full" />

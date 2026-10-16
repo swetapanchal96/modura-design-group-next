@@ -253,7 +253,7 @@ export default function IndustriesServe() {
                 relative
                 overflow-hidden
                 bg-modura-white
-                py-16
+                pb-14 pt-7
                 md:py-12
             "
         >

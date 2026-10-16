@@ -30,7 +30,7 @@ const AboutSection = () => {
                         LEFT SIDE — IMAGE COMPOSITION
                     ================================================== */}
 
-                    <div className="relative mx-auto h-[430px] w-full max-w-[650px] sm:h-[490px] lg:mx-0 lg:h-[500px] xl:h-[530px]">
+                    <div className="relative mx-auto h-[370px] w-full max-w-[650px] sm:h-[430px] lg:mx-0 lg:h-[500px] xl:h-[530px]">
                         {/* =============================================
                             SUBTLE TECHNICAL GRID
                         ============================================== */}
@@ -54,12 +54,14 @@ const AboutSection = () => {
                             MAIN / LEFT IMAGE
                         ============================================== */}
 
-                        <div className="group/about-one border-modura-white absolute top-[5%] left-[10%] z-20 h-[82%] w-[43%] overflow-hidden border-[4px] shadow-xl">
+                        <div className="group/about-one border-modura-white absolute top-[4%]
+                        left-[5%] z-20 h-[78%] w-[58%] overflow-hidden border-[4px] shadow-xl
+                        sm:top-[5%] sm:left-[8%] sm:h-[80%] sm:w-[50%] lg:top-[5%] lg:left-[10%] lg:h-[82%] lg:w-[43%]">
                             <Image
                                 src={about1}
                                 alt="Modern architecture project by Modura Design Group"
                                 fill
-                                sizes="(max-width: 1024px) 45vw, 320px"
+                                sizes="(max-width: 640px) 58vw, (max-width: 1024px) 45vw, 320px"
                                 className="object-cover transition-transform duration-700 group-hover/about-one:scale-[1.04]"
                             />
 
@@ -71,12 +73,14 @@ const AboutSection = () => {
                             TOP CENTER IMAGE
                         ============================================== */}
 
-                        <div className="group/about-two border-modura-white absolute top-[11%] left-[51%] z-30 h-[38%] w-[29%] overflow-hidden border-[4px] shadow-lg">
+                        <div className="group/about-two border-modura-white absolute top-[11%]
+                        left-[54%] z-30 h-[38%] w-[32%] overflow-hidden border-[4px] shadow-lg
+                        sm:top-[11%] sm:left-[51%] sm:h-[38%] sm:w-[29%] lg:top-[11%] lg:left-[51%] lg:h-[38%] lg:w-[29%]">
                             <Image
                                 src={about2}
                                 alt="Architectural landscape and exterior design"
                                 fill
-                                sizes="(max-width: 1024px) 30vw, 220px"
+                                sizes="(max-width: 640px) 32vw, (max-width: 1024px) 30vw, 220px"
                                 className="object-cover transition-transform duration-700 group-hover/about-two:scale-[1.05]"
                             />
                         </div>
@@ -86,12 +90,12 @@ const AboutSection = () => {
                             BOTTOM RIGHT IMAGE
                         ============================================== */}
 
-                        <div className="group/about-three border-modura-white absolute bottom-[5%] left-[48%] z-40 h-[47%] w-[45%] overflow-hidden border-[4px] shadow-xl">
+                        <div className="group/about-three border-modura-white absolute bottom-[5%] left-[43%] z-40 h-[44%] w-[53%] overflow-hidden border-[4px]shadow-xl sm:bottom-[5%] sm:left-[48%] sm:h-[47%] sm:w-[45%] lg:bottom-[5%] lg:left-[48%] lg:h-[47%] lg:w-[45%]">
                             <Image
                                 src={about3}
                                 alt="Modern commercial building and engineering project"
                                 fill
-                                sizes="(max-width: 1024px) 45vw, 340px"
+                                sizes="(max-width: 640px) 53vw, (max-width: 1024px) 45vw, 340px"
                                 className="object-cover transition-transform duration-700 group-hover/about-three:scale-[1.04]"
                             />
 

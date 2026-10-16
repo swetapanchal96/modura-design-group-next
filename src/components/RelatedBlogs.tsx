@@ -100,7 +100,7 @@ export default function RelatedBlogs({
         <section
             ref={sectionRef}
 
-            className="bg-modura-white relative overflow-hidden py-20"
+            className="bg-modura-white relative overflow-hidden py-10 md:py-20"
         >
             {/* blueprint */}
 
@@ -109,7 +109,7 @@ export default function RelatedBlogs({
             <div className="relative mx-auto max-w-[1300px] px-8">
                 {/* HEADER */}
 
-                <div className="blog-heading mb-14 flex items-end justify-between">
+                <div className="blog-heading mb-7 md:mb-14 flex items-end justify-between">
                     <div>
                         <div className="mb-2 flex items-center gap-3">
                             <span className="text-[14px] font-bold tracking-[0.35em] text-[#596a79]">
@@ -117,7 +117,7 @@ export default function RelatedBlogs({
                             </span>
                         </div>
 
-                        <h2 className="text-[48px] leading-none font-bold text-[#0b1d33] uppercase">
+                        <h2 className="text-[32px] md:text-[48px] leading-none font-bold text-[#0b1d33] uppercase">
                             Knowledge For
                             <span className="text-modura-secondary ml-2"> A Smarter Built World</span>
                         </h2>
@@ -130,7 +130,7 @@ export default function RelatedBlogs({
 
                 {/* BLOG GRID */}
 
-                <div className="grid grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {blogs.slice(0, 3).map((blog, index) => (
                         <article
                             key={blog.id}

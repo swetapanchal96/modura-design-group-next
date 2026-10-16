@@ -144,7 +144,7 @@ function InputField({
                     onChange={onChange}
                     placeholder={placeholder}
                     autoComplete="off"
-                    maxLength={name === 'phone' ? 10 : 50}
+                    maxLength={name === 'phone' ? 15 : 50}
                     inputMode={name === 'phone' ? 'numeric' : undefined}
                     className="
                         h-full
@@ -254,7 +254,7 @@ export default function InquiryClient() {
         let updatedValue = value;
 
         if (name === 'phone') {
-            updatedValue = value.replace(/\D/g, '').slice(0, 10);
+            updatedValue = value.replace(/\D/g, '').slice(0, 15);
         } else {
             updatedValue = value.slice(0, 50);
         }

@@ -73,7 +73,11 @@ function InputField({
     onChange,
     type = 'text',
     icon,
+    name,
+    error,
 }: {
+    name: keyof FormData;
+    error?: string;
     label: string;
     placeholder: string;
     value: string;
@@ -86,6 +90,7 @@ function InputField({
     return (
         <div className="group">
             <label
+                htmlFor={name}
                 className="
                     mb-2.5 block
                     text-[13px]
@@ -100,14 +105,14 @@ function InputField({
             </label>
 
             <div
-                className="
+                className={`
                     relative flex h-[60px]
-                    border border-modura-gray-200
+                    border ${error ? "border-red-500" : "border-modura-gray-200"}
                     bg-modura-white
                     transition-all duration-300
                     hover:border-modura-secondary
                     focus-within:border-modura-primary
-                "
+                `}
             >
                 <span
                     className="
@@ -123,10 +128,16 @@ function InputField({
                 </span>
 
                 <input
+                    id={name}
+                    name={name}
                     type={type}
                     value={value}
                     onChange={onChange}
                     placeholder={placeholder}
+                    maxLength={name === 'phone' ? 15 : 50}
+                    inputMode={name === 'phone' ? 'numeric' : undefined}
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? `${name}-error` : undefined}
                     className="
                         h-full w-full min-w-0
                         bg-transparent px-5
@@ -147,6 +158,11 @@ function InputField({
                     "
                 />
             </div>
+            {error && (
+                <p id={`${name}-error`} role="alert" className="mt-1.5 text-[12px] text-red-600">
+                    {error}
+                </p>
+            )}
         </div>
     );
 }
@@ -169,23 +185,56 @@ export default function ContactClient() {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState('');
+    const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
-    const updateField = (
-        field: keyof FormData,
-        value: string
-    ) => {
-        setFormData((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+    const updateField = (field: keyof FormData, value: string) => {
+        const updatedValue = field === 'phone'
+            ? value.replace(/\D/g, '').slice(0, 15)
+            : value.slice(0, 50);
+
+        setFormData((prev) => ({ ...prev, [field]: updatedValue }));
+        setErrors((prev) => ({ ...prev, [field]: undefined }));
+        setSubmitError('');
+    };
+
+    const validateForm = (): boolean => {
+        const nextErrors: Partial<Record<keyof FormData, string>> = {};
+        const fieldLabels: Record<keyof FormData, string> = {
+            name: 'Name',
+            email: 'Email',
+            company: 'Company name',
+            phone: 'Phone number',
+            natureOfProject: 'Nature of project',
+            description: 'Description',
+        };
+
+        (Object.keys(fieldLabels) as (keyof FormData)[]).forEach((field) => {
+            const value = formData[field].trim();
+            if (!value) {
+                nextErrors[field] = `${fieldLabels[field]} is required.`;
+            } else if (field !== 'phone' && value.length > 50) {
+                nextErrors[field] = `${fieldLabels[field]} cannot exceed 50 characters.`;
+            }
+        });
+
+        if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+            nextErrors.email = 'Enter a valid email address.';
+        }
+
+        if (formData.phone.trim() && !/^\d{10,15}$/.test(formData.phone.trim())) {
+            nextErrors.phone = 'Phone number must contain 10 to 15 digits only.';
+        }
+
+        setErrors(nextErrors);
+        return Object.keys(nextErrors).length === 0;
     };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         if (isSubmitting) return;
-
         setSubmitError('');
+        if (!validateForm()) return;
+
         setIsSubmitting(true);
 
         try {
@@ -197,11 +246,6 @@ export default function ContactClient() {
                 natureOfProject: formData.natureOfProject.trim(),
                 projectDetails: formData.description.trim(),
             };
-
-            if (Object.values(payload).some((value) => !value)) {
-                setSubmitError('Please fill in all required fields.');
-                return;
-            }
 
             const response = await axios.post(
                 `${apiUrl}/contactInquiry`,
@@ -341,6 +385,7 @@ export default function ContactClient() {
 
                             <form
                                 onSubmit={handleSubmit}
+                                noValidate
                                 className="space-y-6"
                             >
                                 {/* NAME + EMAIL */}
@@ -357,6 +402,8 @@ export default function ContactClient() {
                                         label="Name"
                                         placeholder="Your full name"
                                         value={formData.name}
+                                        name="name"
+                                        error={errors.name}
                                         onChange={(e) =>
                                             updateField(
                                                 'name',
@@ -373,6 +420,8 @@ export default function ContactClient() {
                                         type="email"
                                         placeholder="Your email address"
                                         value={formData.email}
+                                        name="email"
+                                        error={errors.email}
                                         onChange={(e) =>
                                             updateField(
                                                 'email',
@@ -399,6 +448,8 @@ export default function ContactClient() {
                                         label="Company Name"
                                         placeholder="Your company name"
                                         value={formData.company}
+                                        name="company"
+                                        error={errors.company}
                                         onChange={(e) =>
                                             updateField(
                                                 'company',
@@ -417,6 +468,8 @@ export default function ContactClient() {
                                         type="tel"
                                         placeholder="Your phone number"
                                         value={formData.phone}
+                                        name="phone"
+                                        error={errors.phone}
                                         onChange={(e) =>
                                             updateField(
                                                 'phone',
@@ -435,6 +488,8 @@ export default function ContactClient() {
                                     label="Nature Of Project"
                                     placeholder="Enter nature of project"
                                     value={formData.natureOfProject}
+                                    name="natureOfProject"
+                                    error={errors.natureOfProject}
                                     onChange={(e) =>
                                         updateField('natureOfProject', e.target.value)
                                     }
@@ -471,6 +526,11 @@ export default function ContactClient() {
                                         "
                                     >
                                         <textarea
+                                            id="description"
+                                            name="description"
+                                            maxLength={50}
+                                            aria-invalid={Boolean(errors.description)}
+                                            aria-describedby={errors.description ? "description-error" : undefined}
                                             rows={6}
                                             value={
                                                 formData.description
@@ -510,6 +570,11 @@ export default function ContactClient() {
                                             "
                                         />
                                     </div>
+                                    {errors.description && (
+                                        <p id="description-error" role="alert" className="mt-1.5 text-[12px] text-red-600">
+                                            {errors.description}
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* SUBMIT */}
@@ -1259,7 +1324,7 @@ export default function ContactClient() {
                 <div className="relative h-[480px] md:h-[560px]">
                     <iframe
                         title="Modura Design Group Location"
-                        src="https://www.google.com/maps?q=Ahmedabad%2C%20Gujarat%2C%20India&output=embed"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3443.3271756873573!2d-97.75741282539943!3d30.341650274775223!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8644cae2f96fffff%3A0x893fa7795b7d5f91!2sGenesis%20Business%20Solutions%20LLC%2C%205900%20Balcones%20Dr%20Suit%20100%2C%20Austin%2C%20TX%2078731%2C%20USA!5e0!3m2!1sen!2sin!4v1792126155403!5m2!1sen!2sin"
                         className="
                             absolute
                             inset-0
@@ -1281,65 +1346,6 @@ export default function ContactClient() {
                             bg-modura-primary/[0.08]
                         "
                     />
-
-                    {/* MAP LABEL */}
-
-                    <div
-                        className="
-                            absolute
-                            left-5
-                            top-5
-                            bg-modura-white
-                            px-5
-                            py-4
-                            shadow-[0_15px_40px_rgba(11,29,51,0.12)]
-
-                            md:left-8
-                            md:top-8
-                        "
-                    >
-                        <div className="flex items-center gap-3">
-                            <span
-                                className="
-                                    flex
-                                    h-9
-                                    w-9
-                                    items-center
-                                    justify-center
-                                    bg-modura-primary
-                                    text-modura-white
-                                "
-                            >
-                                <FiMapPin size={16} />
-                            </span>
-
-                            <div>
-                                <p
-                                    className="
-                                        text-[9px]
-                                        font-bold
-                                        uppercase
-                                        tracking-[0.28em]
-                                        text-modura-secondary
-                                    "
-                                >
-                                    FIND US
-                                </p>
-
-                                <p
-                                    className="
-                                        mt-1
-                                        text-[14px]
-                                        font-semibold
-                                        text-modura-primary
-                                    "
-                                >
-                                    Ahmedabad, Gujarat
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
 
                 </div>
             </section>
