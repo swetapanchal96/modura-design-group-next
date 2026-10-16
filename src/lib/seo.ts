@@ -296,3 +296,229 @@ export async function getBlogDetailSeo(
     return null;
   }
 }
+
+
+
+export interface ServiceDetailSeo {
+  id: number;
+  title: string;
+  slug: string;
+  shortDescription: string | null;
+  description: string | null;
+  metaTitle: string | null;
+  metaKeyword: string | null;
+  metaDescription: string | null;
+  headScript: string | null;
+  bodyScript: string | null;
+  imageUrl: string | null;
+}
+
+export async function getServiceDetailSeo(
+  slug: string
+): Promise<ServiceDetailSeo | null> {
+  if (!slug) return null;
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/serviceDetail`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ slug }),
+        next: {
+          revalidate: 60,
+          tags: [`service-seo-${slug}`],
+        },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const result = await response.json();
+
+    if (
+      result.success !== true ||
+      !result.data ||
+      result.data.slug !== slug
+    ) {
+      return null;
+    }
+
+    return result.data as ServiceDetailSeo;
+  } catch (error) {
+    console.error(
+      `Service Detail SEO Error (${slug}):`,
+      error
+    );
+    return null;
+  }
+}
+
+
+
+export interface SoftwareExpertiseSeo {
+  id: number;
+  name: string;
+  slug: string;
+  shortDescription: string | null;
+  longDescription: string | null;
+  metaTitle: string | null;
+  metaKeyword: string | null;
+  metaDescription: string | null;
+  headScript: string | null;
+  bodyScript: string | null;
+  imageUrl: string | null;
+}
+
+export async function getSoftwareExpertiseSeo(
+  slug: string
+): Promise<SoftwareExpertiseSeo | null> {
+  if (!slug) return null;
+
+  try {
+    const response = await fetch(
+      `${API_BASE}/softwareExpertise`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ slug }),
+
+        next: {
+          revalidate: 60,
+          tags: [`software-seo-${slug}`],
+        },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const result = await response.json();
+
+    if (
+      result.success !== true ||
+      !result.data
+    ) {
+      return null;
+    }
+
+    // API may return an array or a single object
+    const data = result.data;
+
+    const software: SoftwareExpertiseSeo | null =
+      Array.isArray(data)
+        ? data.find(
+            (item: SoftwareExpertiseSeo) =>
+              item.slug === slug
+          ) ?? null
+        : data.slug === slug
+          ? data
+          : null;
+
+    return software;
+  } catch (error) {
+    console.error(
+      `Software Expertise SEO Error (${slug}):`,
+      error
+    );
+
+    return null;
+  }
+}
+
+
+
+
+export interface PortfolioCategorySeo {
+  id: number;
+  name: string;
+  slug: string;
+  metaTitle: string | null;
+  metaKeyword: string | null;
+  metaDescription: string | null;
+  headScript: string | null;
+  bodyScript: string | null;
+}
+
+interface PortfolioSeoItem {
+  id: number;
+  coverUrl?: string | null;
+  category: PortfolioCategorySeo | null;
+}
+
+interface PortfolioSeoResponse {
+  success: boolean;
+  data?: {
+    items?: PortfolioSeoItem[];
+  };
+}
+
+export interface PortfolioSeoResult {
+  category: PortfolioCategorySeo;
+  imageUrl: string | null;
+}
+
+export async function getPortfolioCategorySeo(
+  slug: string
+): Promise<PortfolioSeoResult | null> {
+  if (!slug) return null;
+
+  const types: Array<"3d" | "2d"> = ["3d", "2d"];
+
+  for (const type of types) {
+    try {
+      const response = await fetch(
+        `${API_BASE}/portfolios`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            category: slug,
+            type,
+          }),
+          next: {
+            revalidate: 60,
+            tags: [`portfolio-seo-${slug}`],
+          },
+        }
+      );
+
+      if (!response.ok) continue;
+
+      const result =
+        (await response.json()) as PortfolioSeoResponse;
+
+      if (!result.success) continue;
+
+      const items = result.data?.items;
+
+      if (!Array.isArray(items)) continue;
+
+      // SEO must come from the category object
+      const selectedItem = items.find(
+        (item) =>
+          item.category &&
+          item.category.slug === slug
+      );
+
+      if (selectedItem?.category) {
+        return {
+          category: selectedItem.category,
+          imageUrl: selectedItem.coverUrl ?? null,
+        };
+      }
+    } catch (error) {
+      console.error(
+        `Portfolio SEO API Error (${slug}, ${type}):`,
+        error
+      );
+    }
+  }
+
+  return null;
+}

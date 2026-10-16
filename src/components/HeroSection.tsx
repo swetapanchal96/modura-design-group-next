@@ -72,7 +72,7 @@ const HeroSection = () => {
                     el: '.modura-hero-pagination',
                     clickable: true,
                 }}
-                className="relative h-[650px] w-full sm:h-[680px] lg:h-[calc(100vh-170px)] lg:max-h-[820px] lg:min-h-[650px]"
+                className="relative h-[410px] w-full sm:h-[680px] lg:h-[calc(100vh-170px)] lg:max-h-[820px] lg:min-h-[650px]"
             >
                 {/* ========================================
                     SLIDES
@@ -172,7 +172,7 @@ const HeroSection = () => {
 
                                     {/* TITLE */}
 
-                                    <h1 className="text-modura-white text-[42px] leading-[1.06] font-bold tracking-[-0.035em] sm:text-[52px] lg:text-[60px] xl:text-[68px]">
+                                    <h1 className="text-modura-white text-[35px] leading-[1.06] font-bold tracking-[-0.035em] sm:text-[52px] lg:text-[60px] xl:text-[68px]">
                                         <span className="block">{slide.title}</span>
 
                                         <span className="block">{slide.titleSecond}</span>

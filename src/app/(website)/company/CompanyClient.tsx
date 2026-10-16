@@ -377,7 +377,7 @@ export default function CompanyClient() {
                                     LEFT SIDE — IMAGE COMPOSITION
                                 ================================================== */}
 
-                        <div className="relative mx-auto h-[430px] w-full max-w-[650px] sm:h-[490px] lg:mx-0 lg:h-[500px] xl:h-[530px]">
+                        <div className="relative mx-auto h-[370px] w-full max-w-[650px] sm:h-[490px] lg:mx-0 lg:h-[500px] xl:h-[530px]">
                             {/* =============================================
                                         SUBTLE TECHNICAL GRID
                                     ============================================== */}
@@ -401,12 +401,14 @@ export default function CompanyClient() {
                                         MAIN / LEFT IMAGE
                                     ============================================== */}
 
-                            <div className="group/about-one border-modura-white absolute top-[5%] left-[10%] z-20 h-[82%] w-[43%] overflow-hidden border-[4px] shadow-xl">
+                            <div className="group/about-one border-modura-white absolute top-[4%]
+                        left-[5%] z-20 h-[78%] w-[58%] overflow-hidden border-[4px] shadow-xl
+                        sm:top-[5%] sm:left-[8%] sm:h-[80%] sm:w-[50%] lg:top-[5%] lg:left-[10%] lg:h-[82%] lg:w-[43%]">
                                 <Image
                                     src={about1}
                                     alt="Modern architecture project by Modura Design Group"
                                     fill
-                                    sizes="(max-width: 1024px) 45vw, 320px"
+                                    sizes="(max-width: 640px) 58vw, (max-width: 1024px) 45vw, 320px"
                                     className="object-cover transition-transform duration-700 group-hover/about-one:scale-[1.04]"
                                 />
 
@@ -418,12 +420,14 @@ export default function CompanyClient() {
                                         TOP CENTER IMAGE
                                     ============================================== */}
 
-                            <div className="group/about-two border-modura-white absolute top-[11%] left-[51%] z-30 h-[38%] w-[29%] overflow-hidden border-[4px] shadow-lg">
+                            <div className="group/about-two border-modura-white absolute top-[11%]
+                        left-[54%] z-30 h-[38%] w-[32%] overflow-hidden border-[4px] shadow-lg
+                        sm:top-[11%] sm:left-[51%] sm:h-[38%] sm:w-[29%] lg:top-[11%] lg:left-[51%] lg:h-[38%] lg:w-[29%]">
                                 <Image
                                     src={about2}
                                     alt="Architectural landscape and exterior design"
                                     fill
-                                    sizes="(max-width: 1024px) 30vw, 220px"
+                                    sizes="(max-width: 640px) 32vw, (max-width: 1024px) 30vw, 220px"
                                     className="object-cover transition-transform duration-700 group-hover/about-two:scale-[1.05]"
                                 />
                             </div>
@@ -433,12 +437,12 @@ export default function CompanyClient() {
                                         BOTTOM RIGHT IMAGE
                                     ============================================== */}
 
-                            <div className="group/about-three border-modura-white absolute bottom-[5%] left-[48%] z-40 h-[47%] w-[45%] overflow-hidden border-[4px] shadow-xl">
+                            <div className="group/about-three border-modura-white absolute bottom-[5%] left-[43%] z-40 h-[44%] w-[53%] overflow-hidden border-[4px]shadow-xl sm:bottom-[5%] sm:left-[48%] sm:h-[47%] sm:w-[45%] lg:bottom-[5%] lg:left-[48%] lg:h-[47%] lg:w-[45%]">
                                 <Image
                                     src={about3}
                                     alt="Modern commercial building and engineering project"
                                     fill
-                                    sizes="(max-width: 1024px) 45vw, 340px"
+                                    sizes="(max-width: 640px) 53vw, (max-width: 1024px) 45vw, 340px"
                                     className="object-cover transition-transform duration-700 group-hover/about-three:scale-[1.04]"
                                 />
 
@@ -911,6 +915,7 @@ export default function CompanyClient() {
                             className="
                                     group
                                     relative
+                                    
                                     min-h-[400px]
                                     overflow-hidden
                                     rounded-[10px]
@@ -1190,8 +1195,8 @@ export default function CompanyClient() {
                                 <h3
                                     className="
                                             mt-4
-                                            max-w-[500px]
-                                            text-[30px]
+                                            min-w-[520px]
+                                            text-[23px]
                                             leading-[1.08]
                                             font-bold
                                             tracking-[-0.035em]
@@ -1559,14 +1564,15 @@ export default function CompanyClient() {
 
                                 <h3
                                     className="
-                                            mt-4
+                                            mt-3
+                                            md:mt-4
                                             min-w-[520px]
-                                            text-[30px]
+                                            text-[23px]!
                                             leading-[1.08]
                                             font-bold
                                             tracking-[-0.035em]
                                             text-modura-primary
-                                            md:text-[36px]
+                                            md:text-[36px]!
                                         "
                                 >
                                     Designing with precision.
@@ -2447,9 +2453,12 @@ export default function CompanyClient() {
                                             <div
                                                 className="
                                                                     relative
-                                                                    aspect-[0.78]
+                                                                    aspect-[0.9]
                                                                     overflow-hidden
                                                                     bg-modura-gray-200
+
+                                                                    sm:aspect-[0.82]
+                                                                    lg:aspect-[0.78]
                                                                 "
                                             >
                                                 {member.photoUrl && (
@@ -2464,6 +2473,7 @@ export default function CompanyClient() {
                                                         "
                                                     className="
                                                         object-cover
+                                                        object-top
                                                         transition-transform
                                                         duration-700
                                                         ease-out
@@ -2621,247 +2631,330 @@ export default function CompanyClient() {
                 </div>
 
                 {/* =================================================
-                    TEAM MEMBER POPUP
-                ================================================= */}
+                        TEAM MEMBER POPUP
+                    ================================================= */}
 
-                {selectedMember && (
-                    <div
-                        className="
-                            fixed
-                            inset-0
-                            z-[9999]
-                            flex
-                            items-center
-                            justify-center
-                            bg-modura-primary/80
-                            p-5
-                            backdrop-blur-[3px]
-                            md:p-8
-                        "
-                        onClick={() => setSelectedMember(null)}
-                    >
+                    {selectedMember && (
                         <div
                             className="
-                                relative
+                                fixed
+                                inset-0
+                                z-[9999]
                                 flex
-                                min-h-[90vh]
-                                w-full
-                                max-w-[1050px]
-                                flex-col
-                                overflow-hidden
-                                bg-modura-white
-                                shadow-2xl
-                                md:flex-row
+                                items-center
+                                justify-center
+                                bg-modura-primary/80
+                                p-3
+                                backdrop-blur-[3px]
+
+                                sm:p-5
+                                md:p-8
                             "
-                            onClick={(event) =>
-                                event.stopPropagation()
-                            }
+                            onClick={() => setSelectedMember(null)}
                         >
-                            {/* CLOSE */}
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setSelectedMember(null)
-                                }
-                                aria-label="Close team member profile"
-                                className="
-                                    group
-                                    absolute
-                                    top-4
-                                    right-4
-                                    z-30
-                                    flex
-                                    h-11
-                                    w-11
-                                    items-center
-                                    justify-center
-                                    bg-modura-primary
-                                    text-modura-white
-                                    transition-colors
-                                    duration-300
-                                    hover:bg-modura-secondary
-                                "
-                            >
-                                <FiX
-                                    size={20}
-                                    className="
-                                        transition-transform
-                                        duration-300
-                                        group-hover:rotate-90
-                                    "
-                                />
-                            </button>
-
-                            {/* POPUP IMAGE */}
+                            {/* =================================================
+                                POPUP BOX
+                            ================================================= */}
 
                             <div
                                 className="
                                     relative
-                                    h-[320px]
-                                    shrink-0
-                                    bg-modura-gray-200
-                                    md:h-auto
-                                    md:w-[42%]
-                                "
-                            >
-                                {selectedMember.photoUrl && (
-                                <Image
-                                    src={selectedMember.photoUrl}
-                                    alt={`${selectedMember.name} - ${selectedMember.designation}`}
-                                    fill
-                                    sizes="
-                                        (max-width: 768px) 100vw,
-                                        42vw
-                                    "
-                                    className="object-cover"
-                                />
-                                )}
-                            </div>
-
-                            {/* POPUP CONTENT */}
-
-                            <div
-                                className="
                                     flex
+                                    h-[calc(100dvh-24px)]
+                                    w-full
+                                    max-w-[1050px]
                                     min-h-0
-                                    flex-1
                                     flex-col
-                                    overflow-y-auto
-                                    p-7
-                                    md:p-10
-                                    lg:p-12
+                                    overflow-hidden
+                                    bg-modura-white
+                                    shadow-2xl
+
+                                    sm:h-[calc(100dvh-40px)]
+
+                                    md:h-[90vh]
+                                    md:max-h-[900px]
+                                    md:min-h-0
+                                    md:flex-row
                                 "
+                                onClick={(event) => event.stopPropagation()}
                             >
-                                {/* LABEL */}
+
+                                {/* =================================================
+                                    CLOSE BUTTON
+                                ================================================= */}
+
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedMember(null)}
+                                    aria-label="Close team member profile"
+                                    className="
+                                        group
+                                        absolute
+                                        top-3
+                                        right-3
+                                        z-[50]
+                                        flex
+                                        h-10
+                                        w-10
+                                        items-center
+                                        justify-center
+                                        bg-modura-primary
+                                        text-modura-white
+                                        transition-colors
+                                        duration-300
+                                        hover:bg-modura-secondary
+
+                                        sm:top-4
+                                        sm:right-4
+                                        sm:h-11
+                                        sm:w-11
+                                    "
+                                >
+                                    <FiX
+                                        size={20}
+                                        className="
+                                            transition-transform
+                                            duration-300
+                                            group-hover:rotate-90
+                                        "
+                                    />
+                                </button>
+
+                                {/* =================================================
+                                    POPUP IMAGE
+                                ================================================= */}
 
                                 <div
                                     className="
-                                        mb-3
-                                        flex
-                                        items-center
-                                        gap-3
+                                        relative
+                                        h-[180px]
+                                        w-full
+                                        shrink-0
+                                        overflow-hidden
+                                        bg-modura-gray-200
+
+                                        sm:h-[220px]
+
+                                        md:h-full
+                                        md:w-[42%]
                                     "
                                 >
+                                    {selectedMember.photoUrl && (
+                                        <Image
+                                            src={selectedMember.photoUrl}
+                                            alt={`${selectedMember.name} - ${selectedMember.designation}`}
+                                            fill
+                                            priority
+                                            sizes="
+                                                (max-width: 767px) 100vw,
+                                                42vw
+                                            "
+                                            className="
+                                                object-contain
+                                                object-center
 
-
-                                    <span
-                                        className="
-                                            text-[13px]
-                                            font-bold
-                                            tracking-[0.3em]
-                                            text-modura-secondary
-                                            uppercase
-                                        "
-                                    >
-                                        Our People
-                                    </span>
+                                                md:object-cover
+                                                md:object-top
+                                            "
+                                        />
+                                    )}
                                 </div>
 
-                                {/* NAME */}
+                                {/* =================================================
+                                    POPUP CONTENT
+                                ================================================= */}
 
-                                <h2
+                                <div
                                     className="
-                                        text-[34px]
-                                        leading-[1]
-                                        font-bold
-                                        tracking-[-0.035em]
-                                        text-modura-primary
-                                        uppercase
-                                        md:text-[44px]
+                                        min-h-0
+                                        flex-1
+                                        overflow-y-auto
+                                        overscroll-contain
+                                        p-5
+
+                                        sm:p-7
+
+                                        md:p-10
+                                        lg:p-12
                                     "
                                 >
-                                    {selectedMember.name}
-                                </h2>
 
-                                {/* DESIGNATION */}
+                                    {/* =================================================
+                                        LABEL
+                                    ================================================= */}
 
-                                <p
-                                    className="
-                                        mt-3
-                                        text-[12px]
-                                        font-bold
-                                        tracking-[0.18em]
-                                        text-modura-secondary
-                                        uppercase
-                                    "
-                                >
-                                    {selectedMember.designation}
-                                </p>
-
-                                {/* DIVIDER */}
-
-                                <div className="my-4 flex items-center">
-                                    <span
-                                        className="
-                                            h-[3px]
-                                            w-12
-                                            bg-modura-primary
-                                        "
-                                    />
-
-                                    <span
-                                        className="
-                                            h-px
-                                            w-20
-                                            bg-modura-gray-300
-                                        "
-                                    />
-                                </div>
-
-                                {/* DESCRIPTION */}
-
-                                <p
-                                    className="
-                                        max-w-[650px]
-                                        text-[14px]
-                                        leading-7
-                                        text-modura-gray-600
-                                        md:text-[16px]
-                                    "
-                                >
-                                    {selectedMember.bio}
-                                </p>
-
-                                {/* BOTTOM */}
-
-                                <div className="mt-auto pt-10">
                                     <div
                                         className="
+                                            mb-3
                                             flex
                                             items-center
-                                            justify-between
-                                            border-t
-                                            border-modura-gray-200
-                                            pt-4
+                                            gap-3
                                         "
                                     >
                                         <span
                                             className="
-                                                text-[12px]
+                                                text-[11px]
                                                 font-bold
-                                                tracking-[0.3em]
-                                                text-modura-gray-400
+                                                tracking-[0.25em]
+                                                text-modura-secondary
                                                 uppercase
+
+                                                sm:text-[13px]
+                                                sm:tracking-[0.3em]
                                             "
                                         >
-                                            Modura Design Group
+                                            Our People
                                         </span>
+                                    </div>
+
+                                    {/* =================================================
+                                        NAME
+                                    ================================================= */}
+
+                                    <h2
+                                        className="
+                                            max-w-full
+                                            break-words
+                                            text-[28px]
+                                            leading-[1.05]
+                                            font-bold
+                                            tracking-[-0.035em]
+                                            text-modura-primary
+                                            uppercase
+
+                                            sm:text-[34px]
+
+                                            md:text-[44px]
+                                        "
+                                    >
+                                        {selectedMember.name}
+                                    </h2>
+
+                                    {/* =================================================
+                                        DESIGNATION
+                                    ================================================= */}
+
+                                    <p
+                                        className="
+                                            mt-3
+                                            max-w-full
+                                            break-words
+                                            text-[10px]
+                                            leading-5
+                                            font-bold
+                                            tracking-[0.14em]
+                                            text-modura-secondary
+                                            uppercase
+
+                                            sm:text-[12px]
+                                            sm:tracking-[0.18em]
+                                        "
+                                    >
+                                        {selectedMember.designation}
+                                    </p>
+
+                                    {/* =================================================
+                                        DIVIDER
+                                    ================================================= */}
+
+                                    <div className="my-4 flex items-center">
+                                        <span
+                                            className="
+                                                h-[3px]
+                                                w-10
+                                                shrink-0
+                                                bg-modura-primary
+
+                                                sm:w-12
+                                            "
+                                        />
 
                                         <span
                                             className="
-                                                h-[7px]
-                                                w-[7px]
-                                                rotate-45
-                                                bg-modura-secondary
+                                                h-px
+                                                w-16
+                                                bg-modura-gray-300
+
+                                                sm:w-20
                                             "
                                         />
                                     </div>
+
+                                    {/* =================================================
+                                        DESCRIPTION
+                                    ================================================= */}
+
+                                    <p
+                                        className="
+                                            max-w-[650px]
+                                            break-words
+                                            text-[14px]
+                                            leading-7
+                                            text-modura-gray-600
+
+                                            sm:text-[15px]
+
+                                            md:text-[16px]
+                                        "
+                                    >
+                                        {selectedMember.bio}
+                                    </p>
+
+                                    {/* =================================================
+                                        BOTTOM
+                                    ================================================= */}
+
+                                    <div
+                                        className="
+                                            mt-8
+                                            pt-6
+
+                                            md:mt-10
+                                            md:pt-10
+                                        "
+                                    >
+                                        <div
+                                            className="
+                                                flex
+                                                items-center
+                                                justify-between
+                                                gap-4
+                                                border-t
+                                                border-modura-gray-200
+                                                pt-4
+                                            "
+                                        >
+                                            <span
+                                                className="
+                                                    text-[9px]
+                                                    font-bold
+                                                    tracking-[0.2em]
+                                                    text-modura-gray-400
+                                                    uppercase
+
+                                                    sm:text-[12px]
+                                                    sm:tracking-[0.3em]
+                                                "
+                                            >
+                                                Modura Design Group
+                                            </span>
+
+                                            <span
+                                                className="
+                                                    h-[7px]
+                                                    w-[7px]
+                                                    shrink-0
+                                                    rotate-45
+                                                    bg-modura-secondary
+                                                "
+                                            />
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
 
             </section>
@@ -3047,7 +3140,8 @@ export default function CompanyClient() {
                             <h2
                                 className="
                                     text-[48px]
-                                    leading-[0.86]
+                                    
+                                    leading-[0.96]
                                     font-bold
                                     tracking-[-0.055em]
                                     text-modura-primary
@@ -4452,7 +4546,7 @@ export default function CompanyClient() {
                             className="
                                 relative
                                 flex
-                                min-h-[520px]
+                                min-h-[180px]
                                 flex-col
                                 justify-between
                                 lg:min-h-[560px]
@@ -4539,11 +4633,11 @@ export default function CompanyClient() {
                                     pointer-events-none
                                     relative
                                     mt-12
-                                    hidden
+                                    hidden!
                                     h-[190px]
                                     w-full
                                     overflow-hidden
-                                    lg:block
+                                    lg:block!
                                 "
                             >
 
@@ -4657,9 +4751,10 @@ export default function CompanyClient() {
 
                         <div
                             className="
-                                h-[520px]
-                                overflow-hidden
-                                lg:h-[560px]
+                                h-auto
+                                overflow-visible
+                                lg:h-140
+                                lg:overflow-hidden
                             "
                         >
 
@@ -4669,11 +4764,15 @@ export default function CompanyClient() {
 
                             <div
                                 className="
-                                    h-full
-                                    overflow-y-auto
-                                    pr-1
+                                    h-auto
+                                    overflow-visible
+                                    pr-0
 
-                                    [scrollbar-width:none]
+                                    lg:h-full
+                                    lg:overflow-y-auto
+                                    lg:pr-1
+
+                                    scrollbar-none
                                     [&::-webkit-scrollbar]:hidden
                                 "
                             >

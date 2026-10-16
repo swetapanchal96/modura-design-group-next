@@ -35,7 +35,7 @@ const InquiryDrawer = () => {
 
         const updatedValue =
             name === 'phone'
-                ? value.replace(/\D/g, '').slice(0, 10)
+                ? value.replace(/\D/g, '').slice(0, 15)
                 : name === 'description'
                     ? value.slice(0, 1000)
                     : value.slice(0, 50);
@@ -74,10 +74,10 @@ const InquiryDrawer = () => {
             return;
         }
 
-        if (!/^\d{10}$/.test(payload.phone)) {
-            setSubmitError('Phone number must contain exactly 10 digits.');
-            return;
-        }
+        // if (!/^\d{10}$/.test(payload.phone)) {
+        //     setSubmitError('Phone number must contain 10 digits.');
+        //     return;
+        // }
 
         setIsSubmitting(true);
 
@@ -402,7 +402,7 @@ const InquiryDrawer = () => {
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleInputChange}
-                                maxLength={10}
+                                maxLength={15}
                                 inputMode="numeric"
                                 placeholder="Phone Number"
 

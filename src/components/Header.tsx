@@ -1493,7 +1493,7 @@ export default function Header() {
                     {/* MOBILE CTA */}
 
                     <Link
-                        href="#"
+                        href="/contact"
                         onClick={() => setMobileMenu(false)}
                         className="bg-modura-primary text-modura-white mt-5 flex h-[52px] items-center justify-between px-5 text-[12px] font-bold tracking-[0.08em] uppercase"
                     >
