@@ -113,7 +113,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             <strong className="text-primary">{titleFor(pathname)}</strong>
           </div>
           <div className="flex items-center gap-3">
-            <a href="/" target="_blank" rel="noreferrer" className="hidden text-xs text-secondary hover:underline sm:inline">View website ↗</a>
+            {/* <a href="/" target="_blank" rel="noreferrer" className="hidden text-xs text-secondary hover:underline sm:inline">View website ↗</a> */}
             <div className="relative" ref={profileRef}>
               <button type="button" className="flex items-center gap-2 text-primary" onClick={() => setProfileOpen((v) => !v)}>
                 <span className="flex size-[34px] items-center justify-center rounded-full bg-primary text-xs font-bold text-white">{initials}</span>
